@@ -2,6 +2,11 @@ export function cn(...parts: Array<string | false | null | undefined>) {
   return parts.filter(Boolean).join(" ");
 }
 
+/** Quita acentos conservando el texto. "Añejo" queda "Anejo". */
+export function deaccent(input: string): string {
+  return input.normalize("NFD").replace(/[̀-ͯ]/g, "");
+}
+
 /** URL-safe slug. Strips accents so "Producción Aérea" becomes "produccion-aerea". */
 export function slugify(input: string): string {
   return input

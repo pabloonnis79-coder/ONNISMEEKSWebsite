@@ -1,8 +1,20 @@
 -- ONNIS & MEEKS - esquema base
 -- Ejecutar en Supabase > SQL Editor. Es idempotente.
 
-create extension if not exists "pgcrypto";
-create extension if not exists "unaccent";
+create schema if not exists extensions;
+create extension if not exists pgcrypto with schema extensions;
+create extension if not exists unaccent with schema extensions;
+
+-- unaccent() es STABLE y una columna generada exige una funcion IMMUTABLE.
+-- La version de dos argumentos fija el diccionario, asi que envolverla es seguro.
+create or replace function public.om_unaccent(text)
+returns text
+language sql
+immutable
+parallel safe
+as $$
+  select extensions.unaccent('extensions.unaccent'::regdictionary, $1)
+$$;
 
 -- ---------------------------------------------------------------- clientes --
 create table if not exists public.clients (
@@ -88,7 +100,7 @@ alter table public.projects
   generated always as (
     to_tsvector(
       'spanish',
-      unaccent(
+      public.om_unaccent(
         coalesce(title, '') || ' ' ||
         coalesce(project_name, '') || ' ' ||
         coalesce(client_name, '') || ' ' ||

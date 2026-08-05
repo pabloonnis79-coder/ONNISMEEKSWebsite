@@ -3,7 +3,7 @@ import "server-only";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
 import { demoClients, demoProjects } from "@/lib/demo";
 import type { Client, Project, ProjectFilters } from "@/lib/types";
-import { youtubeThumb } from "@/lib/utils";
+import { deaccent, youtubeThumb } from "@/lib/utils";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -66,7 +66,7 @@ function matchesInMemory(p: Project, f: ProjectFilters): boolean {
   if (f.category && p.category !== f.category) return false;
   if (f.service && !p.services.includes(f.service)) return false;
   if (f.q) {
-    const haystack = [
+    const haystack = deaccent([
       p.title,
       p.clientName,
       p.projectName,
@@ -79,8 +79,8 @@ function matchesInMemory(p: Project, f: ProjectFilters): boolean {
       String(p.year ?? ""),
     ]
       .join(" ")
-      .toLowerCase();
-    if (!haystack.includes(f.q.toLowerCase())) return false;
+      .toLowerCase());
+    if (!haystack.includes(deaccent(f.q.toLowerCase()))) return false;
   }
   return true;
 }
@@ -107,7 +107,9 @@ export async function getProjects(
   if (filters.year) query = query.eq("year", filters.year);
   if (filters.category) query = query.eq("category", filters.category);
   if (filters.service) query = query.contains("services", [filters.service]);
-  if (filters.q) query = query.textSearch("search_tsv", filters.q, {
+  // El indice guarda los lexemas sin acentos, asi que la consulta tambien va
+  // sin acentos. Sin esto, buscar "anejo" no encontraria "Anejo Siete".
+  if (filters.q) query = query.textSearch("search_tsv", deaccent(filters.q), {
     type: "websearch",
     config: "spanish",
   });
