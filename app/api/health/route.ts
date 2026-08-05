@@ -41,12 +41,20 @@ async function checkSupabase(): Promise<Check[]> {
   const checks: Check[] = [];
 
   for (const tabla of TABLAS) {
-    const { error } = await supabase.from(tabla).select("*", { count: "exact", head: true });
+    // Un select real, no head: con `head: true` una tabla inexistente vuelve
+    // sin objeto de error y el chequeo daba un falso positivo.
+    const { error, count } = await supabase
+      .from(tabla)
+      .select("id", { count: "exact" })
+      .limit(1);
+
     checks.push({
       nombre: `tabla ${tabla}`,
       configurado: true,
       ok: !error,
-      detalle: error ? error.message : "responde",
+      detalle: error
+        ? `${error.code ?? "error"}: ${error.message}`
+        : `responde, ${count ?? 0} filas`,
     });
   }
 
