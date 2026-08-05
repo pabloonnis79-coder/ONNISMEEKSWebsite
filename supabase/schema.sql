@@ -5,16 +5,7 @@ create schema if not exists extensions;
 create extension if not exists pgcrypto with schema extensions;
 create extension if not exists unaccent with schema extensions;
 
--- unaccent() es STABLE y una columna generada exige una funcion IMMUTABLE.
--- La version de dos argumentos fija el diccionario, asi que envolverla es seguro.
-create or replace function public.om_unaccent(text)
-returns text
-language sql
-immutable
-parallel safe
-as $$
-  select extensions.unaccent('extensions.unaccent'::regdictionary, $1)
-$$;
+drop function if exists public.om_unaccent(text);
 
 -- ---------------------------------------------------------------- clientes --
 create table if not exists public.clients (
@@ -93,27 +84,41 @@ create index if not exists projects_client_idx on public.projects (client_slug);
 create index if not exists projects_year_idx   on public.projects (year);
 
 -- Busqueda full text en espanol, sin acentos.
-alter table public.projects
-  drop column if exists search_tsv;
-alter table public.projects
-  add column search_tsv tsvector
-  generated always as (
-    to_tsvector(
-      'spanish',
-      public.om_unaccent(
-        coalesce(title, '') || ' ' ||
-        coalesce(project_name, '') || ' ' ||
-        coalesce(client_name, '') || ' ' ||
-        coalesce(category, '') || ' ' ||
-        coalesce(location, '') || ' ' ||
-        coalesce(story, '') || ' ' ||
-        coalesce(array_to_string(services, ' '), '') || ' ' ||
-        coalesce(array_to_string(tags, ' '), '') || ' ' ||
-        coalesce(array_to_string(keywords, ' '), '') || ' ' ||
-        coalesce(year::text, '')
-      )
+-- Se mantiene con un trigger y no con una columna generada: unaccent() es
+-- STABLE y Postgres exige IMMUTABLE en la expresion de una columna generada.
+alter table public.projects drop column if exists search_tsv;
+alter table public.projects add column if not exists search_tsv tsvector;
+
+create or replace function public.projects_search_refresh()
+returns trigger
+language plpgsql
+set search_path = public, extensions, pg_catalog
+as $$
+begin
+  new.search_tsv := to_tsvector(
+    'spanish',
+    unaccent(
+      coalesce(new.title, '') || ' ' ||
+      coalesce(new.project_name, '') || ' ' ||
+      coalesce(new.client_name, '') || ' ' ||
+      coalesce(new.category, '') || ' ' ||
+      coalesce(new.location, '') || ' ' ||
+      coalesce(new.story, '') || ' ' ||
+      coalesce(array_to_string(new.services, ' '), '') || ' ' ||
+      coalesce(array_to_string(new.tags, ' '), '') || ' ' ||
+      coalesce(array_to_string(new.keywords, ' '), '') || ' ' ||
+      coalesce(new.year::text, '')
     )
-  ) stored;
+  );
+  return new;
+end $$;
+
+drop trigger if exists projects_search on public.projects;
+create trigger projects_search before insert or update on public.projects
+  for each row execute function public.projects_search_refresh();
+
+-- Recalcula lo que ya estuviera cargado.
+update public.projects set updated_at = updated_at;
 
 create index if not exists projects_search_idx on public.projects using gin (search_tsv);
 
