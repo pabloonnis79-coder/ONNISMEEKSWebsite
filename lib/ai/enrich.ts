@@ -91,12 +91,30 @@ export function isAiConfigured(): boolean {
   return Boolean(process.env.GROQ_API_KEY);
 }
 
+/**
+ * Sin historia, cliente ni servicios no hay nada que redactar. Si igual se le
+ * pide texto, el modelo escribe "sin informacion disponible" y esa frase
+ * termina publicada como meta description. Mejor el respaldo, que solo repite
+ * el titulo, y de paso no se gasta cuota.
+ */
+function hasEnoughContext(parsed: ParsedDescription): boolean {
+  const story = (parsed.story ?? "").trim();
+  const results = (parsed.results ?? "").trim();
+
+  return (
+    story.length >= 40 ||
+    results.length >= 40 ||
+    (Boolean(parsed.clientName) && parsed.services.length > 0)
+  );
+}
+
 export async function enrichProject(
   parsed: ParsedDescription,
   title: string,
   brand = "ONNIS & MEEKS",
 ): Promise<Enrichment> {
   if (!process.env.GROQ_API_KEY) return fallback(parsed, title, brand);
+  if (!hasEnoughContext(parsed)) return fallback(parsed, title, brand);
 
   const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
