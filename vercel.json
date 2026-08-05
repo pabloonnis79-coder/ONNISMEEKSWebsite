@@ -2,8 +2,9 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "crons": [
     {
+      "comment": "El plan Hobby solo admite crons diarios. La actualizacion inmediata la da el webhook de YouTube; esto es la red de seguridad. 11:00 UTC son las 08:00 en Argentina.",
       "path": "/api/sync",
-      "schedule": "0 6,18 * * *"
+      "schedule": "0 11 * * *"
     }
   ]
 }

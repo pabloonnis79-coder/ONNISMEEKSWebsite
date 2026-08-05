@@ -4,7 +4,13 @@ import { runSync } from "@/lib/youtube/sync";
 import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
-export const maxDuration = 300;
+/**
+ * Tope del plan Hobby de Vercel. Alcanza de sobra: las corridas normales
+ * saltan los videos cuyo hash no cambio y no llaman a la IA. Si algun dia el
+ * canal crece y una corrida completa se pasa de tiempo, hay que paginarla o
+ * subir de plan.
+ */
+export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
 /** Autoriza al cron de Vercel por secreto, o a un admin logueado. */
