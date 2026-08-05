@@ -18,6 +18,16 @@ function apiKey(): string {
   return key;
 }
 
+class YouTubeError extends Error {
+  constructor(
+    message: string,
+    readonly status: number,
+  ) {
+    super(message);
+    this.name = "YouTubeError";
+  }
+}
+
 async function call<T>(path: string, params: Record<string, string>): Promise<T> {
   const url = new URL(`${API}/${path}`);
   for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
@@ -26,7 +36,10 @@ async function call<T>(path: string, params: Record<string, string>): Promise<T>
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) {
     const body = await res.text();
-    throw new Error(`YouTube ${path} respondio ${res.status}: ${body.slice(0, 300)}`);
+    throw new YouTubeError(
+      `YouTube ${path} respondio ${res.status}: ${body.slice(0, 300)}`,
+      res.status,
+    );
   }
   return (await res.json()) as T;
 }
@@ -60,15 +73,24 @@ export async function listUploadIds(max = 200): Promise<string[]> {
   let pageToken: string | undefined;
 
   do {
-    const data = await call<{
+    let data: {
       items?: Array<{ contentDetails: { videoId: string } }>;
       nextPageToken?: string;
-    }>("playlistItems", {
-      part: "contentDetails",
-      playlistId,
-      maxResults: "50",
-      ...(pageToken ? { pageToken } : {}),
-    });
+    };
+
+    try {
+      data = await call("playlistItems", {
+        part: "contentDetails",
+        playlistId,
+        maxResults: "50",
+        ...(pageToken ? { pageToken } : {}),
+      });
+    } catch (error) {
+      // Un canal sin videos todavia no tiene playlist de subidas: eso no es un
+      // fallo, es simplemente que no hay nada para importar.
+      if (error instanceof YouTubeError && error.status === 404) return [];
+      throw error;
+    }
 
     for (const item of data.items ?? []) ids.push(item.contentDetails.videoId);
     pageToken = data.nextPageToken;
