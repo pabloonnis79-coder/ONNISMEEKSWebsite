@@ -1,6 +1,6 @@
 import "server-only";
 
-import { createClient, isSupabaseConfigured } from "@/lib/supabase/server";
+import { createPublicClient, isSupabaseConfigured } from "@/lib/supabase/public";
 import { demoClients, demoProjects } from "@/lib/demo";
 import type { Client, Project, ProjectFilters } from "@/lib/types";
 import { deaccent, youtubeThumb } from "@/lib/utils";
@@ -93,7 +93,7 @@ export async function getProjects(
     return demoProjects.filter((p) => matchesInMemory(p, filters)).slice(0, limit);
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   let query = supabase
     .from("projects")
     .select(SELECT)
@@ -129,7 +129,7 @@ export async function getFeaturedProjects(limit = 6): Promise<Project[]> {
     return [...featured, ...rest].slice(0, limit);
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("projects")
     .select(SELECT)
@@ -150,7 +150,7 @@ export async function getFeaturedProjects(limit = 6): Promise<Project[]> {
 export async function getProjectBySlug(slug: string): Promise<Project | null> {
   if (isDemoMode()) return demoProjects.find((p) => p.slug === slug) ?? null;
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("projects")
     .select(SELECT)
@@ -170,7 +170,7 @@ export async function getAllProjectSlugs(): Promise<
     return demoProjects.map((p) => ({ slug: p.slug, publishedAt: p.publishedAt }));
   }
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("projects")
     .select("slug, published_at")
@@ -250,7 +250,7 @@ function mapClient(row: any): Client {
 export async function getClients(): Promise<Client[]> {
   if (isDemoMode()) return demoClients;
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("clients")
     .select("*")

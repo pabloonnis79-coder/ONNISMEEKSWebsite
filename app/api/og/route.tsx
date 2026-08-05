@@ -2,7 +2,9 @@ import { ImageResponse } from "next/og";
 import type { NextRequest } from "next/server";
 import { site } from "@/lib/site";
 
-export const runtime = "edge";
+// El runtime edge quedo deprecado en Next 16 y ademas desactiva la generacion
+// estatica de la ruta.
+export const runtime = "nodejs";
 
 /**
  * Tarjeta para compartir en redes. Se genera en el momento, así cada proyecto
