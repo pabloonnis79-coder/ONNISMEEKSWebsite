@@ -1,5 +1,7 @@
--- ONNIS & MEEKS - esquema base
+-- ONNIS & MEEKS - esquema base, version 3
 -- Ejecutar en Supabase > SQL Editor. Es idempotente.
+-- Si el resultado final no dice "schema v3 aplicado", el editor esta
+-- corriendo una version vieja: seleccionar todo y reemplazar antes de pegar.
 
 create schema if not exists extensions;
 create extension if not exists pgcrypto with schema extensions;
@@ -211,3 +213,5 @@ drop policy if exists "media admin write" on storage.objects;
 create policy "media admin write" on storage.objects
   for all to authenticated
   using (bucket_id = 'media') with check (bucket_id = 'media');
+
+select 'schema v3 aplicado' as resultado;
