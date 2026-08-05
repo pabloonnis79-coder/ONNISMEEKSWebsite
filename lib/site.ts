@@ -10,7 +10,16 @@ export const site = {
   tagline: "Productora audiovisual",
   description:
     "Productora audiovisual. Dirigimos, filmamos y terminamos piezas para marcas que necesitan que su historia se vea bien contada.",
-  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://onnismeeks.com",
+  /**
+   * De aca salen las URL canonicas, el sitemap y las tarjetas para redes.
+   * Si todavia no hay dominio propio, Vercel expone la URL de produccion y el
+   * sitio se autoconfigura solo.
+   */
+  url:
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL
+      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+      : "https://onnismeeks.com"),
   locale: "es_AR",
   foundingYear: 2018,
 
