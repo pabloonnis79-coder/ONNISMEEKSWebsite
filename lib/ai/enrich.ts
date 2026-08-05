@@ -82,8 +82,16 @@ const SYSTEM = `Sos el editor de contenidos de una productora audiovisual argent
 Escribís en español rioplatense, con acentuación correcta, en tono profesional, concreto y sobrio.
 Reglas duras:
 - Prohibido usar rayas largas. Nunca escribas los caracteres de raya larga ni de raya media.
-- Prohibidas las palabras vacías: elevar, potenciar, revolucionar, sinergia, next-gen, único, disruptivo.
-- No inventes datos, clientes, premios ni métricas que no estén en la información recibida.
+- Prohibidas las palabras vacías y los adjetivos de relleno: elevar, potenciar, revolucionar,
+  sinergia, next-gen, único, disruptivo, auténtico, cálido, mágico, inolvidable, especial,
+  natural, atractivo, cautivante, envolvente, impactante.
+- Prohibido cerrar una frase con un adjetivo decorativo que no esté en la historia.
+  "Filmamos el plato en el salón" es correcto. "en un ambiente natural y atractivo" no.
+- No inventes nada. Ni datos, ni clientes, ni premios, ni métricas, ni ambientes, ni sensaciones.
+  Si la historia dice "salón", no deduzcas si es una casa, un restaurante o un estudio.
+- Usá el nombre del proyecto y el del cliente tal como vienen en los campos "proyecto" y
+  "cliente". El campo "titulo_video" es solo el nombre del archivo en YouTube: ignoralo si
+  hay un "proyecto" cargado.
 - Si falta información, escribí menos, no rellenes.
 Respondés exclusivamente con un objeto JSON válido.`;
 
@@ -118,10 +126,12 @@ export async function enrichProject(
 
   const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
+  const nombre = parsed.projectName ?? title;
+  const titular = parsed.clientName ? `${nombre} para ${parsed.clientName}` : nombre;
+
   const input = {
-    titulo_video: title,
-    cliente: parsed.clientName,
     proyecto: parsed.projectName,
+    cliente: parsed.clientName,
     anio: parsed.year,
     servicios: parsed.services,
     categoria: parsed.category,
@@ -129,18 +139,21 @@ export async function enrichProject(
     historia: parsed.story,
     resultados: parsed.results,
     tags: parsed.tags,
+    titulo_video: title,
   };
 
   const userPrompt = `Información del proyecto (JSON):
 ${JSON.stringify(input, null, 2)}
 
+El titular del proyecto es exactamente: "${titular}"
+
 Devolvé un JSON con exactamente estas claves:
 {
-  "aiSummary": "resumen profesional del proyecto, 2 o 3 oraciones, máximo 300 caracteres",
-  "seoTitle": "título SEO, máximo 60 caracteres, terminado en ' | ${brand}'",
-  "seoDescription": "meta description, máximo 155 caracteres",
-  "keywords": ["8 a 12 palabras clave en minúsculas"],
-  "homeExcerpt": "bajada corta para la portada, máximo 110 caracteres, sin punto final",
+  "aiSummary": "resumen del proyecto en 2 o 3 oraciones, máximo 300 caracteres. Solo lo que dice la historia",
+  "seoTitle": "empieza con '${titular}' y termina en ' | ${brand}'. Si no entra en 60 caracteres, recortá el titular, nunca la marca",
+  "seoDescription": "meta description de máximo 155 caracteres. Tiene que nombrar el proyecto y el cliente, y decir qué se hizo",
+  "keywords": ["8 a 12 palabras clave en minúsculas, sin repetir la misma palabra en singular y plural"],
+  "homeExcerpt": "una frase de la historia que funcione como bajada, máximo 110 caracteres, sin punto final. No pegues nombres sueltos",
   "socialLinkedin": "post para LinkedIn, tono profesional, máximo 600 caracteres, sin hashtags genéricos",
   "socialInstagram": "caption para Instagram, máximo 280 caracteres, hasta 4 hashtags al final",
   "socialFacebook": "post para Facebook, máximo 400 caracteres"
@@ -149,7 +162,8 @@ Devolvé un JSON con exactamente estas claves:
   try {
     const completion = await groq.chat.completions.create({
       model: MODEL,
-      temperature: 0.4,
+      // Bajo a proposito: se busca que reformule lo que hay, no que invente.
+      temperature: 0.25,
       max_tokens: 1400,
       response_format: { type: "json_object" },
       messages: [
