@@ -28,6 +28,21 @@ function sanitize(text: string): string {
     .trim();
 }
 
+/**
+ * Une titular y cuerpo sin repetir. Si el video no trae descripcion, el cuerpo
+ * termina siendo el mismo titular y quedaria "01 rell. 01 rell".
+ */
+function compose(headline: string, body: string | null, max: number): string {
+  const clean = body?.replace(/\s+/g, " ").trim();
+  if (!clean || clean.toLowerCase() === headline.toLowerCase()) {
+    return truncate(headline, max);
+  }
+  if (clean.toLowerCase().startsWith(headline.toLowerCase())) {
+    return truncate(clean, max);
+  }
+  return truncate(`${headline}. ${clean}`, max);
+}
+
 function fallback(
   parsed: ParsedDescription,
   title: string,
@@ -36,16 +51,17 @@ function fallback(
   const name = parsed.projectName ?? title;
   const client = parsed.clientName;
   const headline = client ? `${name} para ${client}` : name;
-  const body = parsed.story ?? parsed.results ?? headline;
+  const body = parsed.story ?? parsed.results ?? null;
   const services = parsed.services.slice(0, 3).join(", ");
 
+  const seoDescription = services
+    ? truncate(`${headline}. ${services}.`, 155)
+    : compose(headline, body, 155);
+
   return {
-    aiSummary: truncate(body, 280),
+    aiSummary: compose(headline, body, 280),
     seoTitle: truncate(`${headline} | ${brand}`, 60),
-    seoDescription: truncate(
-      services ? `${headline}. ${services}.` : `${headline}. ${body}`,
-      155,
-    ),
+    seoDescription,
     keywords: uniq(
       [
         ...parsed.tags,
@@ -55,10 +71,10 @@ function fallback(
         "producción audiovisual",
       ].filter(Boolean) as string[],
     ).slice(0, 12),
-    homeExcerpt: truncate(body, 110),
-    socialLinkedin: `${headline}. ${truncate(body, 220)}`,
-    socialInstagram: `${headline}. ${truncate(body, 140)}`,
-    socialFacebook: `${headline}. ${truncate(body, 180)}`,
+    homeExcerpt: truncate(body ?? headline, 110),
+    socialLinkedin: compose(headline, body, 600),
+    socialInstagram: compose(headline, body, 280),
+    socialFacebook: compose(headline, body, 400),
   };
 }
 
