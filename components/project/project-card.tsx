@@ -9,11 +9,14 @@ export function ProjectCard({
   priority = false,
   size = "md",
   sizes,
+  auto = false,
 }: {
   project: Project;
   priority?: boolean;
   size?: "sm" | "md" | "lg";
   sizes?: string;
+  /** Reproduce el video al entrar en pantalla, sin esperar al cursor. */
+  auto?: boolean;
 }) {
   const poster =
     project.coverUrl ?? (project.youtubeId ? youtubeThumb(project.youtubeId) : null);
@@ -37,6 +40,7 @@ export function ProjectCard({
           poster={poster}
           alt={`${title}${project.clientName ? ` para ${project.clientName}` : ""}`}
           priority={priority}
+          auto={auto}
           sizes={sizes ?? "(max-width: 768px) 100vw, 50vw"}
         />
 

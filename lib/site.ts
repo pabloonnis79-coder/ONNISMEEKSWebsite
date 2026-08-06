@@ -85,64 +85,70 @@ export type Service = {
   name: string;
   summary: string;
   includes: string[];
+  /**
+   * Como se muestra la seccion. "fotos" arma una grilla de imagenes en vez de
+   * un video de fondo: la fotografia no se muestra en movimiento.
+   */
+  media: "video" | "fotos";
 };
 
+/**
+ * Cinco secciones, cada una con su panel en la portada y su propia página.
+ * TODO: confirmar con el estudio que estos son los cinco servicios reales y
+ * ajustar nombres y textos. Los de abajo son una propuesta, no un dato.
+ */
 export const services: Service[] = [
   {
-    slug: "direccion",
-    name: "Dirección",
+    slug: "produccion-audiovisual",
+    name: "Producción audiovisual",
     summary:
-      "Definimos el punto de vista de la pieza y lo sostenemos desde el guion hasta el máster final.",
-    includes: ["Guion y tratamiento", "Dirección de rodaje", "Casting", "Storyboard"],
+      "Dirección, producción ejecutiva y rodaje. Definimos el punto de vista de la pieza y lo sostenemos desde el guion hasta el máster final.",
+    includes: [
+      "Guion y tratamiento",
+      "Dirección de rodaje",
+      "Producción ejecutiva",
+      "Cámara cine digital",
+      "Aéreas con piloto habilitado",
+      "Sonido directo",
+    ],
+    media: "video",
   },
   {
-    slug: "produccion",
-    name: "Producción ejecutiva",
+    slug: "produccion-fotografica",
+    name: "Producción fotográfica",
     summary:
-      "Presupuesto, permisos, equipo y logística. El rodaje empieza el día que dijimos que iba a empezar.",
-    includes: ["Presupuesto cerrado", "Locaciones", "Permisos", "Coordinación de equipo"],
-  },
-  {
-    slug: "fotografia",
-    name: "Dirección de fotografía",
-    summary:
-      "Cámara, luz y óptica elegidas por la historia, no por la ficha técnica del equipo.",
-    includes: ["Cámara cine digital", "Iluminación", "Óptica", "Plan de rodaje"],
-  },
-  {
-    slug: "aereas",
-    name: "Aéreas y drone",
-    summary:
-      "Vuelos con piloto habilitado ANAC, para planos que ubican al espectador en dos segundos.",
-    includes: ["Piloto habilitado", "Seguro de vuelo", "FPV", "Aéreas de locación"],
-  },
-  {
-    slug: "post",
-    name: "Post producción",
-    summary:
-      "Montaje, gráfica y armado de versiones. Una pieza madre y todos los cortes que pide cada canal.",
-    includes: ["Montaje", "Motion graphics", "Versiones por formato", "Subtitulado"],
+      "Se filma una vez y se aprovecha todo. La gráfica sale del mismo rodaje, con la misma dirección de arte.",
+    includes: ["Producto", "Retrato", "Campaña", "Making of", "Banco de imágenes"],
+    media: "fotos",
   },
   {
     slug: "color",
-    name: "Color",
+    name: "Color grading",
     summary:
       "Etalonaje en sala calibrada. La marca se ve igual en el cine, en el feed y en la tele del local.",
     includes: ["Etalonaje", "Look de campaña", "Entrega HDR y SDR", "Control de piel"],
+    media: "video",
   },
   {
-    slug: "sonido",
-    name: "Sonido y música",
+    slug: "animacion-vfx",
+    name: "Animación y VFX",
     summary:
-      "Registro directo, diseño sonoro y música original o licenciada, mezclada para cada plataforma.",
-    includes: ["Sonido directo", "Diseño sonoro", "Música original", "Mezcla y máster"],
+      "Motion graphics, composición y efectos. Lo que no se puede filmar, se construye.",
+    includes: ["Motion graphics", "Composición", "Limpieza de plano", "Títulos y placas"],
+    media: "video",
   },
   {
-    slug: "fotografia-fija",
-    name: "Fotografía de campaña",
+    slug: "contenido",
+    name: "Contenido para marcas",
     summary:
-      "Se filma una vez y se aprovecha todo. La gráfica sale del mismo rodaje, con la misma dirección de arte.",
-    includes: ["Producto", "Retrato", "Making of", "Banco de imágenes"],
+      "Piezas pensadas para publicar seguido. Un rodaje que rinde durante meses en todos los canales.",
+    includes: [
+      "Series para redes",
+      "Versiones por formato",
+      "Subtitulado",
+      "Calendario de publicación",
+    ],
+    media: "video",
   },
 ];
 

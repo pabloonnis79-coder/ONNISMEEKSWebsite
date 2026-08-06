@@ -150,6 +150,15 @@ create table if not exists public.contact_messages (
   created_at timestamptz not null default now()
 );
 
+-- ------------------------------------------------- configuracion del sitio --
+-- Clave y valor libre. Hoy guarda que video va detras de cada seccion, pero
+-- sirve para cualquier ajuste que no justifique una tabla propia.
+create table if not exists public.site_settings (
+  key        text primary key,
+  value      jsonb not null default '{}'::jsonb,
+  updated_at timestamptz not null default now()
+);
+
 -- --------------------------------------------------------------- updated_at --
 create or replace function public.touch_updated_at()
 returns trigger language plpgsql as $$
@@ -167,6 +176,15 @@ alter table public.projects         enable row level security;
 alter table public.clients          enable row level security;
 alter table public.sync_runs        enable row level security;
 alter table public.contact_messages enable row level security;
+alter table public.site_settings    enable row level security;
+
+drop policy if exists "settings readable" on public.site_settings;
+create policy "settings readable" on public.site_settings
+  for select using (true);
+
+drop policy if exists "settings admin write" on public.site_settings;
+create policy "settings admin write" on public.site_settings
+  for all to authenticated using (true) with check (true);
 
 -- Los mensajes solo los lee el panel. El alta la hace el servidor con service role.
 drop policy if exists "messages admin read" on public.contact_messages;
@@ -214,4 +232,4 @@ create policy "media admin write" on storage.objects
   for all to authenticated
   using (bucket_id = 'media') with check (bucket_id = 'media');
 
-select 'schema v3 aplicado' as resultado;
+select 'schema v4 aplicado' as resultado;

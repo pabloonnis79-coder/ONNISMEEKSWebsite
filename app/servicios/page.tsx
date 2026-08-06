@@ -60,8 +60,13 @@ export default function ServicesPage() {
               className="grid scroll-mt-28 gap-6 border-t border-line py-10 md:grid-cols-12 md:gap-10 md:py-14"
             >
               <div className="md:col-span-5">
-                <h2 className="display font-display text-[9vw] font-extrabold uppercase tracking-[-0.045em] text-paper sm:text-[6vw] lg:text-[3.4vw]">
-                  {service.name}
+                <h2 className="display font-display text-[9vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[6vw] lg:text-[3.4vw]">
+                  <Link
+                    href={`/servicios/${service.slug}`}
+                    className="text-paper transition-colors duration-300 hover:text-flame"
+                  >
+                    {service.name}
+                  </Link>
                 </h2>
               </div>
 

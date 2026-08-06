@@ -79,8 +79,13 @@ export function VideoBackdrop({
             Para que un 16:9 cubra la pantalla sin bandas hay que desbordarlo
             por el lado que sobre: alto = ancho * 9/16 y viceversa, y se toma
             el mayor de los dos.
+
+            El scale extra saca de cuadro la barra de titulo y el logo que
+            YouTube dibuja en los bordes: con controls=0 igual los muestra, y
+            no hay parametro para apagarlos. Agrandar y recortar es la unica
+            forma de que no aparezcan.
           */
-          className="pointer-events-none absolute left-1/2 top-1/2 h-[56.25vw] min-h-full w-[177.78vh] min-w-full -translate-x-1/2 -translate-y-1/2 border-0"
+          className="pointer-events-none absolute left-1/2 top-1/2 h-[56.25vw] min-h-full w-[177.78vh] min-w-full -translate-x-1/2 -translate-y-1/2 scale-[1.35] border-0"
         />
       )}
     </div>

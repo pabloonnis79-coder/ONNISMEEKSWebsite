@@ -1,66 +1,88 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr";
 import { VideoBackdrop } from "@/components/media/video-backdrop";
 import { services } from "@/lib/site";
 import type { Project } from "@/lib/types";
+import type { VideosDeSeccion } from "@/lib/db/settings";
 import { youtubeThumb } from "@/lib/utils";
 
 /**
- * Un panel casi de pantalla completa por servicio, con un trabajo real
- * corriendo de fondo y el nombre del servicio en grande.
+ * Un panel casi de pantalla completa por seccion, con el nombre en grande.
  *
- * Se muestran cuatro. Con ocho la pagina se vuelve un desfile y ninguno pesa;
- * los que quedan afuera van en una tira compacta al pie de la seccion.
+ * Las secciones de video llevan un trabajo corriendo de fondo; el video se
+ * elige desde el panel de administracion y, si no hay ninguno asignado, se
+ * cae a un proyecto publicado. La seccion de fotografia no lleva video: va
+ * una grilla de imagenes, igual que en la referencia.
  */
-const MAX_PANELES = 4;
 
-function proyectoPara(service: string, projects: Project[], usados: Set<string>) {
+function videoPara(
+  slug: string,
+  nombre: string,
+  asignados: VideosDeSeccion,
+  projects: Project[],
+  usados: Set<string>,
+) {
+  const asignado = asignados[slug];
+  if (asignado) return { youtubeId: asignado, cover: youtubeThumb(asignado) };
+
   const conVideo = projects.filter((p) => p.youtubeId);
-
-  return (
-    conVideo.find((p) => p.services.includes(service) && !usados.has(p.id)) ??
-    conVideo.find((p) => p.services.includes(service)) ??
+  const elegido =
+    conVideo.find((p) => p.services.includes(nombre) && !usados.has(p.id)) ??
     conVideo.find((p) => !usados.has(p.id)) ??
-    conVideo[0] ??
-    null
-  );
+    conVideo[0];
+
+  if (!elegido?.youtubeId) return null;
+  usados.add(elegido.id);
+
+  return {
+    youtubeId: elegido.youtubeId,
+    cover: elegido.coverUrl ?? youtubeThumb(elegido.youtubeId),
+  };
 }
 
-export function ServicePanels({ projects }: { projects: Project[] }) {
+export function ServicePanels({
+  projects,
+  sectionVideos,
+}: {
+  projects: Project[];
+  sectionVideos: VideosDeSeccion;
+}) {
   const usados = new Set<string>();
 
-  // Primero los servicios que tienen trabajo publicado: son los que valen un
-  // panel entero.
-  const ordenados = [...services].sort((a, b) => {
-    const ta = projects.some((p) => p.services.includes(a.name)) ? 0 : 1;
-    const tb = projects.some((p) => p.services.includes(b.name)) ? 0 : 1;
-    return ta - tb;
-  });
-
-  const conPanel = ordenados.slice(0, MAX_PANELES);
-  const resto = ordenados.slice(MAX_PANELES);
+  // Para la grilla de fotografia: portadas de trabajos publicados.
+  const stills = projects
+    .map((p) => ({
+      url: p.coverUrl ?? (p.youtubeId ? youtubeThumb(p.youtubeId) : null),
+      alt: p.projectName ?? p.title,
+      slug: p.slug,
+    }))
+    .filter((s): s is { url: string; alt: string; slug: string } => Boolean(s.url))
+    .slice(0, 8);
 
   return (
     <section aria-label="Servicios">
-      {conPanel.map((service, i) => {
-        const project = proyectoPara(service.name, projects, usados);
-        if (project) usados.add(project.id);
-
-        const poster =
-          project?.coverUrl ??
-          (project?.youtubeId ? youtubeThumb(project.youtubeId) : null);
+      {services.map((service, i) => {
+        const esFoto = service.media === "fotos";
+        const media = esFoto
+          ? null
+          : videoPara(service.slug, service.name, sectionVideos, projects, usados);
 
         return (
           <article
             key={service.slug}
             className="relative flex min-h-[86vh] items-end overflow-hidden border-t border-line"
           >
-            <VideoBackdrop
-              youtubeId={project?.youtubeId ?? null}
-              poster={poster}
-              alt=""
-              priority={i === 0}
-            />
+            {esFoto ? (
+              <PhotoGrid stills={stills} />
+            ) : (
+              <VideoBackdrop
+                youtubeId={media?.youtubeId ?? null}
+                poster={media?.cover ?? null}
+                alt=""
+                priority={i === 0}
+              />
+            )}
 
             {/* Velo de dos capas: el titular tiene que leerse sobre cualquier
                 fotograma, y los fotogramas cambian todo el tiempo. */}
@@ -71,7 +93,7 @@ export function ServicePanels({ projects }: { projects: Project[] }) {
             />
 
             <div className="relative mx-auto w-full max-w-[1600px] px-5 pb-16 md:px-10 md:pb-24">
-              <h2 className="display max-w-[14ch] font-display text-[14vw] font-extrabold uppercase tracking-[-0.05em] text-paper sm:text-[10vw] lg:text-[7vw]">
+              <h2 className="display max-w-[14ch] font-display text-[13vw] font-extrabold uppercase tracking-[-0.05em] text-paper sm:text-[9vw] lg:text-[6.4vw]">
                 {service.name}
               </h2>
 
@@ -81,10 +103,10 @@ export function ServicePanels({ projects }: { projects: Project[] }) {
                 </p>
 
                 <Link
-                  href={`/proyectos?servicio=${encodeURIComponent(service.name)}`}
+                  href={`/servicios/${service.slug}`}
                   className="group inline-flex shrink-0 items-center gap-2 text-[13px] font-semibold uppercase tracking-[0.14em] text-paper transition-colors hover:text-flame-warm"
                 >
-                  Ver trabajos
+                  Ver más
                   <ArrowRightIcon
                     size={16}
                     weight="bold"
@@ -96,28 +118,32 @@ export function ServicePanels({ projects }: { projects: Project[] }) {
           </article>
         );
       })}
-
-      {resto.length > 0 && (
-        <div className="border-t border-line">
-          <ul className="mx-auto grid max-w-[1600px] grid-cols-1 gap-px bg-line px-0 sm:grid-cols-2 lg:grid-cols-4">
-            {resto.map((service) => (
-              <li key={service.slug} className="bg-ink">
-                <Link
-                  href={`/servicios#${service.slug}`}
-                  className="group flex h-full flex-col justify-between gap-8 p-7 transition-colors duration-300 hover:bg-ink-800 md:p-9"
-                >
-                  <h3 className="font-display text-2xl font-extrabold uppercase leading-[0.95] tracking-[-0.035em] text-paper transition-colors duration-300 group-hover:text-flame">
-                    {service.name}
-                  </h3>
-                  <p className="max-w-[34ch] text-sm leading-relaxed text-paper-dim">
-                    {service.summary}
-                  </p>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </section>
+  );
+}
+
+/** Fondo de la seccion de fotografia. Imagenes quietas, sin movimiento. */
+function PhotoGrid({
+  stills,
+}: {
+  stills: Array<{ url: string; alt: string; slug: string }>;
+}) {
+  if (stills.length === 0) return <div className="absolute inset-0 bg-ink-800" />;
+
+  return (
+    <div aria-hidden="true" className="absolute inset-0 grid grid-cols-2 gap-1 lg:grid-cols-4">
+      {stills.map((still, i) => (
+        <div key={`${still.slug}-${i}`} className="relative overflow-hidden bg-ink-800">
+          <Image
+            src={still.url}
+            alt=""
+            fill
+            sizes="(max-width: 1024px) 50vw, 25vw"
+            quality={75}
+            className="object-cover"
+          />
+        </div>
+      ))}
+    </div>
   );
 }

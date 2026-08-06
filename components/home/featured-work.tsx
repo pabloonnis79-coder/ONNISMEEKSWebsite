@@ -58,6 +58,10 @@ export function FeaturedWork({ projects }: { projects: Project[] }) {
                 project={project}
                 size={SIZES[step]}
                 priority={i === 0}
+                // En la portada las tarjetas se reproducen solas al entrar en
+                // pantalla. En el listado de proyectos no: ahi hay decenas y
+                // serian decenas de reproductores.
+                auto
                 sizes={
                   SPANS[step] === 12
                     ? "(max-width: 1024px) 100vw, 1560px"

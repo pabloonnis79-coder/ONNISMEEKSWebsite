@@ -7,15 +7,17 @@ import { Manifesto } from "@/components/home/manifesto";
 import { Process } from "@/components/home/process";
 import { ContactCta } from "@/components/home/contact-cta";
 import { getClients, getFeaturedProjects } from "@/lib/db/projects";
+import { getSectionVideos } from "@/lib/db/settings";
 import { site } from "@/lib/site";
 import { youtubeThumb } from "@/lib/utils";
 
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const [todos, clients] = await Promise.all([
+  const [todos, clients, sectionVideos] = await Promise.all([
     getFeaturedProjects(14),
     getClients(),
+    getSectionVideos(),
   ]);
 
   const projects = todos.slice(0, 5);
@@ -30,11 +32,11 @@ export default async function HomePage() {
     <>
       <Hero
         poster={poster}
-        showreelId={site.showreel.youtubeId}
-        backdropId={lead?.youtubeId ?? null}
+        showreelId={site.showreel.youtubeId || (sectionVideos.hero ?? "")}
+        backdropId={sectionVideos.hero ?? lead?.youtubeId ?? null}
       />
       <ServicesMarquee />
-      <ServicePanels projects={todos} />
+      <ServicePanels projects={todos} sectionVideos={sectionVideos} />
       <FeaturedWork projects={projects} />
       <Manifesto />
       <ClientWall clients={clients.slice(0, 10)} />

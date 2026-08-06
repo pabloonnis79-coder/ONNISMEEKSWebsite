@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { CLAVE_VIDEOS_SECCION, extraerYoutubeId } from "@/lib/db/settings";
 import { slugify, uniq } from "@/lib/utils";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -239,6 +240,61 @@ export async function createManualProject(formData: FormData) {
 
   refresh();
   redirect(`/admin/proyectos/${data.id}`);
+}
+
+/* ------------------------------------------- videos de fondo por seccion -- */
+
+export async function saveSectionVideos(
+  _prev: SaveState,
+  formData: FormData,
+): Promise<SaveState> {
+  const value: Record<string, string> = {};
+  const invalidas: string[] = [];
+
+  for (const [campo, bruto] of formData.entries()) {
+    if (!campo.startsWith("seccion_")) continue;
+
+    const slug = campo.slice("seccion_".length);
+    const texto = String(bruto).trim();
+    if (!texto) continue;
+
+    const id = extraerYoutubeId(texto);
+    if (!id) {
+      invalidas.push(slug);
+      continue;
+    }
+    value[slug] = id;
+  }
+
+  if (invalidas.length > 0) {
+    return {
+      status: "error",
+      message: `No pude leer el id de YouTube en: ${invalidas.join(", ")}. Pegá el enlace completo del video.`,
+    };
+  }
+
+  try {
+    const supabase = await client();
+    const { error } = await supabase
+      .from("site_settings")
+      .upsert(
+        { key: CLAVE_VIDEOS_SECCION, value, updated_at: new Date().toISOString() },
+        { onConflict: "key" },
+      );
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath("/");
+    revalidatePath("/servicios");
+    revalidatePath("/admin/secciones");
+
+    return { status: "ok", message: "Videos actualizados." };
+  } catch (error) {
+    return {
+      status: "error",
+      message: error instanceof Error ? error.message : "No se pudo guardar",
+    };
+  }
 }
 
 /* ---------------------------------------------------------------- sesión -- */
