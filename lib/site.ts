@@ -3,6 +3,25 @@
  * Todo lo que alguien sin perfil técnico podría querer cambiar vive acá.
  */
 
+/**
+ * De acá salen las URL canónicas, el sitemap, el robots y las tarjetas para
+ * redes. Es el dato que más caro sale equivocar: un sitemap apuntando a
+ * localhost deja el sitio sin indexar.
+ *
+ * Por eso, si la variable quedó con una dirección local pero estamos corriendo
+ * en Vercel, gana la URL de producción. En desarrollo localhost sigue mandando,
+ * que es lo correcto.
+ */
+function resolveSiteUrl(): string {
+  const explicita = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  const esLocal = explicita ? /localhost|127\.0\.0\.1|0\.0\.0\.0/.test(explicita) : false;
+
+  if (explicita && !(esLocal && vercel)) return explicita.replace(/\/$/, "");
+  if (vercel) return `https://${vercel}`;
+  return "https://onnismeeks.com";
+}
+
 export const site = {
   name: "ONNIS & MEEKS",
   shortName: "O&M",
@@ -10,16 +29,7 @@ export const site = {
   tagline: "Productora audiovisual",
   description:
     "Productora audiovisual. Dirigimos, filmamos y terminamos piezas para marcas que necesitan que su historia se vea bien contada.",
-  /**
-   * De aca salen las URL canonicas, el sitemap y las tarjetas para redes.
-   * Si todavia no hay dominio propio, Vercel expone la URL de produccion y el
-   * sitio se autoconfigura solo.
-   */
-  url:
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : "https://onnismeeks.com"),
+  url: resolveSiteUrl(),
   locale: "es_AR",
   foundingYear: 2018,
 
