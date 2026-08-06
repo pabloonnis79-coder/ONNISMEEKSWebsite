@@ -33,7 +33,7 @@ export default async function HomePage() {
       <ClientWall clients={clients.slice(0, 10)} />
       <FeaturedWork projects={projects} />
       <Manifesto />
-      <ServicesIndex />
+      <ServicesIndex projects={projects} />
       <Process />
       <ContactCta />
     </>

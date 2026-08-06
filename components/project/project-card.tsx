@@ -16,9 +16,7 @@ export function ProjectCard({
   sizes?: string;
 }) {
   const poster =
-    project.coverUrl ??
-    (project.youtubeId ? youtubeThumb(project.youtubeId) : null) ??
-    `https://picsum.photos/seed/${project.slug}/1600/900`;
+    project.coverUrl ?? (project.youtubeId ? youtubeThumb(project.youtubeId) : null);
 
   const title = project.projectName ?? project.title;
   const duration = formatDuration(project.durationSeconds);

@@ -1,11 +1,16 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 import { Reveal } from "@/components/ui/reveal";
 import { ActionLink } from "@/components/ui/action";
+import { BrandSquare } from "@/components/brand/wordmark";
 import { JsonLd } from "@/components/json-ld";
+import { getFeaturedProjects } from "@/lib/db/projects";
 import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 import { capabilities, site } from "@/lib/site";
 import { team } from "@/lib/content";
+
+export const revalidate = 600;
 
 export const metadata: Metadata = pageMetadata({
   title: "Estudio",
@@ -14,8 +19,17 @@ export const metadata: Metadata = pageMetadata({
   path: "/estudio",
 });
 
-export default function StudioPage() {
+export default async function StudioPage() {
   const years = new Date().getFullYear() - site.foundingYear;
+
+  const [ultimo] = await getFeaturedProjects(1);
+  const portada = ultimo?.coverUrl
+    ? {
+        cover: ultimo.coverUrl,
+        titulo: ultimo.projectName ?? ultimo.title,
+        slug: ultimo.slug,
+      }
+    : null;
 
   return (
     <>
@@ -55,17 +69,43 @@ export default function StudioPage() {
           </div>
 
           <div className="lg:col-span-5">
-            <div className="relative aspect-[4/5] w-full overflow-hidden bg-ink-700">
-              {/* TODO: reemplazar por una foto real del equipo en rodaje. */}
-              <Image
-                src="https://picsum.photos/seed/om-estudio/1000/1250"
-                alt="Equipo de ONNIS & MEEKS durante un rodaje"
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 40vw"
-                className="object-cover"
-              />
-            </div>
+            {/*
+              Se muestra el ultimo trabajo publicado en lugar de una foto de
+              stock. Es material real del estudio y se actualiza solo.
+            */}
+            {portada ? (
+              <Link
+                href={`/proyectos/${portada.slug}`}
+                className="group block"
+                aria-label={`Ver ${portada.titulo}`}
+              >
+                <div className="relative aspect-[4/5] w-full overflow-hidden bg-ink-800">
+                  <Image
+                    src={portada.cover}
+                    alt={portada.titulo}
+                    fill
+                    priority
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                    quality={90}
+                    className="object-cover transition-transform duration-[900ms] ease-[var(--ease-out-expo)] group-hover:scale-[1.03]"
+                  />
+                  <span
+                    aria-hidden="true"
+                    className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent"
+                  />
+                </div>
+                <p className="mt-4 text-sm text-paper-dim transition-colors group-hover:text-flame-warm">
+                  {portada.titulo}
+                </p>
+              </Link>
+            ) : (
+              <div className="flex aspect-[4/5] w-full flex-col justify-between border border-line p-8">
+                <BrandSquare size={28} />
+                <p className="display font-display text-[7vw] font-extrabold uppercase leading-[0.9] tracking-[-0.04em] text-paper lg:text-[2.6vw]">
+                  Desde {site.foundingYear}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </section>

@@ -138,6 +138,38 @@ export async function getVideos(ids: string[]): Promise<YouTubeVideo[]> {
   return out;
 }
 
+/**
+ * Devuelve la miniatura de mayor resolucion que exista de verdad.
+ *
+ * No alcanza con mirar snippet.thumbnails: YouTube tarda algunos minutos en
+ * generar maxresdefault, asi que un video recien subido reporta como maxima la
+ * de 480x360. Guardar esa y estirarla a 3840 en desktop es lo que se veia mal.
+ *
+ * Cuando el archivo no existe, YouTube responde 404 o devuelve una imagen gris
+ * de relleno que pesa alrededor de 1 KB, por eso tambien se mira el tamano.
+ */
+const THUMB_VARIANTS = ["maxresdefault", "hq720", "sddefault", "hqdefault"] as const;
+const PLACEHOLDER_MAX_BYTES = 2500;
+
+export async function bestThumbnail(youtubeId: string): Promise<string> {
+  for (const variant of THUMB_VARIANTS) {
+    const url = `https://i.ytimg.com/vi/${youtubeId}/${variant}.jpg`;
+    try {
+      const res = await fetch(url, { method: "HEAD", cache: "no-store" });
+      if (!res.ok) continue;
+
+      const size = Number(res.headers.get("content-length") ?? "0");
+      if (size > 0 && size <= PLACEHOLDER_MAX_BYTES) continue;
+
+      return url;
+    } catch {
+      // Error de red puntual: se prueba la siguiente variante.
+    }
+  }
+
+  return `https://i.ytimg.com/vi/${youtubeId}/hqdefault.jpg`;
+}
+
 export function isYouTubeConfigured(): boolean {
   return Boolean(
     process.env.YOUTUBE_API_KEY &&

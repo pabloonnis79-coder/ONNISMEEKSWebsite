@@ -11,20 +11,23 @@ export function PlayableCover({
   title,
 }: {
   youtubeId: string | null;
-  poster: string;
+  poster: string | null;
   title: string;
 }) {
   const [open, setOpen] = useState(false);
 
-  const image = (
+  const image = poster ? (
     <Image
       src={poster}
       alt={title}
       fill
       priority
       sizes="100vw"
+      quality={90}
       className="object-cover transition-transform duration-[900ms] ease-[var(--ease-out-expo)] group-hover:scale-[1.02]"
     />
+  ) : (
+    <div className="h-full w-full bg-ink-800" />
   );
 
   if (!youtubeId) {

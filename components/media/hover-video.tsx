@@ -18,7 +18,7 @@ export function HoverVideo({
   className,
 }: {
   youtubeId: string | null;
-  poster: string;
+  poster: string | null;
   alt: string;
   priority?: boolean;
   sizes?: string;
@@ -52,14 +52,25 @@ export function HoverVideo({
       onPointerEnter={arm}
       onPointerLeave={disarm}
     >
-      <Image
-        src={poster}
-        alt={alt}
-        fill
-        priority={priority}
-        sizes={sizes}
-        className="object-cover transition-transform duration-[900ms] ease-[var(--ease-out-expo)] group-hover:scale-[1.04]"
-      />
+      {poster ? (
+        <Image
+          src={poster}
+          alt={alt}
+          fill
+          priority={priority}
+          sizes={sizes}
+          quality={90}
+          className="object-cover transition-transform duration-[900ms] ease-[var(--ease-out-expo)] group-hover:scale-[1.04]"
+        />
+      ) : (
+        // Sin portada cargada. Mejor un panel de la marca que una foto de
+        // archivo que no tiene nada que ver con el proyecto.
+        <div className="flex h-full w-full items-center justify-center bg-ink-800">
+          <span className="font-display text-sm font-extrabold uppercase tracking-[0.2em] text-paper-faint">
+            Sin portada
+          </span>
+        </div>
+      )}
 
       {playing && youtubeId && (
         <iframe

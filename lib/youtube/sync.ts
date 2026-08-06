@@ -3,9 +3,14 @@ import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { enrichProject } from "@/lib/ai/enrich";
 import { buildSlug, parseDescription } from "@/lib/youtube/parser";
-import { getVideos, listUploadIds, type YouTubeVideo } from "@/lib/youtube/api";
+import {
+  bestThumbnail,
+  getVideos,
+  listUploadIds,
+  type YouTubeVideo,
+} from "@/lib/youtube/api";
 import type { SyncSummary } from "@/lib/types";
-import { hashString, slugify, youtubeThumb } from "@/lib/utils";
+import { hashString, slugify } from "@/lib/utils";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -48,6 +53,10 @@ async function syncVideo(
     .eq("youtube_id", video.id)
     .maybeSingle()) as { data: ExistingRow | null };
 
+  // La portada se recalcula siempre, incluso si el texto no cambio: YouTube
+  // publica la miniatura grande varios minutos despues de subir el video.
+  const cover = parsed.coverUrl ?? (await bestThumbnail(video.id));
+
   const unchanged =
     existing && existing.description_hash === hash && existing.ai_summary && !force;
 
@@ -55,7 +64,7 @@ async function syncVideo(
     summary.skipped += 1;
     await supabase
       .from("projects")
-      .update({ synced_at: new Date().toISOString() })
+      .update({ synced_at: new Date().toISOString(), cover_url: cover })
       .eq("id", existing.id);
     return;
   }
@@ -82,7 +91,7 @@ async function syncVideo(
     story: parsed.story,
     results: parsed.results,
     tags: parsed.tags.length > 0 ? parsed.tags : video.tags.slice(0, 10),
-    cover_url: parsed.coverUrl ?? video.thumbnail ?? youtubeThumb(video.id),
+    cover_url: cover,
     duration_seconds: video.durationSeconds,
     published_at: video.publishedAt,
     featured: parsed.featured,

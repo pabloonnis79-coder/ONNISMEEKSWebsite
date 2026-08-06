@@ -23,11 +23,9 @@ export async function generateStaticParams() {
   return slugs.map(({ slug }) => ({ slug }));
 }
 
-function posterFor(project: Project) {
+function posterFor(project: Project): string | null {
   return (
-    project.coverUrl ??
-    (project.youtubeId ? youtubeThumb(project.youtubeId) : null) ??
-    `https://picsum.photos/seed/${project.slug}/1920/1080`
+    project.coverUrl ?? (project.youtubeId ? youtubeThumb(project.youtubeId) : null)
   );
 }
 
@@ -269,6 +267,7 @@ export default async function ProjectPage({
 
 function NextProject({ project }: { project: Project }) {
   const title = project.projectName ?? project.title;
+  const poster = posterFor(project);
 
   return (
     <section className="border-t border-line">
@@ -292,14 +291,17 @@ function NextProject({ project }: { project: Project }) {
           </div>
 
           <div className="md:col-span-5">
-            <div className="relative aspect-[16/10] w-full overflow-hidden bg-ink-700">
-              <Image
-                src={posterFor(project)}
-                alt={title}
-                fill
-                sizes="(max-width: 768px) 100vw, 40vw"
-                className="object-cover transition-transform duration-[900ms] ease-[var(--ease-out-expo)] group-hover:scale-[1.04]"
-              />
+            <div className="relative aspect-[16/10] w-full overflow-hidden bg-ink-800">
+              {poster && (
+                <Image
+                  src={poster}
+                  alt={title}
+                  fill
+                  sizes="(max-width: 768px) 100vw, 40vw"
+                  quality={90}
+                  className="object-cover transition-transform duration-[900ms] ease-[var(--ease-out-expo)] group-hover:scale-[1.04]"
+                />
+              )}
             </div>
           </div>
         </div>

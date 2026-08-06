@@ -2,20 +2,42 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { ArrowRightIcon } from "@phosphor-icons/react";
 import { services } from "@/lib/site";
+import type { Project } from "@/lib/types";
+
+type Preview = { cover: string; titulo: string; slug: string } | null;
 
 /**
- * Indice de servicios. La imagen de la derecha cambia con el servicio que el
- * cursor esta recorriendo: sirve para asociar cada disciplina con como se ve,
- * que es exactamente lo que el visitante vino a averiguar.
+ * Indice de servicios. La imagen de la derecha muestra un trabajo real hecho
+ * con ese servicio. Cuando todavia no hay ninguno, en lugar de poner una foto
+ * de stock que no dice nada, se arma un panel tipografico con lo que incluye.
  */
-export function ServicesIndex() {
+export function ServicesIndex({ projects }: { projects: Project[] }) {
   const [active, setActive] = useState(0);
   const reduce = useReducedMotion();
   const current = services[active];
+
+  const previews = useMemo<Preview[]>(
+    () =>
+      services.map((service) => {
+        const match = projects.find(
+          (p) => p.coverUrl && p.services.some((s) => s === service.name),
+        );
+        return match?.coverUrl
+          ? {
+              cover: match.coverUrl,
+              titulo: match.projectName ?? match.title,
+              slug: match.slug,
+            }
+          : null;
+      }),
+    [projects],
+  );
+
+  const preview = previews[active];
 
   return (
     <section className="mx-auto max-w-[1600px] px-5 py-24 md:px-10 md:py-32">
@@ -58,30 +80,53 @@ export function ServicesIndex() {
 
         <div className="hidden lg:col-span-5 lg:block">
           <div className="sticky top-28">
-            <div className="relative aspect-[4/5] w-full overflow-hidden bg-ink-700">
+            <div className="relative aspect-[4/5] w-full overflow-hidden bg-ink-800">
               <AnimatePresence mode="popLayout">
                 <motion.div
                   key={current.slug}
-                  initial={reduce ? false : { opacity: 0, scale: 1.04 }}
+                  initial={reduce ? false : { opacity: 0, scale: 1.03 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
                   className="absolute inset-0"
                 >
-                  {/* TODO: reemplazar por fotos reales de rodaje del estudio. */}
-                  <Image
-                    src={`https://picsum.photos/seed/om-${current.slug}/900/1125`}
-                    alt={current.name}
-                    fill
-                    sizes="40vw"
-                    className="object-cover"
-                  />
+                  {preview ? (
+                    <Link href={`/proyectos/${preview.slug}`} className="group block h-full">
+                      <Image
+                        src={preview.cover}
+                        alt={preview.titulo}
+                        fill
+                        sizes="(max-width: 1024px) 0px, 40vw"
+                        quality={90}
+                        className="object-cover"
+                      />
+                      <span
+                        aria-hidden="true"
+                        className="absolute inset-0 bg-gradient-to-t from-ink via-ink/20 to-transparent"
+                      />
+                      <span className="absolute bottom-6 left-6 right-6 font-display text-xl font-extrabold uppercase leading-none tracking-[-0.03em] text-paper transition-colors duration-300 group-hover:text-flame-warm">
+                        {preview.titulo}
+                      </span>
+                    </Link>
+                  ) : (
+                    <div className="flex h-full flex-col justify-between border border-line p-8">
+                      <p className="font-mono text-[11px] uppercase tracking-[0.2em] text-flame">
+                        Qué incluye
+                      </p>
+                      <ul className="space-y-3">
+                        {current.includes.map((item) => (
+                          <li
+                            key={item}
+                            className="font-display text-xl font-extrabold uppercase leading-none tracking-[-0.03em] text-paper"
+                          >
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </motion.div>
               </AnimatePresence>
-              <div
-                aria-hidden="true"
-                className="absolute inset-0 bg-gradient-to-t from-ink/80 to-transparent"
-              />
             </div>
 
             <p className="mt-6 max-w-[46ch] text-sm leading-relaxed text-paper-dim">
