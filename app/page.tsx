@@ -12,11 +12,14 @@ import { youtubeThumb } from "@/lib/utils";
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const [projects, clients] = await Promise.all([
-    getFeaturedProjects(5),
+  // El muro del hero necesita mas material que la grilla de destacados: con
+  // pocas portadas se repite la misma imagen en columnas contiguas.
+  const [todos, clients] = await Promise.all([
+    getFeaturedProjects(14),
     getClients(),
   ]);
 
+  const projects = todos.slice(0, 5);
   const lead = projects[0];
   const poster =
     site.showreel.poster ||
@@ -29,11 +32,12 @@ export default async function HomePage() {
         poster={poster}
         showreelId={site.showreel.youtubeId}
         loopMp4={site.showreel.loopMp4}
+        projects={todos}
       />
       <ClientWall clients={clients.slice(0, 10)} />
       <FeaturedWork projects={projects} />
       <Manifesto />
-      <ServicesIndex projects={projects} />
+      <ServicesIndex projects={todos} />
       <Process />
       <ContactCta />
     </>

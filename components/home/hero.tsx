@@ -7,15 +7,19 @@ import { PlayIcon } from "@phosphor-icons/react";
 import { ActionLink } from "@/components/ui/action";
 import { RevealLines } from "@/components/ui/reveal";
 import { VideoLightbox } from "@/components/media/video-lightbox";
+import { FragmentWall } from "@/components/home/fragment-wall";
+import type { Project } from "@/lib/types";
 
 export function Hero({
   poster,
   showreelId,
   loopMp4,
+  projects,
 }: {
   poster: string | null;
   showreelId: string;
   loopMp4: string;
+  projects: Project[];
 }) {
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotion();
@@ -43,6 +47,8 @@ export function Hero({
           >
             <source src={loopMp4} type="video/mp4" />
           </video>
+        ) : projects.length > 0 ? (
+          <FragmentWall projects={projects} />
         ) : poster ? (
           <Image
             src={poster}
@@ -58,10 +64,15 @@ export function Hero({
         )}
       </motion.div>
 
-      {/* Velo para que el titular tenga contraste sobre cualquier fotograma. */}
+      {/*
+        Velo en tres capas. El muro de fragmentos es mucho mas ruidoso que una
+        foto sola, asi que hace falta una base pareja ademas del degrade, para
+        que el titular mantenga contraste sobre cualquier combinacion.
+      */}
+      <div aria-hidden="true" className="absolute inset-0 bg-ink/60" />
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/25"
+        className="absolute inset-0 bg-gradient-to-t from-ink via-ink/75 to-ink/40"
       />
       <div
         aria-hidden="true"
