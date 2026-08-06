@@ -7,22 +7,25 @@ import type { Project } from "@/lib/types";
 import { cn, youtubeThumb } from "@/lib/utils";
 
 /**
- * Muro de fragmentos en movimiento. Columnas de portadas reales que se
+ * Muro de fragmentos del hero. Cuatro columnas de trabajos reales que se
  * desplazan a distinta velocidad y en sentidos alternados.
  *
- * Va detras del titular, asi que es decorativo: no recibe clics ni foco, y el
- * lector de pantalla lo ignora. El movimiento es una sola transformacion por
- * columna, de las que resuelve la placa de video, no hay JavaScript por cuadro.
+ * Dos piezas corren en video, mudas y en loop. No mas: cada reproductor de
+ * YouTube trae su propio JavaScript, y la referencia que tomamos carga siete
+ * de golpe. Cuales son esta fijo, no rota: una rotacion por temporizador
+ * agregaba estado y remontajes a cambio de muy poco.
+ *
+ * Es decorativo: no recibe clics ni foco, y el lector de pantalla lo ignora.
  */
 
 const COLUMNAS = [
-  { duracion: "52s", sentido: "normal", clase: "" },
-  { duracion: "68s", sentido: "reverse", clase: "hidden sm:block" },
-  { duracion: "44s", sentido: "normal", clase: "hidden lg:block" },
-  { duracion: "60s", sentido: "reverse", clase: "hidden xl:block" },
+  { duracion: "52s", sentido: "normal", clase: "", vivo: 1 },
+  { duracion: "68s", sentido: "reverse", clase: "hidden sm:block", vivo: 2 },
+  { duracion: "44s", sentido: "normal", clase: "hidden lg:block", vivo: -1 },
+  { duracion: "60s", sentido: "reverse", clase: "hidden xl:block", vivo: -1 },
 ] as const;
 
-type Fragmento = { cover: string; alt: string };
+type Fragmento = { cover: string; alt: string; youtubeId: string | null };
 
 export function FragmentWall({ projects }: { projects: Project[] }) {
   const reduce = useReducedMotion();
@@ -32,20 +35,21 @@ export function FragmentWall({ projects }: { projects: Project[] }) {
       .map((p) => ({
         cover: p.coverUrl ?? (p.youtubeId ? youtubeThumb(p.youtubeId) : null),
         alt: p.projectName ?? p.title,
+        youtubeId: p.youtubeId,
       }))
       .filter((f): f is Fragmento => Boolean(f.cover));
 
     if (fragmentos.length === 0) return [];
 
-    // Cada columna arranca en un punto distinto de la lista, para que no se
-    // vean cuatro veces la misma portada en fila.
     return COLUMNAS.map((col, i) => {
+      // Cada columna arranca en otro punto de la lista, para no ver la misma
+      // portada repetida en columnas contiguas.
       const rotados = fragmentos.map(
         (_, j) => fragmentos[(j + i * 2) % fragmentos.length],
       );
-      // Se repite la lista hasta tener material suficiente y se duplica al
-      // final, que es lo que hace que el loop no tenga corte visible.
       const base = rotados.length >= 4 ? rotados : [...rotados, ...rotados, ...rotados];
+      // La lista va duplicada: correr media altura y volver a cero deja el
+      // ciclo sin corte visible.
       return { ...col, items: [...base, ...base] };
     });
   }, [projects]);
@@ -68,23 +72,37 @@ export function FragmentWall({ projects }: { projects: Project[] }) {
                     }
               }
             >
-              {col.items.map((item, j) => (
-                <div
-                  key={`${item.cover}-${j}`}
-                  className="relative aspect-[4/5] w-full shrink-0 overflow-hidden bg-ink-800"
-                >
-                  <Image
-                    src={item.cover}
-                    alt=""
-                    fill
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    // Va detras de un velo al 60 por ciento: no necesita mas.
-                    quality={75}
-                    priority={j < 2}
-                    className="object-cover"
-                  />
-                </div>
-              ))}
+              {col.items.map((item, j) => {
+                const vivo = j === col.vivo && Boolean(item.youtubeId) && !reduce;
+
+                return (
+                  <div
+                    key={`${item.cover}-${j}`}
+                    className="relative aspect-[4/5] w-full shrink-0 overflow-hidden bg-ink-800"
+                  >
+                    <Image
+                      src={item.cover}
+                      alt=""
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      // Va detras de un velo al 60 por ciento: no necesita mas.
+                      quality={75}
+                      priority={j < 2}
+                      className="object-cover"
+                    />
+
+                    {vivo && (
+                      <iframe
+                        title=""
+                        tabIndex={-1}
+                        src={`https://www.youtube-nocookie.com/embed/${item.youtubeId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${item.youtubeId}&modestbranding=1&playsinline=1&rel=0&disablekb=1&fs=0&iv_load_policy=3`}
+                        allow="autoplay; encrypted-media"
+                        className="absolute left-1/2 top-1/2 h-[177.77vw] w-[100vw] -translate-x-1/2 -translate-y-1/2 border-0 sm:h-[88.88vw] sm:w-[50vw] lg:h-[59.25vw] lg:w-[33.3vw] xl:h-[44.44vw] xl:w-[25vw]"
+                      />
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         ))}
