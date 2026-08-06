@@ -1,78 +1,46 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
-import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import { PlayIcon } from "@phosphor-icons/react";
 import { ActionLink } from "@/components/ui/action";
 import { RevealLines } from "@/components/ui/reveal";
 import { VideoLightbox } from "@/components/media/video-lightbox";
-import { FragmentWall } from "@/components/home/fragment-wall";
-import type { Project } from "@/lib/types";
+import { VideoBackdrop } from "@/components/media/video-backdrop";
 
+/**
+ * Hero a sangre completa con un solo video de fondo, mudo y en loop.
+ *
+ * Si hay showreel cargado, manda el showreel. Si no, corre el ultimo trabajo
+ * publicado, que es material real y se actualiza solo.
+ */
 export function Hero({
   poster,
   showreelId,
-  loopMp4,
-  projects,
+  backdropId,
 }: {
   poster: string | null;
   showreelId: string;
-  loopMp4: string;
-  projects: Project[];
+  backdropId: string | null;
 }) {
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotion();
-  const { scrollYProgress } = useScroll();
-
-  // Parallax leve del fondo. Solo transform y opacity, sin layout.
-  const mediaY = useTransform(scrollYProgress, [0, 0.35], ["0%", "12%"]);
-  const mediaScale = useTransform(scrollYProgress, [0, 0.35], [1, 1.08]);
 
   return (
     <section className="relative flex min-h-[100dvh] flex-col justify-end overflow-hidden">
-      <motion.div
-        style={reduce ? undefined : { y: mediaY, scale: mediaScale }}
-        className="absolute inset-0"
-      >
-        {loopMp4 ? (
-          <video
-            className="h-full w-full object-cover"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            poster={poster ?? undefined}
-          >
-            <source src={loopMp4} type="video/mp4" />
-          </video>
-        ) : projects.length > 0 ? (
-          <FragmentWall projects={projects} />
-        ) : poster ? (
-          <Image
-            src={poster}
-            alt=""
-            fill
-            priority
-            sizes="100vw"
-            quality={90}
-            className="object-cover"
-          />
-        ) : (
-          <div className="h-full w-full bg-ink-700" />
-        )}
-      </motion.div>
+      <VideoBackdrop
+        youtubeId={showreelId || backdropId}
+        poster={poster}
+        alt=""
+        priority
+        siempre
+      />
 
-      {/*
-        Velo en tres capas. El muro de fragmentos es mucho mas ruidoso que una
-        foto sola, asi que hace falta una base pareja ademas del degrade, para
-        que el titular mantenga contraste sobre cualquier combinacion.
-      */}
-      <div aria-hidden="true" className="absolute inset-0 bg-ink/60" />
+      {/* Velo de dos capas para que el titular no dependa del fotograma. */}
+      <div aria-hidden="true" className="absolute inset-0 bg-ink/50" />
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-gradient-to-t from-ink via-ink/75 to-ink/40"
+        className="absolute inset-0 bg-gradient-to-t from-ink via-ink/60 to-ink/30"
       />
       <div
         aria-hidden="true"
@@ -83,9 +51,7 @@ export function Hero({
         <h1 className="display max-w-[16ch] font-display text-[11vw] font-extrabold uppercase tracking-[-0.045em] text-paper sm:text-[10vw] lg:text-[6.6vw]">
           <RevealLines
             lines={[
-              <>
-                Dirigimos, filmamos
-              </>,
+              <>Dirigimos, filmamos</>,
               <>
                 y <span className="flame-text">terminamos</span>.
               </>,
@@ -122,7 +88,7 @@ export function Hero({
               <button
                 type="button"
                 onClick={() => setOpen(true)}
-                aria-label="Reproducir showreel"
+                aria-label="Reproducir showreel con sonido"
                 className="ml-1 inline-flex h-12 w-12 items-center justify-center rounded-full border border-line text-paper transition-colors duration-300 hover:border-flame-warm hover:text-flame-warm"
               >
                 <PlayIcon size={17} weight="fill" />

@@ -37,21 +37,17 @@ function Logo({ client }: { client: Client }) {
 export function ClientWall({ clients }: { clients: Client[] }) {
   if (clients.length === 0) return null;
 
-  const loop = [...clients, ...clients];
-
   return (
-    <section aria-label="Marcas con las que trabajamos" className="border-y border-line py-8 md:py-10">
-      <div className="edge-fade-x overflow-hidden">
-        <div
-          className="marquee-track flex w-max items-center gap-14 md:gap-20"
-          style={{ ["--marquee-duration" as string]: `${Math.max(28, clients.length * 7)}s` }}
-        >
-          {loop.map((client, i) => (
-            <div key={`${client.id}-${i}`} aria-hidden={i >= clients.length}>
-              <Logo client={client} />
-            </div>
-          ))}
-        </div>
+    // Fila estatica a proposito. La unica marquesina de la portada es la de
+    // servicios: dos compitiendo entre si hacen que no se lea ninguna.
+    <section
+      aria-label="Marcas con las que trabajamos"
+      className="border-y border-line py-10 md:py-14"
+    >
+      <div className="mx-auto flex max-w-[1600px] flex-wrap items-center justify-center gap-x-12 gap-y-6 px-5 md:gap-x-20 md:px-10">
+        {clients.map((client) => (
+          <Logo key={client.id} client={client} />
+        ))}
       </div>
     </section>
   );
