@@ -48,9 +48,16 @@ const ESPERA_CHROME_MS = 900;
 export function YoutubeLoop({
   youtubeId,
   className,
+  vertical = false,
 }: {
   youtubeId: string;
   className?: string;
+  /**
+   * Para piezas 9:16. El reproductor pasa a ocupar la caja entera en vez de
+   * desbordarse como un 16:9, que en un contenedor vertical dejaria el video
+   * como una franja en el medio.
+   */
+  vertical?: boolean;
 }) {
   const contenedorId = `yt-${useId().replace(/[:]/g, "")}`;
   const player = useRef<any>(null);
@@ -118,12 +125,18 @@ export function YoutubeLoop({
       } ${className ?? ""}`}
     >
       {/*
-        El 16:9 se desborda por el lado que sobre para cubrir sin bandas, y el
-        scale extra saca de cuadro cualquier resto que YouTube dibuje al borde.
+        En horizontal, el 16:9 se desborda por el lado que sobre para cubrir
+        sin bandas. En vertical ocupa la caja entera, porque el material ya
+        viene 9:16. El scale extra saca de cuadro lo que YouTube dibuja al
+        borde en los dos casos.
       */}
       <div
         id={contenedorId}
-        className="absolute left-1/2 top-1/2 h-[56.25vw] min-h-full w-[177.78vh] min-w-full -translate-x-1/2 -translate-y-1/2 scale-[1.35] border-0"
+        className={
+          vertical
+            ? "absolute inset-0 h-full w-full scale-[1.35] border-0"
+            : "absolute left-1/2 top-1/2 h-[56.25vw] min-h-full w-[177.78vh] min-w-full -translate-x-1/2 -translate-y-1/2 scale-[1.35] border-0"
+        }
       />
     </div>
   );

@@ -12,6 +12,13 @@ export const CLAVE_AUTORIDADES = "authorities";
 export const CLAVE_FOTOGRAFIA = "photo_galleries";
 /** Clave de los logos de marcas del carrusel. */
 export const CLAVE_MARCAS = "brand_logos";
+/** Clave de los reels verticales. */
+export const CLAVE_REELS = "reels";
+
+export type Reel = { youtubeId: string; titulo: string; cliente: string };
+
+/** Cuantos reels admite la seccion. */
+export const MAX_REELS = 8;
 
 export type GaleriaFoto = { titulo: string; fotos: string[] };
 export type Marca = { nombre: string; logo: string; sitio: string };
@@ -58,19 +65,9 @@ export type Autoridad = {
   cargo: string;
 };
 
-/**
- * Extrae el id de un enlace de YouTube. Acepta lo que se copia del navegador:
- * youtu.be, watch?v=, shorts, embed, o directamente el id pelado.
- */
-export function extraerYoutubeId(entrada: string): string | null {
-  const texto = entrada.trim();
-  if (!texto) return null;
+// extraerYoutubeId vive en lib/utils: los formularios del panel lo usan para la
+// vista previa en vivo y este archivo es server-only, no lo pueden importar.
 
-  if (/^[A-Za-z0-9_-]{11}$/.test(texto)) return texto;
-
-  const m = /(?:youtu\.be\/|v=|embed\/|shorts\/|live\/)([A-Za-z0-9_-]{11})/.exec(texto);
-  return m ? m[1] : null;
-}
 
 /**
  * Lee una clave de configuracion. Si la tabla todavia no existe porque no se
@@ -136,6 +133,22 @@ export async function getBrandLogos(): Promise<Marca[]> {
       };
     })
     .filter((m) => m.nombre || m.logo);
+}
+
+export async function getReels(): Promise<Reel[]> {
+  const value = await leerAjuste(CLAVE_REELS);
+  if (!Array.isArray(value)) return [];
+
+  return value
+    .map((item) => {
+      const r = item as Partial<Reel>;
+      return {
+        youtubeId: String(r?.youtubeId ?? "").trim(),
+        titulo: String(r?.titulo ?? "").trim(),
+        cliente: String(r?.cliente ?? "").trim(),
+      };
+    })
+    .filter((r) => r.youtubeId);
 }
 
 export async function getAuthorities(): Promise<Autoridad[]> {

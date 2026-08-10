@@ -9,10 +9,12 @@ import { ContactCta } from "@/components/home/contact-cta";
 import { getClients, getFeaturedProjects } from "@/lib/db/projects";
 import { Authorities } from "@/components/home/authorities";
 import { BrandCarousel } from "@/components/home/brand-carousel";
+import { Reels } from "@/components/home/reels";
 import {
   getAuthorities,
   getBrandLogos,
   getPhotoGalleries,
+  getReels,
   getSectionVideos,
 } from "@/lib/db/settings";
 import { site } from "@/lib/site";
@@ -21,7 +23,7 @@ import { youtubeThumb } from "@/lib/utils";
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const [todos, clients, sectionVideos, autoridades, marcas, galerias] =
+  const [todos, clients, sectionVideos, autoridades, marcas, galerias, reels] =
     await Promise.all([
       getFeaturedProjects(14),
       getClients(),
@@ -29,6 +31,7 @@ export default async function HomePage() {
       getAuthorities(),
       getBrandLogos(),
       getPhotoGalleries(),
+      getReels(),
     ]);
 
   const projects = todos.slice(0, 5);
@@ -53,6 +56,7 @@ export default async function HomePage() {
         galerias={galerias}
       />
       <FeaturedWork projects={projects} />
+      <Reels reels={reels} />
       <Manifesto />
       <Authorities people={autoridades} />
       {/* Si hay marcas cargadas a mano manda el carrusel; si no, se muestran

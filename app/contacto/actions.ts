@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { avisarConsulta } from "@/lib/email/notify";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseConfigured } from "@/lib/supabase/server";
 
@@ -73,6 +74,10 @@ export async function sendContactMessage(
     });
 
     if (error) throw new Error(error.message);
+
+    // El mensaje ya está a salvo en la base. El aviso por correo va después y
+    // aparte: si Resend está caído o sin configurar, la consulta no se pierde.
+    await avisarConsulta({ name, email, company, budget, message });
 
     return {
       status: "ok",

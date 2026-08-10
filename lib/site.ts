@@ -34,8 +34,7 @@ export const site = {
   foundingYear: 2018,
 
   contact: {
-    // TODO: reemplazar el correo por el real del estudio.
-    email: "hola@onnismeeks.com",
+    email: "info@onnismeeks.com",
     phone: "+54 9 11 6882 7421",
     /** Formato internacional sin signos, como lo pide wa.me */
     whatsapp: "5491168827421",

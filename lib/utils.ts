@@ -61,6 +61,20 @@ export function youtubeThumb(
   return `https://i.ytimg.com/vi/${youtubeId}/${file}.jpg`;
 }
 
+/**
+ * Extrae el id de un enlace de YouTube. Acepta lo que se copia del navegador:
+ * youtu.be, watch?v=, shorts, embed, o directamente el id pelado.
+ */
+export function extraerYoutubeId(entrada: string): string | null {
+  const texto = entrada.trim();
+  if (!texto) return null;
+
+  if (/^[A-Za-z0-9_-]{11}$/.test(texto)) return texto;
+
+  const m = /(?:youtu\.be\/|v=|embed\/|shorts\/|live\/)([A-Za-z0-9_-]{11})/.exec(texto);
+  return m ? m[1] : null;
+}
+
 export function truncate(text: string, max: number): string {
   const clean = text.replace(/\s+/g, " ").trim();
   if (clean.length <= max) return clean;

@@ -93,6 +93,20 @@ export default async function AdminPage() {
             Marcas
           </Link>
 
+          <Link
+            href="/admin/reels"
+            className="inline-flex h-10 items-center rounded-full border border-line px-5 text-[12px] font-semibold uppercase tracking-[0.1em] text-paper transition-colors hover:border-flame-warm hover:text-flame-warm"
+          >
+            Reels
+          </Link>
+
+          <Link
+            href="/admin/mensajes"
+            className="inline-flex h-10 items-center rounded-full border border-line px-5 text-[12px] font-semibold uppercase tracking-[0.1em] text-paper transition-colors hover:border-flame-warm hover:text-flame-warm"
+          >
+            Mensajes
+          </Link>
+
           <form action={createManualProject}>
             <input type="hidden" name="title" value="Proyecto nuevo" />
             <button

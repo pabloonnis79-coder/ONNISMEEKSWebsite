@@ -7,11 +7,11 @@ import {
   CLAVE_AUTORIDADES,
   CLAVE_FOTOGRAFIA,
   CLAVE_MARCAS,
+  CLAVE_REELS,
   CLAVE_VIDEOS_SECCION,
-  extraerYoutubeId,
   normalizarImagen,
 } from "@/lib/db/settings";
-import { slugify, uniq } from "@/lib/utils";
+import { extraerYoutubeId, slugify, uniq } from "@/lib/utils";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -453,6 +453,64 @@ export async function saveBrandLogos(
     return {
       status: "ok",
       message: value.length === 0 ? "Sin marcas cargadas." : `${value.length} marcas guardadas.`,
+    };
+  } catch (error) {
+    return {
+      status: "error",
+      message: error instanceof Error ? error.message : "No se pudo guardar",
+    };
+  }
+}
+
+/* ------------------------------------------------------ reels verticales -- */
+
+export async function saveReels(
+  _prev: SaveState,
+  formData: FormData,
+): Promise<SaveState> {
+  const value: Array<{ youtubeId: string; titulo: string; cliente: string }> = [];
+  const invalidos: number[] = [];
+
+  for (let i = 0; i < 8; i++) {
+    const bruto = String(formData.get(`reel_url_${i}`) ?? "").trim();
+    const titulo = String(formData.get(`reel_titulo_${i}`) ?? "").trim();
+    const cliente = String(formData.get(`reel_cliente_${i}`) ?? "").trim();
+
+    if (!bruto) continue;
+
+    const youtubeId = extraerYoutubeId(bruto);
+    if (!youtubeId) {
+      invalidos.push(i + 1);
+      continue;
+    }
+
+    value.push({ youtubeId, titulo, cliente });
+  }
+
+  if (invalidos.length > 0) {
+    return {
+      status: "error",
+      message: `No pude leer el enlace de YouTube en el reel ${invalidos.join(", ")}. Pegá la dirección completa del Short.`,
+    };
+  }
+
+  try {
+    const supabase = await client();
+    const { error } = await supabase
+      .from("site_settings")
+      .upsert(
+        { key: CLAVE_REELS, value, updated_at: new Date().toISOString() },
+        { onConflict: "key" },
+      );
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath("/");
+    revalidatePath("/admin/reels");
+
+    return {
+      status: "ok",
+      message: value.length === 0 ? "Sin reels cargados." : `${value.length} reels publicados.`,
     };
   } catch (error) {
     return {
