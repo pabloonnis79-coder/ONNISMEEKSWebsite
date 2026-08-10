@@ -16,7 +16,7 @@ export function SiteFooter() {
       <div className="mx-auto max-w-[1600px] px-5 py-16 md:px-10 md:py-20">
         <div className="grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-6">
-            <h2 className="display font-display text-[10.5vw] font-extrabold uppercase leading-[0.85] tracking-[-0.045em] text-paper sm:text-[9vw] lg:text-[5.4vw]">
+            <h2 className="display font-display text-[10.5vw] font-extrabold uppercase leading-[0.85] tracking-[-0.045em] text-paper sm:text-[9vw] lg:text-[min(5.4vw,86.4px)]">
               Onnis
               <span className="flame-text">&amp;</span>
               Meeks

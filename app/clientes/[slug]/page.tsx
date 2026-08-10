@@ -84,7 +84,7 @@ export default async function ClientPage({
                 className="mb-8 h-12 w-auto object-contain"
               />
             )}
-            <h1 className="display font-display text-[11vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[9vw] lg:text-[5.6vw]">
+            <h1 className="display font-display text-[11vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[9vw] lg:text-[min(5.6vw,89.6px)]">
               {client.name}
             </h1>
             {client.story && (

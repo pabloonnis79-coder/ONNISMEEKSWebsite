@@ -20,7 +20,7 @@ export function FeaturedWork({ projects }: { projects: Project[] }) {
   if (projects.length === 0) {
     return (
       <section className="mx-auto max-w-[1600px] px-5 py-24 md:px-10 md:py-32">
-        <h2 className="display font-display text-[9vw] font-extrabold uppercase leading-[0.9] tracking-[-0.04em] lg:text-[4.4vw]">
+        <h2 className="display font-display text-[9vw] font-extrabold uppercase leading-[0.9] tracking-[-0.04em] lg:text-[min(4.4vw,70.4px)]">
           Todavía no hay proyectos publicados
         </h2>
         <p className="mt-6 max-w-[52ch] text-paper-dim">
@@ -38,7 +38,7 @@ export function FeaturedWork({ projects }: { projects: Project[] }) {
           <p className="mb-5 font-mono text-[11px] uppercase tracking-[0.22em] text-flame">
             Trabajos
           </p>
-          <h2 className="display max-w-[14ch] font-display text-[11vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[8vw] lg:text-[5vw]">
+          <h2 className="display max-w-[14ch] font-display text-[11vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[8vw] lg:text-[min(5vw,80px)]">
             Lo último que salió del estudio
           </h2>
         </div>

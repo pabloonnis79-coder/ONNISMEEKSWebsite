@@ -102,7 +102,7 @@ export default async function ServicePage({
           <p className="mb-5 font-mono text-[11px] uppercase tracking-[0.22em] text-flame">
             Servicios
           </p>
-          <h1 className="display max-w-[14ch] font-display text-[13vw] font-extrabold uppercase tracking-[-0.05em] text-paper sm:text-[9vw] lg:text-[6.4vw]">
+          <h1 className="display max-w-[14ch] font-display text-[13vw] font-extrabold uppercase tracking-[-0.05em] text-paper sm:text-[9vw] lg:text-[min(6.4vw,102.4px)]">
             {service.name}
           </h1>
           <p className="mt-7 max-w-[56ch] text-base leading-relaxed text-paper-dim md:text-lg">
@@ -134,7 +134,7 @@ export default async function ServicePage({
       {service.media !== "fotos" && proyectos.length > 0 && (
         <section className="mx-auto max-w-[1600px] border-t border-line px-5 py-16 md:px-10 md:py-24">
           <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
-            <h2 className="display font-display text-[10vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[6.5vw] lg:text-[4vw]">
+            <h2 className="display font-display text-[10vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[6.5vw] lg:text-[min(4vw,64px)]">
               {propios.length > 0 ? "Trabajos" : "Últimos trabajos"}
             </h2>
             <Link
@@ -161,7 +161,7 @@ export default async function ServicePage({
 
       <section className="border-t border-line bg-ink-800">
         <div className="mx-auto flex max-w-[1600px] flex-col gap-8 px-5 py-20 md:flex-row md:items-center md:justify-between md:px-10 md:py-28">
-          <h2 className="display max-w-[18ch] font-display text-[10vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[6.5vw] lg:text-[4vw]">
+          <h2 className="display max-w-[18ch] font-display text-[10vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[6.5vw] lg:text-[min(4vw,64px)]">
             Contanos qué hay que filmar
           </h2>
           <ActionLink href="/contacto" arrow className="self-start">

@@ -26,7 +26,7 @@ export function Process() {
         */}
         <div className="min-w-0 lg:col-span-4">
           <div className="lg:sticky lg:top-28">
-            <h2 className="display font-display text-[11vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[8vw] lg:text-[3.6vw]">
+            <h2 className="display font-display text-[11vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[8vw] lg:text-[min(3.6vw,57.6px)]">
               Cómo
               <br />
               trabajamos
@@ -42,7 +42,7 @@ export function Process() {
           {steps.map((step, i) => (
             <Reveal key={step.verb} delay={i * 0.06}>
               <div className="border-t border-line py-10 first:border-t-0 first:pt-0 md:py-14">
-                <h3 className="display font-display text-[13vw] font-extrabold uppercase tracking-[-0.05em] text-paper sm:text-[9vw] lg:text-[5.6vw]">
+                <h3 className="display font-display text-[13vw] font-extrabold uppercase tracking-[-0.05em] text-paper sm:text-[9vw] lg:text-[min(5.6vw,89.6px)]">
                   {step.verb}
                 </h3>
                 <p className="mt-5 max-w-[60ch] text-base leading-relaxed text-paper-dim">

@@ -6,7 +6,7 @@ export default function NotFound() {
       <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-flame">
         Error 404
       </p>
-      <h1 className="display mt-6 max-w-[16ch] font-display text-[13vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[9vw] lg:text-[5.4vw]">
+      <h1 className="display mt-6 max-w-[16ch] font-display text-[13vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[9vw] lg:text-[min(5.4vw,86.4px)]">
         Esta página no existe
       </h1>
       <p className="mt-6 max-w-[48ch] text-base leading-relaxed text-paper-dim">

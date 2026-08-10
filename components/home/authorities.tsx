@@ -17,7 +17,7 @@ export function Authorities({ people }: { people: Autoridad[] }) {
       className="border-t border-line bg-ink-800"
     >
       <div className="mx-auto max-w-[1600px] px-5 py-20 md:px-10 md:py-28">
-        <h2 className="display max-w-[14ch] font-display text-[11vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[7vw] lg:text-[4.4vw]">
+        <h2 className="display max-w-[14ch] font-display text-[11vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[7vw] lg:text-[min(4.4vw,70.4px)]">
           Quiénes dirigen
         </h2>
 

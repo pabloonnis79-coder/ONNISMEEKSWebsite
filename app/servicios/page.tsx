@@ -42,7 +42,7 @@ export default function ServicesPage() {
 
       <div className="mx-auto max-w-[1600px] px-5 pt-32 md:px-10 md:pt-40">
         <header className="max-w-[24ch]">
-          <h1 className="display font-display text-[12vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[11vw] lg:text-[7vw]">
+          <h1 className="display font-display text-[12vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[11vw] lg:text-[min(7vw,112px)]">
             Servicios
           </h1>
           <p className="mt-6 max-w-[52ch] text-base leading-relaxed text-paper-dim md:text-lg">
@@ -60,7 +60,7 @@ export default function ServicesPage() {
               className="grid scroll-mt-28 gap-6 border-t border-line py-10 md:grid-cols-12 md:gap-10 md:py-14"
             >
               <div className="md:col-span-5">
-                <h2 className="display font-display text-[9vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[6vw] lg:text-[3.4vw]">
+                <h2 className="display font-display text-[9vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[6vw] lg:text-[min(3.4vw,54.4px)]">
                   <Link
                     href={`/servicios/${service.slug}`}
                     className="text-paper transition-colors duration-300 hover:text-flame"
@@ -115,7 +115,7 @@ export default function ServicesPage() {
 
       <section className="border-t border-line bg-ink-800">
         <div className="mx-auto flex max-w-[1600px] flex-col gap-8 px-5 py-20 md:flex-row md:items-center md:justify-between md:px-10 md:py-28">
-          <h2 className="display max-w-[18ch] font-display text-[10vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[6.5vw] lg:text-[4vw]">
+          <h2 className="display max-w-[18ch] font-display text-[10vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[6.5vw] lg:text-[min(4vw,64px)]">
             Contanos qué hay que filmar
           </h2>
           <ActionLink href="/contacto" arrow className="self-start">

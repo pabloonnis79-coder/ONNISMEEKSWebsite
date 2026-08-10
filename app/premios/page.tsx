@@ -35,7 +35,7 @@ export default function AwardsPage() {
 
       <div className="mx-auto max-w-[1600px] px-5 pb-24 pt-32 md:px-10 md:pb-32 md:pt-40">
         <header className="mb-14 md:mb-20">
-          <h1 className="display font-display text-[13vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[11vw] lg:text-[7vw]">
+          <h1 className="display font-display text-[13vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[11vw] lg:text-[min(7vw,112px)]">
             Premios
           </h1>
           <p className="mt-6 max-w-[52ch] text-base leading-relaxed text-paper-dim md:text-lg">
@@ -62,7 +62,7 @@ export default function AwardsPage() {
             {years.map((year) => (
               <Reveal key={year}>
                 <div className="grid gap-6 md:grid-cols-12">
-                  <h2 className="display font-display text-[14vw] font-extrabold uppercase leading-[0.85] tracking-[-0.05em] text-paper-faint sm:text-[8vw] md:col-span-3 lg:text-[4.4vw]">
+                  <h2 className="display font-display text-[14vw] font-extrabold uppercase leading-[0.85] tracking-[-0.05em] text-paper-faint sm:text-[8vw] md:col-span-3 lg:text-[min(4.4vw,70.4px)]">
                     {year}
                   </h2>
 

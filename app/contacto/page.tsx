@@ -24,7 +24,7 @@ export default function ContactPage() {
       <div className="mx-auto max-w-[1600px] px-5 pb-24 pt-32 md:px-10 md:pb-32 md:pt-40">
         <div className="grid gap-14 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-5">
-            <h1 className="display font-display text-[11vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[9vw] lg:text-[4.6vw]">
+            <h1 className="display font-display text-[11vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[9vw] lg:text-[min(4.6vw,73.6px)]">
               Contanos qué hay que filmar
             </h1>
             <p className="mt-7 max-w-[42ch] text-base leading-relaxed text-paper-dim md:text-lg">

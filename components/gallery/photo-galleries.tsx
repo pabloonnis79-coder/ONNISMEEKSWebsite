@@ -19,7 +19,7 @@ export function PhotoGalleries({ galerias }: { galerias: GaleriaFoto[] }) {
           key={galeria.titulo}
           className="mx-auto max-w-[1600px] border-t border-line px-5 py-16 md:px-10 md:py-24"
         >
-          <h2 className="display font-display text-[10vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[6.5vw] lg:text-[4vw]">
+          <h2 className="display font-display text-[10vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[6.5vw] lg:text-[min(4vw,64px)]">
             {galeria.titulo}
           </h2>
 

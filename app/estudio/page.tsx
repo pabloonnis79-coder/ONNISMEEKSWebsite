@@ -41,7 +41,7 @@ export default async function StudioPage() {
       />
 
       <div className="mx-auto max-w-[1600px] px-5 pt-32 md:px-10 md:pt-40">
-        <h1 className="display max-w-[18ch] font-display text-[11vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[9vw] lg:text-[6vw]">
+        <h1 className="display max-w-[18ch] font-display text-[11vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[9vw] lg:text-[min(6vw,96px)]">
           Un estudio, <span className="flame-text">todo el proceso</span>
         </h1>
       </div>
@@ -101,7 +101,7 @@ export default async function StudioPage() {
             ) : (
               <div className="flex aspect-[4/5] w-full flex-col justify-between border border-line p-8">
                 <BrandSquare size={28} />
-                <p className="display font-display text-[7vw] font-extrabold uppercase leading-[0.9] tracking-[-0.04em] text-paper lg:text-[2.6vw]">
+                <p className="display font-display text-[7vw] font-extrabold uppercase leading-[0.9] tracking-[-0.04em] text-paper lg:text-[min(2.6vw,41.6px)]">
                   Desde {site.foundingYear}
                 </p>
               </div>
@@ -131,7 +131,7 @@ export default async function StudioPage() {
 
       {team.length > 0 && (
         <section className="mx-auto max-w-[1600px] px-5 py-20 md:px-10 md:py-28">
-          <h2 className="display font-display text-[10vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[6.5vw] lg:text-[4vw]">
+          <h2 className="display font-display text-[10vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[6.5vw] lg:text-[min(4vw,64px)]">
             Equipo
           </h2>
           <ul className="mt-12 grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-3 lg:grid-cols-4">
@@ -160,7 +160,7 @@ export default async function StudioPage() {
 
       <section className="border-t border-line">
         <div className="mx-auto flex max-w-[1600px] flex-col gap-8 px-5 py-20 md:flex-row md:items-center md:justify-between md:px-10 md:py-28">
-          <h2 className="display max-w-[18ch] font-display text-[10vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[6.5vw] lg:text-[4vw]">
+          <h2 className="display max-w-[18ch] font-display text-[10vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[6.5vw] lg:text-[min(4vw,64px)]">
             Contanos qué hay que filmar
           </h2>
           <ActionLink href="/contacto" arrow className="self-start">

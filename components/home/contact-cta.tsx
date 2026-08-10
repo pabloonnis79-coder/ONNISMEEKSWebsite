@@ -12,7 +12,7 @@ export function ContactCta() {
 
       <div className="relative mx-auto max-w-[1600px] px-5 py-24 md:px-10 md:py-36">
         <Reveal>
-          <h2 className="display max-w-[16ch] font-display text-[12vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[8.5vw] lg:text-[5.6vw]">
+          <h2 className="display max-w-[16ch] font-display text-[12vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[8.5vw] lg:text-[min(5.6vw,89.6px)]">
             Contanos qué hay que filmar
           </h2>
         </Reveal>

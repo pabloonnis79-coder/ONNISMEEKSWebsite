@@ -39,7 +39,7 @@ export default async function BehindTheScenesPage() {
 
       <div className="mx-auto max-w-[1600px] px-5 pt-32 md:px-10 md:pt-40">
         <header className="max-w-[20ch]">
-          <h1 className="display font-display text-[12vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[10vw] lg:text-[6.4vw]">
+          <h1 className="display font-display text-[12vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[10vw] lg:text-[min(6.4vw,102.4px)]">
             Detrás de cámara
           </h1>
           <p className="mt-6 max-w-[52ch] text-base leading-relaxed text-paper-dim md:text-lg">

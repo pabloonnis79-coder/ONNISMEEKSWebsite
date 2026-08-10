@@ -91,7 +91,7 @@ export default async function ProjectPage({
               {project.clientName}
             </p>
           )}
-          <h1 className="display max-w-[16ch] font-display text-[11vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[9vw] lg:text-[6vw]">
+          <h1 className="display max-w-[16ch] font-display text-[11vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[9vw] lg:text-[min(6vw,96px)]">
             {title}
           </h1>
         </header>
@@ -148,7 +148,7 @@ export default async function ProjectPage({
             <div className="mx-auto grid max-w-[1600px] gap-10 px-5 py-20 md:px-10 md:py-28 lg:grid-cols-12 lg:gap-16">
               {project.story && (
                 <div className="lg:col-span-7">
-                  <h2 className="display font-display text-[9vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[6vw] lg:text-[3.2vw]">
+                  <h2 className="display font-display text-[9vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[6vw] lg:text-[min(3.2vw,51.2px)]">
                     El proyecto
                   </h2>
                   <div className="mt-8 space-y-5 text-base leading-relaxed text-paper-dim md:text-lg">
@@ -186,7 +186,7 @@ export default async function ProjectPage({
         {/* Galería */}
         {project.gallery.length > 0 && (
           <section className="mx-auto max-w-[1600px] px-5 py-20 md:px-10 md:py-28">
-            <h2 className="display font-display text-[9vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[6vw] lg:text-[3.2vw]">
+            <h2 className="display font-display text-[9vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[6vw] lg:text-[min(3.2vw,51.2px)]">
               Galería
             </h2>
             <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -210,7 +210,7 @@ export default async function ProjectPage({
         {/* Making of y videos adicionales */}
         {(project.makingOf.length > 0 || project.extraVideos.length > 0) && (
           <section className="mx-auto max-w-[1600px] border-t border-line px-5 py-20 md:px-10 md:py-28">
-            <h2 className="display font-display text-[9vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[6vw] lg:text-[3.2vw]">
+            <h2 className="display font-display text-[9vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[6vw] lg:text-[min(3.2vw,51.2px)]">
               Detrás de cámara
             </h2>
             <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -242,7 +242,7 @@ export default async function ProjectPage({
         {/* Créditos */}
         {project.credits.length > 0 && (
           <section className="mx-auto max-w-[1600px] border-t border-line px-5 py-20 md:px-10 md:py-28">
-            <h2 className="display font-display text-[9vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[6vw] lg:text-[3.2vw]">
+            <h2 className="display font-display text-[9vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[6vw] lg:text-[min(3.2vw,51.2px)]">
               Créditos
             </h2>
             <div className="mt-10 grid grid-cols-1 gap-x-12 gap-y-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -277,7 +277,7 @@ function NextProject({ project }: { project: Project }) {
             <p className="font-mono text-[11px] uppercase tracking-[0.22em] text-flame">
               Siguiente proyecto
             </p>
-            <h2 className="display mt-5 font-display text-[11vw] font-extrabold uppercase tracking-[-0.05em] text-paper transition-colors duration-300 group-hover:text-flame-warm sm:text-[7vw] lg:text-[4.4vw]">
+            <h2 className="display mt-5 font-display text-[11vw] font-extrabold uppercase tracking-[-0.05em] text-paper transition-colors duration-300 group-hover:text-flame-warm sm:text-[7vw] lg:text-[min(4.4vw,70.4px)]">
               {title}
             </h2>
             <p className="mt-4 flex items-center gap-2 text-sm text-paper-dim">

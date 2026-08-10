@@ -50,7 +50,7 @@ export function Hero({
       <div className="relative mx-auto w-full max-w-[1600px] px-5 pb-16 pt-24 md:px-10 md:pb-20">
         {/* Sin límite de ancho: el corte de línea ya está decidido a mano en
             RevealLines, y un max-width acá obligaba a "TERMINAMOS" a partirse. */}
-        <h1 className="display font-display text-[10.5vw] font-extrabold uppercase tracking-[-0.045em] text-paper sm:text-[9vw] lg:text-[6.2vw]">
+        <h1 className="display font-display text-[10.5vw] font-extrabold uppercase tracking-[-0.045em] text-paper sm:text-[9vw] lg:text-[min(6.2vw,99.2px)]">
           {/*
             Hasta 1024 el titular va en tres líneas: "contenido que" en una
             sola línea con "Creamos" no entra en un teléfono, y partir la

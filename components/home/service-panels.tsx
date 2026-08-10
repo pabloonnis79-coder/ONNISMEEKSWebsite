@@ -104,7 +104,7 @@ export function ServicePanels({
             <div className="relative mx-auto w-full max-w-[1600px] px-5 pb-16 md:px-10 md:pb-24">
               {/* 11vw y no 13: "audiovisual" y "fotográfica" son 11 caracteres,
                   que a 13vw piden 93vw de ancho y no entran en un teléfono. */}
-              <h2 className="display max-w-[14ch] font-display text-[11vw] font-extrabold uppercase tracking-[-0.05em] text-paper sm:text-[9vw] lg:text-[6.4vw]">
+              <h2 className="display max-w-[14ch] font-display text-[11vw] font-extrabold uppercase tracking-[-0.05em] text-paper sm:text-[9vw] lg:text-[min(6.4vw,102.4px)]">
                 {service.name}
               </h2>
 
