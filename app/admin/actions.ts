@@ -3,7 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { CLAVE_VIDEOS_SECCION, extraerYoutubeId } from "@/lib/db/settings";
+import {
+  CLAVE_AUTORIDADES,
+  CLAVE_VIDEOS_SECCION,
+  extraerYoutubeId,
+} from "@/lib/db/settings";
 import { slugify, uniq } from "@/lib/utils";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -289,6 +293,60 @@ export async function saveSectionVideos(
     revalidatePath("/admin/secciones");
 
     return { status: "ok", message: "Videos actualizados." };
+  } catch (error) {
+    return {
+      status: "error",
+      message: error instanceof Error ? error.message : "No se pudo guardar",
+    };
+  }
+}
+
+/* ---------------------------------------------------- autoridades --------- */
+
+export async function saveAuthorities(
+  _prev: SaveState,
+  formData: FormData,
+): Promise<SaveState> {
+  const value: Array<Record<string, string>> = [];
+
+  for (let i = 0; i < 3; i++) {
+    const nombre = String(formData.get(`nombre_${i}`) ?? "").trim();
+    const apellido = String(formData.get(`apellido_${i}`) ?? "").trim();
+    const cargo = String(formData.get(`cargo_${i}`) ?? "").trim();
+    const foto = String(formData.get(`foto_${i}`) ?? "").trim();
+
+    // Una ficha sin nombre no dice nada: se descarta en silencio.
+    if (!nombre && !apellido) continue;
+
+    if (foto && !/^https?:\/\//.test(foto)) {
+      return {
+        status: "error",
+        message: `La foto de ${nombre || apellido} tiene que ser un enlace que empiece con http. Subila y pegá la dirección.`,
+      };
+    }
+
+    value.push({ nombre, apellido, cargo, foto });
+  }
+
+  try {
+    const supabase = await client();
+    const { error } = await supabase
+      .from("site_settings")
+      .upsert(
+        { key: CLAVE_AUTORIDADES, value, updated_at: new Date().toISOString() },
+        { onConflict: "key" },
+      );
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath("/");
+    revalidatePath("/estudio");
+    revalidatePath("/admin/autoridades");
+
+    return {
+      status: "ok",
+      message: value.length === 0 ? "Sección vacía, no se muestra." : "Autoridades actualizadas.",
+    };
   } catch (error) {
     return {
       status: "error",

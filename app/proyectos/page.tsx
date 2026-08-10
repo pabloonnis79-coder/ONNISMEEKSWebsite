@@ -68,14 +68,16 @@ export default async function ProjectsPage({
         {projects.length === 0 ? (
           <EmptyState />
         ) : (
-          <div className="mt-16 grid grid-cols-1 gap-x-6 gap-y-16 md:grid-cols-2 md:gap-y-20">
+          // Grilla pareja de 16:9, densa y sin jerarquias: el listado es para
+          // recorrer todo el trabajo, no para destacar una pieza.
+          <div className="mt-16 grid grid-cols-1 gap-x-5 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {projects.map((project, i) => (
-              <Reveal key={project.id} delay={i % 2 === 1 ? 0.08 : 0}>
+              <Reveal key={project.id} delay={(i % 3) * 0.06}>
                 <ProjectCard
                   project={project}
-                  priority={i < 2}
-                  size={i % 3 === 0 ? "md" : "sm"}
-                  sizes="(max-width: 768px) 100vw, 48vw"
+                  priority={i < 3}
+                  size="reel"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
               </Reveal>
             ))}

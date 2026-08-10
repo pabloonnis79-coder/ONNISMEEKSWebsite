@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
+import { YoutubeLoop } from "@/components/media/youtube-loop";
 
 /**
  * Portada de un proyecto.
@@ -96,16 +97,7 @@ export function HoverVideo({
       )}
 
       {mostrarVideo && youtubeId && (
-        <iframe
-          title=""
-          aria-hidden="true"
-          tabIndex={-1}
-          src={`https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${youtubeId}&modestbranding=1&playsinline=1&rel=0&disablekb=1&fs=0&iv_load_policy=3`}
-          allow="autoplay; encrypted-media"
-          /* El scale saca de cuadro la barra de titulo y el logo de YouTube,
-             que aparecen igual con controls=0 y no se pueden apagar. */
-          className="pointer-events-none absolute left-1/2 top-1/2 h-[56.25vw] min-h-full w-[177.78vh] min-w-full -translate-x-1/2 -translate-y-1/2 scale-[1.35] border-0"
-        />
+        <YoutubeLoop key={youtubeId} youtubeId={youtubeId} />
       )}
     </div>
   );

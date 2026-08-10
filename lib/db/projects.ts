@@ -262,11 +262,20 @@ export async function getClients(): Promise<Client[]> {
     return [];
   }
 
-  const clients = (data ?? []).map(mapClient);
+  const facets = await getFacets();
+  const conProyectos = new Set(facets.clients.map((c) => c.slug));
+
+  const clients = (data ?? [])
+    .map(mapClient)
+    // Un cliente sin ninguna pieza publicada no va en el muro. Suele ser
+    // resto de una descripcion que despues se corrigio, o de un video que se
+    // borro. La sincronizacion los limpia, pero esto evita mostrarlos en el
+    // rato que va hasta la proxima corrida.
+    .filter((c) => conProyectos.has(c.slug) || c.logoUrl || c.story);
+
   if (clients.length > 0) return clients;
 
   // Si nadie cargo clientes a mano, los derivamos de los proyectos.
-  const facets = await getFacets();
   return facets.clients.map((c, i) => ({
     id: c.slug,
     slug: c.slug,

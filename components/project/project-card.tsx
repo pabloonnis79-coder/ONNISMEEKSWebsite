@@ -13,7 +13,8 @@ export function ProjectCard({
 }: {
   project: Project;
   priority?: boolean;
-  size?: "sm" | "md" | "lg";
+  /** "reel" es la grilla densa y pareja del listado: todo en 16:9. */
+  size?: "reel" | "sm" | "md" | "lg";
   sizes?: string;
   /** Reproduce el video al entrar en pantalla, sin esperar al cursor. */
   auto?: boolean;
@@ -32,7 +33,13 @@ export function ProjectCard({
       <div
         className={cn(
           "relative w-full overflow-hidden",
-          size === "lg" ? "aspect-[16/10]" : size === "sm" ? "aspect-[4/3]" : "aspect-[3/2]",
+          size === "lg"
+            ? "aspect-[16/10]"
+            : size === "reel"
+              ? "aspect-video"
+              : size === "sm"
+                ? "aspect-[4/3]"
+                : "aspect-[3/2]",
         )}
       >
         <HoverVideo
@@ -52,17 +59,31 @@ export function ProjectCard({
         <span className="absolute bottom-0 left-0 h-[3px] w-full origin-left scale-x-0 flame-bg transition-transform duration-700 ease-[var(--ease-out-expo)] group-hover:scale-x-100" />
       </div>
 
-      <div className="flex items-start justify-between gap-6 pt-5">
+      <div
+        className={cn(
+          "flex items-start justify-between gap-6",
+          size === "reel" ? "pt-3.5" : "pt-5",
+        )}
+      >
         <div className="min-w-0">
           <h3
             className={cn(
               "font-display font-extrabold uppercase leading-[0.95] tracking-[-0.035em] text-paper transition-colors duration-300 group-hover:text-flame-warm",
-              size === "lg" ? "text-2xl md:text-4xl" : "text-xl md:text-2xl",
+              size === "lg"
+                ? "text-2xl md:text-4xl"
+                : size === "reel"
+                  ? "text-base md:text-lg"
+                  : "text-xl md:text-2xl",
             )}
           >
             {title}
           </h3>
-          <p className="mt-2 text-sm text-paper-dim">
+          <p
+            className={cn(
+              "text-paper-dim",
+              size === "reel" ? "mt-1.5 text-[13px]" : "mt-2 text-sm",
+            )}
+          >
             {[project.clientName, project.category].filter(Boolean).join(", ")}
           </p>
         </div>

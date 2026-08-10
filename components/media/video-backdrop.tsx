@@ -3,14 +3,17 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
+import { YoutubeLoop } from "@/components/media/youtube-loop";
 
 /**
  * Fondo de video a sangre completa.
  *
- * La portada carga siempre; el reproductor se monta recien cuando el panel
- * entra en pantalla y se desmonta al salir. Asi nunca hay mas de uno o dos
- * corriendo a la vez, por mas paneles que tenga la pagina. La referencia que
- * tomamos deja los siete cargados desde el principio.
+ * La portada carga siempre y queda debajo: el video aparece por encima recien
+ * cuando esta reproduciendo de verdad. Asi nunca se ve la barra de controles
+ * que YouTube dibuja mientras esta pausado.
+ *
+ * El reproductor se monta al entrar en pantalla y se desmonta al salir, para
+ * que no haya mas de uno o dos corriendo por mas paneles que tenga la pagina.
  */
 export function VideoBackdrop({
   youtubeId,
@@ -23,20 +26,13 @@ export function VideoBackdrop({
   poster: string | null;
   alt: string;
   priority?: boolean;
-  /**
-   * Monta el reproductor sin esperar al observador. Es para el hero, que
-   * siempre esta en pantalla al cargar: hacerlo depender de una interseccion
-   * que puede no dispararse nunca es arriesgar el elemento mas visible del
-   * sitio a cambio de nada.
-   */
+  /** Monta el reproductor sin esperar al observador, para el hero. */
   siempre?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [enPantalla, setEnPantalla] = useState(false);
   const reduce = useReducedMotion();
 
-  // Con `siempre` no hace falta observador ni estado: el video se muestra y
-  // listo. Solo `reduce` puede sacarlo.
   const mostrarVideo = Boolean(youtubeId) && !reduce && (siempre || enPantalla);
 
   useEffect(() => {
@@ -68,25 +64,10 @@ export function VideoBackdrop({
         />
       )}
 
-      {mostrarVideo && (
-        <iframe
-          title=""
-          tabIndex={-1}
-          aria-hidden="true"
-          src={`https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${youtubeId}&modestbranding=1&playsinline=1&rel=0&disablekb=1&fs=0&iv_load_policy=3`}
-          allow="autoplay; encrypted-media"
-          /*
-            Para que un 16:9 cubra la pantalla sin bandas hay que desbordarlo
-            por el lado que sobre: alto = ancho * 9/16 y viceversa, y se toma
-            el mayor de los dos.
-
-            El scale extra saca de cuadro la barra de titulo y el logo que
-            YouTube dibuja en los bordes: con controls=0 igual los muestra, y
-            no hay parametro para apagarlos. Agrandar y recortar es la unica
-            forma de que no aparezcan.
-          */
-          className="pointer-events-none absolute left-1/2 top-1/2 h-[56.25vw] min-h-full w-[177.78vh] min-w-full -translate-x-1/2 -translate-y-1/2 scale-[1.35] border-0"
-        />
+      {/* La clave fuerza un reproductor nuevo si cambia el video, asi el
+          revelado vuelve a empezar en vez de mostrar el anterior. */}
+      {mostrarVideo && youtubeId && (
+        <YoutubeLoop key={youtubeId} youtubeId={youtubeId} />
       )}
     </div>
   );

@@ -158,6 +158,26 @@ async function upsertClients(
         { onConflict: "slug", ignoreDuplicates: false },
       );
   }
+
+  // Limpieza de huerfanos. Un cliente creado por una descripcion que despues
+  // se corrigio, o cuyo video se borro, quedaba para siempre en el muro de la
+  // portada sin ningun proyecto detras y sin forma de sacarlo.
+  //
+  // Solo se borran los que la sincronizacion pudo haber creado: si alguien le
+  // cargo logo, historia o sitio desde el panel, es trabajo a mano y se
+  // respeta aunque momentaneamente no tenga piezas publicadas.
+  const { data: existentes } = await supabase
+    .from("clients")
+    .select("slug, logo_url, logo_slug, story, website");
+
+  const huerfanos = ((existentes ?? []) as any[])
+    .filter((c) => !map.has(c.slug))
+    .filter((c) => !c.logo_url && !c.logo_slug && !c.story && !c.website)
+    .map((c) => c.slug);
+
+  if (huerfanos.length > 0) {
+    await supabase.from("clients").delete().in("slug", huerfanos);
+  }
 }
 
 export type SyncOptions = {
