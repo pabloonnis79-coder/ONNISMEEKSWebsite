@@ -1,21 +1,36 @@
 import "server-only";
+import nodemailer from "nodemailer";
 import { site } from "@/lib/site";
 
 /**
  * Aviso por correo de cada consulta del formulario.
  *
- * Se manda con Resend por HTTP, sin librería: es una sola llamada y así no
- * sumamos una dependencia más al bundle del servidor.
+ * Sale por el SMTP de Zoho, la misma casilla corporativa que ya está andando.
+ * Así el aviso llega desde info@onnismeeks.com y no hace falta contratar ni
+ * verificar nada más.
  *
- * Todo esto es opcional a propósito. Si no hay RESEND_API_KEY el sitio sigue
- * andando igual: el mensaje ya quedó guardado en la base y se lee desde
+ * Todo esto es opcional a propósito. Si faltan las variables, el sitio sigue
+ * funcionando igual: el mensaje ya quedó guardado en la base y se lee desde
  * /admin/mensajes. El correo es el aviso, no el registro.
+ *
+ * La clave NO es la contraseña de Zoho: es una contraseña de aplicación, que se
+ * genera en accounts.zoho.com → Seguridad → Contraseñas de aplicación y se
+ * puede revocar sola sin tocar la cuenta.
  */
 
-const API = "https://api.resend.com/emails";
+/** Servidor de Zoho. Cambia según la región donde se creó la cuenta. */
+const HOST = process.env.SMTP_HOST ?? "smtp.zoho.com";
+const PORT = Number(process.env.SMTP_PORT ?? 465);
 
-/** Remitente. Va en un subdominio propio para no tocar el DKIM de Zoho. */
-const FROM = process.env.RESEND_FROM ?? "ONNIS & MEEKS <web@send.onnismeeks.com>";
+/** La casilla que se autentica. Tiene que ser la cuenta real, no un alias. */
+const USER = process.env.SMTP_USER ?? "";
+const PASS = process.env.SMTP_PASS ?? "";
+
+/**
+ * Remitente. Zoho solo acepta la propia cuenta o uno de sus alias: si acá va
+ * una dirección ajena, el servidor contesta "Relaying not allowed".
+ */
+const FROM = process.env.SMTP_FROM ?? site.contact.email;
 
 /** Destino de las consultas. */
 const TO = process.env.CONTACT_INBOX ?? site.contact.email;
@@ -36,7 +51,7 @@ function escapar(texto: string): string {
     .replace(/"/g, "&quot;");
 }
 
-function cuerpoHtml(c: ConsultaEmail): string {
+export function cuerpoHtml(c: ConsultaEmail): string {
   const filas = [
     ["Nombre", c.name],
     ["Correo", c.email],
@@ -55,10 +70,46 @@ function cuerpoHtml(c: ConsultaEmail): string {
   <table style="border-collapse:collapse;margin-bottom:20px">${filas}</table>
   <div style="border-left:3px solid #e0e0e0;padding-left:16px;font-size:15px;line-height:1.6;color:#111;white-space:pre-wrap">${escapar(c.message)}</div>
   <p style="margin-top:28px;font-size:12px;color:#8a8a8a">
-    Respondé este correo y le llega directo. También queda en
-    <a href="${site.url}/admin/mensajes" style="color:#8a8a8a">el panel</a>.
+    Respondé este correo y le llega directo a quien escribió. La consulta también
+    queda en <a href="${site.url}/admin/mensajes" style="color:#8a8a8a">el panel</a>.
   </p>
 </div>`;
+}
+
+export function cuerpoTexto(c: ConsultaEmail): string {
+  return [
+    `Consulta desde el sitio`,
+    ``,
+    `Nombre: ${c.name}`,
+    `Correo: ${c.email}`,
+    `Empresa: ${c.company || "—"}`,
+    `Presupuesto: ${c.budget || "—"}`,
+    ``,
+    c.message,
+    ``,
+    `Ver en el panel: ${site.url}/admin/mensajes`,
+  ].join("\n");
+}
+
+/**
+ * El transporte se arma una sola vez y se reusa entre invocaciones: abrir una
+ * conexión TLS nueva por cada consulta es caro y Zoho lo penaliza.
+ */
+let transporte: nodemailer.Transporter | null = null;
+
+function obtenerTransporte() {
+  if (!USER || !PASS) return null;
+
+  transporte ??= nodemailer.createTransport({
+    host: HOST,
+    port: PORT,
+    // 465 es TLS directo; 587 arranca en claro y sube con STARTTLS.
+    secure: PORT === 465,
+    auth: { user: USER, pass: PASS },
+    requireTLS: true,
+  });
+
+  return transporte;
 }
 
 /**
@@ -66,30 +117,19 @@ function cuerpoHtml(c: ConsultaEmail): string {
  * romperle el formulario a quien nos está escribiendo.
  */
 export async function avisarConsulta(c: ConsultaEmail): Promise<boolean> {
-  const key = process.env.RESEND_API_KEY;
-  if (!key) return false;
+  const mailer = obtenerTransporte();
+  if (!mailer) return false;
 
   try {
-    const res = await fetch(API, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${key}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: FROM,
-        to: [TO],
-        // Así "Responder" en el cliente de correo le contesta a la persona.
-        reply_to: c.email,
-        subject: `Consulta web — ${c.name}${c.company ? ` (${c.company})` : ""}`,
-        html: cuerpoHtml(c),
-      }),
+    await mailer.sendMail({
+      from: `${site.name} <${FROM}>`,
+      to: TO,
+      // Así "Responder" en el cliente de correo le contesta a la persona.
+      replyTo: `${c.name} <${c.email}>`,
+      subject: `Consulta web — ${c.name}${c.company ? ` (${c.company})` : ""}`,
+      text: cuerpoTexto(c),
+      html: cuerpoHtml(c),
     });
-
-    if (!res.ok) {
-      console.error("[email] resend respondió", res.status, await res.text());
-      return false;
-    }
 
     return true;
   } catch (error) {
