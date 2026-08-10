@@ -28,7 +28,7 @@ export const site = {
   legalName: "Onnis & Meeks Studio",
   tagline: "Productora audiovisual",
   description:
-    "Productora audiovisual. Dirigimos, filmamos y terminamos piezas para marcas que necesitan que su historia se vea bien contada.",
+    "Creamos contenido que impulsa marcas. Estrategia, producción y postproducción para empresas que quieren diferenciarse.",
   url: resolveSiteUrl(),
   locale: "es_AR",
   foundingYear: 2018,

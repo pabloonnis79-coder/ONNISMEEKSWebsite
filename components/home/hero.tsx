@@ -52,20 +52,18 @@ export function Hero({
             RevealLines, y un max-width acá obligaba a "TERMINAMOS" a partirse. */}
         <h1 className="display font-display text-[10.5vw] font-extrabold uppercase tracking-[-0.045em] text-paper sm:text-[9vw] lg:text-[6.2vw]">
           {/*
-            Hasta 1024 el titular va en tres líneas. En una sola, "Dirigimos,
-            filmamos" pide unos 12,35em de ancho y no entra en un teléfono:
-            antes esto se resolvía partiendo la palabra, que quedaba peor.
-            Con el corte extra, la línea más larga pasa a ser "y terminamos."
-            y el cuerpo puede seguir siendo grande.
+            Hasta 1024 el titular va en tres líneas: "contenido que" en una
+            sola línea con "Creamos" no entra en un teléfono, y partir la
+            palabra queda peor que agregar el corte.
           */}
           <RevealLines
             lines={[
               <>
-                Dirigimos,
-                <br className="lg:hidden" /> filmamos
+                Creamos
+                <br className="lg:hidden" /> contenido
               </>,
               <>
-                y <span className="flame-text">terminamos</span>.
+                que <span className="flame-text">impulsa marcas</span>
               </>,
             ]}
             delay={0.15}
@@ -79,8 +77,8 @@ export function Hero({
             transition={{ duration: 0.8, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
             className="max-w-[46ch] text-base leading-relaxed text-paper-dim md:text-lg"
           >
-            Publicidad, branded content y documental de marca. Rodaje, post y
-            entrega final en un mismo estudio.
+            Estrategia, producción y postproducción para empresas que quieren
+            diferenciarse.
           </motion.p>
 
           <motion.div

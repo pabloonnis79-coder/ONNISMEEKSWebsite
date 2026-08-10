@@ -19,7 +19,12 @@ export function Process() {
   return (
     <section className="border-t border-line">
       <div className="mx-auto grid max-w-[1600px] gap-12 px-5 py-24 md:px-10 md:py-32 lg:grid-cols-12 lg:gap-16">
-        <div className="lg:col-span-4">
+        {/*
+          min-w-0 en las dos columnas. Sin eso, un hijo de grilla usa
+          min-width:auto y un titular ancho ensancha su columna mas alla de lo
+          que le toca: "PENSAR" terminaba montado sobre "CÓMO TRABAJAMOS".
+        */}
+        <div className="min-w-0 lg:col-span-4">
           <div className="lg:sticky lg:top-28">
             <h2 className="display font-display text-[11vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[8vw] lg:text-[3.6vw]">
               Cómo
@@ -33,7 +38,7 @@ export function Process() {
           </div>
         </div>
 
-        <div className="lg:col-span-8">
+        <div className="min-w-0 lg:col-span-8">
           {steps.map((step, i) => (
             <Reveal key={step.verb} delay={i * 0.06}>
               <div className="border-t border-line py-10 first:border-t-0 first:pt-0 md:py-14">
