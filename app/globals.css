@@ -85,13 +85,18 @@
 @layer utilities {
   /*
     Display type: interlineado ajustado, con lugar reservado para las colas de
-    las letras. El break-word es la red de seguridad: una palabra larga en una
-    pantalla angosta corta de línea en vez de salirse del contenedor.
+    las letras.
+
+    Nada de partir palabras. Se probó con overflow-wrap y quedaba "TERMINAMO /
+    S.", que es peor que cualquier desborde. Si una palabra no entra, lo que se
+    achica es el cuerpo tipográfico, no la palabra.
   */
   .display {
     line-height: 0.92;
     padding-bottom: 0.06em;
-    overflow-wrap: break-word;
+    overflow-wrap: normal;
+    word-break: keep-all;
+    hyphens: none;
   }
 
   .flame-text {

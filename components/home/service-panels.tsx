@@ -4,7 +4,7 @@ import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr";
 import { VideoBackdrop } from "@/components/media/video-backdrop";
 import { services } from "@/lib/site";
 import type { Project } from "@/lib/types";
-import type { VideosDeSeccion } from "@/lib/db/settings";
+import type { GaleriaFoto, VideosDeSeccion } from "@/lib/db/settings";
 import { youtubeThumb } from "@/lib/utils";
 
 /**
@@ -44,21 +44,30 @@ function videoPara(
 export function ServicePanels({
   projects,
   sectionVideos,
+  galerias = [],
 }: {
   projects: Project[];
   sectionVideos: VideosDeSeccion;
+  /** Fotos cargadas desde el panel, para la seccion de fotografia. */
+  galerias?: GaleriaFoto[];
 }) {
   const usados = new Set<string>();
 
-  // Para la grilla de fotografia: portadas de trabajos publicados.
-  const stills = projects
-    .map((p) => ({
-      url: p.coverUrl ?? (p.youtubeId ? youtubeThumb(p.youtubeId) : null),
-      alt: p.projectName ?? p.title,
-      slug: p.slug,
-    }))
-    .filter((s): s is { url: string; alt: string; slug: string } => Boolean(s.url))
-    .slice(0, 8);
+  // Las fotos reales del estudio mandan. Si todavia no se cargo ninguna, se
+  // usan las portadas de los trabajos para que el panel no quede vacio.
+  const propias = galerias.flatMap((g) => g.fotos);
+
+  const stills =
+    propias.length > 0
+      ? propias.slice(0, 8).map((url, i) => ({ url, alt: "", slug: `foto-${i}` }))
+      : projects
+          .map((p) => ({
+            url: p.coverUrl ?? (p.youtubeId ? youtubeThumb(p.youtubeId) : null),
+            alt: p.projectName ?? p.title,
+            slug: p.slug,
+          }))
+          .filter((s): s is { url: string; alt: string; slug: string } => Boolean(s.url))
+          .slice(0, 8);
 
   return (
     <section aria-label="Servicios">
@@ -93,7 +102,9 @@ export function ServicePanels({
             />
 
             <div className="relative mx-auto w-full max-w-[1600px] px-5 pb-16 md:px-10 md:pb-24">
-              <h2 className="display max-w-[14ch] font-display text-[13vw] font-extrabold uppercase tracking-[-0.05em] text-paper sm:text-[9vw] lg:text-[6.4vw]">
+              {/* 11vw y no 13: "audiovisual" y "fotográfica" son 11 caracteres,
+                  que a 13vw piden 93vw de ancho y no entran en un teléfono. */}
+              <h2 className="display max-w-[14ch] font-display text-[11vw] font-extrabold uppercase tracking-[-0.05em] text-paper sm:text-[9vw] lg:text-[6.4vw]">
                 {service.name}
               </h2>
 

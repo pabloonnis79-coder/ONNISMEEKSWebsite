@@ -7,7 +7,8 @@ import { ActionLink } from "@/components/ui/action";
 import { Reveal } from "@/components/ui/reveal";
 import { JsonLd } from "@/components/json-ld";
 import { getProjects } from "@/lib/db/projects";
-import { getSectionVideos } from "@/lib/db/settings";
+import { getPhotoGalleries, getSectionVideos } from "@/lib/db/settings";
+import { PhotoGalleries } from "@/components/gallery/photo-galleries";
 import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 import { services, site } from "@/lib/site";
 import { youtubeThumb } from "@/lib/utils";
@@ -43,9 +44,10 @@ export default async function ServicePage({
   const service = services.find((s) => s.slug === slug);
   if (!service) notFound();
 
-  const [todos, sectionVideos] = await Promise.all([
+  const [todos, sectionVideos, galerias] = await Promise.all([
     getProjects({}, 40),
     getSectionVideos(),
+    service.media === "fotos" ? getPhotoGalleries() : Promise.resolve([]),
   ]);
 
   // Trabajos de este servicio. Si todavía nadie cargó el campo SERVICIOS en
@@ -126,7 +128,10 @@ export default async function ServicePage({
         </ul>
       </section>
 
-      {proyectos.length > 0 && (
+      {/* Fotografía: en vez del listado de piezas, sus galerías por categoría. */}
+      <PhotoGalleries galerias={galerias} />
+
+      {service.media !== "fotos" && proyectos.length > 0 && (
         <section className="mx-auto max-w-[1600px] border-t border-line px-5 py-16 md:px-10 md:py-24">
           <div className="mb-12 flex flex-wrap items-end justify-between gap-6">
             <h2 className="display font-display text-[10vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[6.5vw] lg:text-[4vw]">

@@ -5,8 +5,11 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
   CLAVE_AUTORIDADES,
+  CLAVE_FOTOGRAFIA,
+  CLAVE_MARCAS,
   CLAVE_VIDEOS_SECCION,
   extraerYoutubeId,
+  normalizarImagen,
 } from "@/lib/db/settings";
 import { slugify, uniq } from "@/lib/utils";
 
@@ -346,6 +349,110 @@ export async function saveAuthorities(
     return {
       status: "ok",
       message: value.length === 0 ? "Sección vacía, no se muestra." : "Autoridades actualizadas.",
+    };
+  } catch (error) {
+    return {
+      status: "error",
+      message: error instanceof Error ? error.message : "No se pudo guardar",
+    };
+  }
+}
+
+/* ------------------------------------------------- galerías de fotografía -- */
+
+// Los topes viven en lib/db/settings: un archivo "use server" solo puede
+// exportar funciones asíncronas, así que acá no pueden ser públicos.
+
+export async function savePhotoGalleries(
+  _prev: SaveState,
+  formData: FormData,
+): Promise<SaveState> {
+  const value: Array<{ titulo: string; fotos: string[] }> = [];
+
+  for (let i = 0; i < 4; i++) {
+    const titulo = String(formData.get(`titulo_${i}`) ?? "").trim();
+    const fotos = parseLines(formData.get(`fotos_${i}`))
+      .map((f) => normalizarImagen(f))
+      .filter((f) => /^https?:\/\//.test(f));
+
+    if (!titulo || fotos.length === 0) continue;
+    value.push({ titulo, fotos });
+  }
+
+  try {
+    const supabase = await client();
+    const { error } = await supabase
+      .from("site_settings")
+      .upsert(
+        { key: CLAVE_FOTOGRAFIA, value, updated_at: new Date().toISOString() },
+        { onConflict: "key" },
+      );
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath("/");
+    revalidatePath("/servicios/produccion-fotografica");
+    revalidatePath("/admin/fotografia");
+
+    const total = value.reduce((n, g) => n + g.fotos.length, 0);
+    return {
+      status: "ok",
+      message:
+        value.length === 0
+          ? "Sin galerías cargadas."
+          : `${value.length} categorías, ${total} fotos.`,
+    };
+  } catch (error) {
+    return {
+      status: "error",
+      message: error instanceof Error ? error.message : "No se pudo guardar",
+    };
+  }
+}
+
+/* ------------------------------------------------------ marcas y logos ----- */
+
+export async function saveBrandLogos(
+  _prev: SaveState,
+  formData: FormData,
+): Promise<SaveState> {
+  const value: Array<{ nombre: string; logo: string; sitio: string }> = [];
+
+  for (let i = 0; i < 12; i++) {
+    const nombre = String(formData.get(`marca_nombre_${i}`) ?? "").trim();
+    const logo = normalizarImagen(String(formData.get(`marca_logo_${i}`) ?? ""));
+    const sitio = String(formData.get(`marca_sitio_${i}`) ?? "").trim();
+
+    if (!nombre && !logo) continue;
+
+    if (logo && !/^https?:\/\//.test(logo)) {
+      return {
+        status: "error",
+        message: `El logo de ${nombre || `la marca ${i + 1}`} tiene que ser un enlace que empiece con http.`,
+      };
+    }
+
+    value.push({ nombre, logo, sitio });
+  }
+
+  try {
+    const supabase = await client();
+    const { error } = await supabase
+      .from("site_settings")
+      .upsert(
+        { key: CLAVE_MARCAS, value, updated_at: new Date().toISOString() },
+        { onConflict: "key" },
+      );
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath("/");
+    revalidatePath("/clientes");
+    revalidatePath("/admin/marcas");
+
+    return {
+      status: "ok",
+      message: value.length === 0 ? "Sin marcas cargadas." : `${value.length} marcas guardadas.`,
     };
   } catch (error) {
     return {

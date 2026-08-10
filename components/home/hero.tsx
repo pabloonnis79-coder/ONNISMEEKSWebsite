@@ -48,10 +48,22 @@ export function Hero({
       />
 
       <div className="relative mx-auto w-full max-w-[1600px] px-5 pb-16 pt-24 md:px-10 md:pb-20">
-        <h1 className="display max-w-[16ch] font-display text-[11vw] font-extrabold uppercase tracking-[-0.045em] text-paper sm:text-[10vw] lg:text-[6.6vw]">
+        {/* Sin límite de ancho: el corte de línea ya está decidido a mano en
+            RevealLines, y un max-width acá obligaba a "TERMINAMOS" a partirse. */}
+        <h1 className="display font-display text-[10.5vw] font-extrabold uppercase tracking-[-0.045em] text-paper sm:text-[9vw] lg:text-[6.2vw]">
+          {/*
+            Hasta 1024 el titular va en tres líneas. En una sola, "Dirigimos,
+            filmamos" pide unos 12,35em de ancho y no entra en un teléfono:
+            antes esto se resolvía partiendo la palabra, que quedaba peor.
+            Con el corte extra, la línea más larga pasa a ser "y terminamos."
+            y el cuerpo puede seguir siendo grande.
+          */}
           <RevealLines
             lines={[
-              <>Dirigimos, filmamos</>,
+              <>
+                Dirigimos,
+                <br className="lg:hidden" /> filmamos
+              </>,
               <>
                 y <span className="flame-text">terminamos</span>.
               </>,

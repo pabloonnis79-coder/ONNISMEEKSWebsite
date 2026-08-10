@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "yt3.ggpht.com" },
       { protocol: "https", hostname: "picsum.photos" },
       { protocol: "https", hostname: "cdn.simpleicons.org" },
+      // Google Drive: los enlaces del boton Compartir se reescriben al CDN,
+      // que es el unico que devuelve el archivo y no una pagina del visor.
+      { protocol: "https", hostname: "lh3.googleusercontent.com" },
+      { protocol: "https", hostname: "drive.google.com" },
       { protocol: "https", hostname: "**.supabase.co" },
     ],
   },
