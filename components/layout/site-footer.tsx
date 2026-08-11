@@ -13,7 +13,13 @@ export function SiteFooter() {
 
   return (
     <footer className="border-t border-line bg-ink">
-      <div className="mx-auto max-w-[1600px] px-5 py-16 md:px-10 md:py-20">
+      {/*
+        El pie termina mas abajo de lo que haria falta, a proposito: el boton de
+        WhatsApp queda fijo en la esquina y, al llegar al final de la pagina, se
+        montaba sobre la ultima linea. Este espacio le reserva el lugar. Sale de
+        la medida real del boton, 56 px de alto, mas su separacion del borde.
+      */}
+      <div className="mx-auto max-w-[1600px] px-5 pb-28 pt-16 md:px-10 md:pb-32 md:pt-20">
         <div className="grid gap-12 lg:grid-cols-12">
           <div className="lg:col-span-6">
             <h2 className="display font-display text-[10.5vw] font-extrabold uppercase leading-[0.85] tracking-[-0.045em] text-paper sm:text-[9vw] lg:text-[min(5.4vw,86.4px)]">
