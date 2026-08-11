@@ -61,16 +61,23 @@ export const metadata: Metadata = {
   },
   twitter: { card: "summary_large_image", images: ["/api/og"] },
   /**
-   * No hay favicon.svg a propósito. El que venía era un PNG de 1000 px metido
-   * dentro de una etiqueta SVG: 805 kB que descargaba cada visitante para
-   * dibujar un ícono de 16 px, y sin ninguna de las ventajas de un vector.
+   * Dos artes distintos, a propósito.
+   *
+   * En la pestaña el ícono se dibuja a 16 px, y ahí el logo completo con
+   * "ONNIS & MEEKS" en dos líneas no se lee: queda una mancha. Por eso los
+   * tamaños chicos llevan solo el ampersand con su corchete, recortado del
+   * propio logo. El logo entero se sigue usando donde se ve grande: el ícono
+   * de iOS y el del manifiesto.
+   *
+   * Justamente por eso acá no se declaran los archivos de 192 y 512: si
+   * estuvieran, el navegador podría elegirlos en una pantalla densa y volver
+   * a mostrar la mancha.
+   *
+   * Tampoco hay favicon.svg. El que venía era un PNG de 1000 px envuelto en
+   * una etiqueta SVG: 805 kB para dibujar 16 px, sin ninguna ventaja de vector.
    */
   icons: {
-    icon: [
-      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
-      { url: "/web-app-manifest-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/web-app-manifest-512x512.png", sizes: "512x512", type: "image/png" },
-    ],
+    icon: [{ url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" }],
     shortcut: "/favicon.ico",
     apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },

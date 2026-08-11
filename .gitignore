@@ -42,3 +42,4 @@ next-env.d.ts
 
 # Vista previa generada por scripts/ver-firmas.mjs
 docs/firmas-equipo.html
+docs/marca-ampersand.png
