@@ -317,9 +317,17 @@ export async function saveAuthorities(
     const apellido = String(formData.get(`apellido_${i}`) ?? "").trim();
     const cargo = String(formData.get(`cargo_${i}`) ?? "").trim();
     const foto = String(formData.get(`foto_${i}`) ?? "").trim();
+    const email = String(formData.get(`email_${i}`) ?? "").trim();
 
     // Una ficha sin nombre no dice nada: se descarta en silencio.
     if (!nombre && !apellido) continue;
+
+    if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      return {
+        status: "error",
+        message: `El correo de ${nombre || apellido} no parece válido.`,
+      };
+    }
 
     if (foto && !/^https?:\/\//.test(foto)) {
       return {
@@ -328,7 +336,7 @@ export async function saveAuthorities(
       };
     }
 
-    value.push({ nombre, apellido, cargo, foto });
+    value.push({ nombre, apellido, cargo, foto, email });
   }
 
   try {
@@ -345,6 +353,7 @@ export async function saveAuthorities(
     revalidatePath("/");
     revalidatePath("/estudio");
     revalidatePath("/admin/autoridades");
+    revalidatePath("/admin/firmas");
 
     return {
       status: "ok",

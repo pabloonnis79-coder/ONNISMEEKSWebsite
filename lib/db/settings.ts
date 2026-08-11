@@ -63,6 +63,8 @@ export type Autoridad = {
   nombre: string;
   apellido: string;
   cargo: string;
+  /** Solo para armar la firma de correo. No se publica en el sitio. */
+  email: string;
 };
 
 // extraerYoutubeId vive en lib/utils: los formularios del panel lo usan para la
@@ -163,6 +165,7 @@ export async function getAuthorities(): Promise<Autoridad[]> {
         nombre: String(a?.nombre ?? "").trim(),
         apellido: String(a?.apellido ?? "").trim(),
         cargo: String(a?.cargo ?? "").trim(),
+        email: String(a?.email ?? "").trim(),
       };
     })
     // Sin nombre la ficha no dice nada, asi que no se muestra.

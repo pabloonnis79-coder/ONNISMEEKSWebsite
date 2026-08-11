@@ -101,6 +101,13 @@ export default async function AdminPage() {
           </Link>
 
           <Link
+            href="/admin/firmas"
+            className="inline-flex h-10 items-center rounded-full border border-line px-5 text-[12px] font-semibold uppercase tracking-[0.1em] text-paper transition-colors hover:border-flame-warm hover:text-flame-warm"
+          >
+            Firmas
+          </Link>
+
+          <Link
             href="/admin/mensajes"
             className="inline-flex h-10 items-center rounded-full border border-line px-5 text-[12px] font-semibold uppercase tracking-[0.1em] text-paper transition-colors hover:border-flame-warm hover:text-flame-warm"
           >

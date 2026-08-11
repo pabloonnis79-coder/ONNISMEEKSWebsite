@@ -13,7 +13,7 @@ const initial: SaveState = { status: "idle" };
 const field =
   "w-full border border-line bg-ink-800 px-4 py-2.5 text-sm text-paper placeholder:text-paper-dim focus:border-flame focus:outline-none";
 
-const VACIA: Autoridad = { foto: "", nombre: "", apellido: "", cargo: "" };
+const VACIA: Autoridad = { foto: "", nombre: "", apellido: "", cargo: "", email: "" };
 
 function Guardar() {
   const { pending } = useFormStatus();
@@ -148,6 +148,26 @@ export function AuthoritiesForm({ actuales }: { actuales: Autoridad[] }) {
                   name={`cargo_${i}`}
                   defaultValue={actual.cargo}
                   placeholder="Dirección general"
+                  className={field}
+                />
+              </div>
+
+              <div className="sm:col-span-2">
+                <label
+                  htmlFor={`email_${i}`}
+                  className="mb-2 block text-sm font-medium text-paper"
+                >
+                  Correo{" "}
+                  <span className="font-normal text-paper-faint">
+                    — solo para armar la firma, no se publica en el sitio
+                  </span>
+                </label>
+                <input
+                  id={`email_${i}`}
+                  name={`email_${i}`}
+                  type="email"
+                  defaultValue={actual.email}
+                  placeholder="nombre@onnismeeks.com"
                   className={field}
                 />
               </div>
