@@ -13,6 +13,7 @@ import { Reels } from "@/components/home/reels";
 import {
   getAuthorities,
   getBrandLogos,
+  getBrandScale,
   getPhotoGalleries,
   getReels,
   getSectionVideos,
@@ -23,7 +24,7 @@ import { youtubeThumb } from "@/lib/utils";
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const [todos, clients, sectionVideos, autoridades, marcas, galerias, reels] =
+  const [todos, clients, sectionVideos, autoridades, marcas, galerias, reels, escalaMarcas] =
     await Promise.all([
       getFeaturedProjects(14),
       getClients(),
@@ -32,6 +33,7 @@ export default async function HomePage() {
       getBrandLogos(),
       getPhotoGalleries(),
       getReels(),
+      getBrandScale(),
     ]);
 
   const projects = todos.slice(0, 5);
@@ -62,7 +64,7 @@ export default async function HomePage() {
       {/* Si hay marcas cargadas a mano manda el carrusel; si no, se muestran
           los clientes que salieron solos de las descripciones de YouTube. */}
       {marcas.length > 0 ? (
-        <BrandCarousel marcas={marcas} />
+        <BrandCarousel marcas={marcas} escala={escalaMarcas} />
       ) : (
         <ClientWall clients={clients.slice(0, 10)} />
       )}

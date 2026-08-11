@@ -27,14 +27,78 @@ function Guardar() {
   );
 }
 
-export function BrandsForm({ actuales }: { actuales: Marca[] }) {
+/** Tiene que coincidir con ESCALAS_MARCAS de lib/db/settings. */
+const ESCALAS = [0.25, 0.5, 1, 1.25, 1.5, 2];
+
+/** Altura del logo al tamaño normal, igual que en el carrusel del sitio. */
+const ALTO_BASE = 40;
+
+export function BrandsForm({
+  actuales,
+  escalaActual,
+}: {
+  actuales: Marca[];
+  escalaActual: number;
+}) {
   const [state, formAction] = useActionState(saveBrandLogos, initial);
   const [logos, setLogos] = useState<string[]>(() =>
     Array.from({ length: MAX }, (_, i) => actuales[i]?.logo ?? ""),
   );
+  const [escala, setEscala] = useState(escalaActual);
+
+  const cargados = logos.filter(Boolean);
 
   return (
     <form action={formAction} className="flex flex-col gap-8">
+      <fieldset className="border border-line p-5">
+        <legend className="px-2 font-mono text-[11px] uppercase tracking-[0.18em] text-flame">
+          Tamaño de los logos
+        </legend>
+
+        <p className="mb-4 max-w-[62ch] text-sm leading-relaxed text-paper-dim">
+          Se aplica a todos a la vez. La vista previa de abajo muestra el tamaño
+          real que van a tener en la portada.
+        </p>
+
+        <input type="hidden" name="escala" value={escala} />
+
+        <div className="flex flex-wrap gap-2">
+          {ESCALAS.map((valor) => (
+            <button
+              key={valor}
+              type="button"
+              onClick={() => setEscala(valor)}
+              aria-pressed={escala === valor}
+              className={`inline-flex h-9 items-center rounded-full border px-5 text-[12px] font-semibold uppercase tracking-[0.1em] transition-colors ${
+                escala === valor
+                  ? "border-flame bg-flame text-ink"
+                  : "border-line text-paper hover:border-flame-warm hover:text-flame-warm"
+              }`}
+            >
+              ×{valor}
+            </button>
+          ))}
+        </div>
+
+        {cargados.length > 0 && (
+          <div className="mt-6 overflow-x-auto border border-line bg-ink-800 p-5">
+            <div className="flex w-max items-center gap-10">
+              {cargados.map((logo, i) => (
+                <Image
+                  key={`${logo}-${i}`}
+                  src={logo}
+                  alt=""
+                  width={400}
+                  height={160}
+                  style={{ height: Math.round(ALTO_BASE * escala) }}
+                  className="w-auto object-contain opacity-70 grayscale"
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </fieldset>
+
       {Array.from({ length: MAX }, (_, i) => {
         const actual = actuales[i];
 

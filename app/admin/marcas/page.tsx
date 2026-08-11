@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeftIcon } from "@phosphor-icons/react/dist/ssr";
 import { BrandsForm } from "./brands-form";
-import { getBrandLogos } from "@/lib/db/settings";
+import { getBrandLogos, getBrandScale } from "@/lib/db/settings";
 
 export const metadata: Metadata = {
   title: "Marcas",
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function BrandsAdminPage() {
-  const actuales = await getBrandLogos();
+  const [actuales, escalaActual] = await Promise.all([getBrandLogos(), getBrandScale()]);
 
   return (
     <div className="mx-auto max-w-[900px] px-5 pb-24 pt-28 md:px-10 md:pt-32">
@@ -38,7 +38,7 @@ export default async function BrandsAdminPage() {
       </p>
 
       <div className="mt-10">
-        <BrandsForm actuales={actuales} />
+        <BrandsForm actuales={actuales} escalaActual={escalaActual} />
       </div>
     </div>
   );

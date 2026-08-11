@@ -12,6 +12,8 @@ export const CLAVE_AUTORIDADES = "authorities";
 export const CLAVE_FOTOGRAFIA = "photo_galleries";
 /** Clave de los logos de marcas del carrusel. */
 export const CLAVE_MARCAS = "brand_logos";
+/** Clave del tamano al que se dibujan esos logos. */
+export const CLAVE_MARCAS_ESCALA = "brand_logos_scale";
 /** Clave de los reels verticales. */
 export const CLAVE_REELS = "reels";
 
@@ -27,6 +29,14 @@ export type Marca = { nombre: string; logo: string; sitio: string };
 export const MAX_GALERIAS = 4;
 /** Cuantas marcas admite el carrusel. */
 export const MAX_MARCAS = 12;
+
+/**
+ * Tamanos a los que se puede dibujar el carrusel de marcas. Son multiplicadores
+ * sobre la altura base del logo, no valores absolutos: asi el numero significa
+ * lo mismo en el celular y en el escritorio.
+ */
+export const ESCALAS_MARCAS = [0.25, 0.5, 1, 1.25, 1.5, 2] as const;
+export const ESCALA_MARCAS_POR_DEFECTO = 1;
 
 /**
  * Convierte un enlace de Google Drive en una direccion que sirva dentro de una
@@ -135,6 +145,19 @@ export async function getBrandLogos(): Promise<Marca[]> {
       };
     })
     .filter((m) => m.nombre || m.logo);
+}
+
+/**
+ * Tamano elegido para el carrusel. Si lo guardado no es uno de los valores
+ * previstos se vuelve al normal, en vez de dibujar cualquier cosa.
+ */
+export async function getBrandScale(): Promise<number> {
+  const value = await leerAjuste(CLAVE_MARCAS_ESCALA);
+  const numero = Number(value);
+
+  return (ESCALAS_MARCAS as readonly number[]).includes(numero)
+    ? numero
+    : ESCALA_MARCAS_POR_DEFECTO;
 }
 
 export async function getReels(): Promise<Reel[]> {

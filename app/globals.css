@@ -193,3 +193,30 @@
     animation: none;
   }
 }
+
+/*
+  Tamano del carrusel de marcas, elegido desde el panel. Va por variables y no
+  por clases de Tailwind porque el valor se decide recien en tiempo de
+  ejecucion, y Tailwind necesita ver las clases escritas para generarlas.
+
+  La separacion es margen de cada logo, no gap del contenedor: con gap el ancho
+  de la tira es N logos mas N-1 espacios, y correr el 50% no equivale a una
+  vuelta exacta.
+*/
+.logo-hueco {
+  margin-right: var(--logo-sep, 56px);
+}
+
+.logo-marca {
+  height: var(--logo-alto, 32px);
+}
+
+@media (min-width: 768px) {
+  .logo-hueco {
+    margin-right: var(--logo-sep-md, 80px);
+  }
+
+  .logo-marca {
+    height: var(--logo-alto-md, 40px);
+  }
+}

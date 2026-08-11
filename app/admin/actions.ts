@@ -7,7 +7,10 @@ import {
   CLAVE_AUTORIDADES,
   CLAVE_FOTOGRAFIA,
   CLAVE_MARCAS,
+  CLAVE_MARCAS_ESCALA,
   CLAVE_REELS,
+  ESCALA_MARCAS_POR_DEFECTO,
+  ESCALAS_MARCAS,
   CLAVE_VIDEOS_SECCION,
   normalizarImagen,
 } from "@/lib/db/settings";
@@ -444,12 +447,24 @@ export async function saveBrandLogos(
     value.push({ nombre, logo, sitio });
   }
 
+  // El tamano viaja en el mismo formulario pero se guarda aparte: es un ajuste
+  // del carrusel, no un dato de ninguna marca en particular.
+  const pedida = Number(formData.get("escala"));
+  const escala = (ESCALAS_MARCAS as readonly number[]).includes(pedida)
+    ? pedida
+    : ESCALA_MARCAS_POR_DEFECTO;
+
   try {
     const supabase = await client();
+    const ahora = new Date().toISOString();
+
     const { error } = await supabase
       .from("site_settings")
       .upsert(
-        { key: CLAVE_MARCAS, value, updated_at: new Date().toISOString() },
+        [
+          { key: CLAVE_MARCAS, value, updated_at: ahora },
+          { key: CLAVE_MARCAS_ESCALA, value: escala, updated_at: ahora },
+        ],
         { onConflict: "key" },
       );
 
