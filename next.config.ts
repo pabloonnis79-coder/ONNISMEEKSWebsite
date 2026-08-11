@@ -1,5 +1,12 @@
 import type { NextConfig } from "next";
 
+/**
+ * A donde va mail.onnismeeks.com. accounts.zoho.com es la pantalla de la
+ * cuenta; si algun dia se prefiere caer directo en la bandeja, cambiar por
+ * https://mail.zoho.com y listo.
+ */
+const WEBMAIL = "https://accounts.zoho.com/";
+
 const nextConfig: NextConfig = {
   images: {
     formats: ["image/avif", "image/webp"],
@@ -24,6 +31,24 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizePackageImports: ["@phosphor-icons/react", "motion"],
+  },
+  /**
+   * mail.onnismeeks.com no es una seccion del sitio: es un atajo para entrar
+   * al correo. Cualquier ruta bajo ese subdominio sale para Zoho.
+   *
+   * Es una redireccion temporal a proposito. Una permanente queda cacheada en
+   * el navegador de por vida, y si manana el correo se muda a otro proveedor
+   * hay gente que seguiria yendo a Zoho sin manera de arreglarlo.
+   */
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "mail.onnismeeks.com" }],
+        destination: WEBMAIL,
+        permanent: false,
+      },
+    ];
   },
   async headers() {
     return [
