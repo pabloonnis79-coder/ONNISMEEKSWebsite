@@ -60,13 +60,19 @@ export const metadata: Metadata = {
     ],
   },
   twitter: { card: "summary_large_image", images: ["/api/og"] },
+  /**
+   * No hay favicon.svg a propósito. El que venía era un PNG de 1000 px metido
+   * dentro de una etiqueta SVG: 805 kB que descargaba cada visitante para
+   * dibujar un ícono de 16 px, y sin ninguna de las ventajas de un vector.
+   */
   icons: {
     icon: [
-      { url: "/favicon.svg", type: "image/svg+xml" },
       { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
+      { url: "/web-app-manifest-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/web-app-manifest-512x512.png", sizes: "512x512", type: "image/png" },
     ],
     shortcut: "/favicon.ico",
-    apple: "/apple-touch-icon.png",
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
   manifest: "/site.webmanifest",
   robots: {
