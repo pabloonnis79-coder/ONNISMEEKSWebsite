@@ -17,8 +17,8 @@ const ALTO_BASE = 32;
 const ALTO_BASE_MD = 40;
 
 /** Separacion entre logos, tambien proporcional al tamano elegido. */
-const SEPARACION = 56;
-const SEPARACION_MD = 80;
+const SEPARACION = 34;
+const SEPARACION_MD = 48;
 
 /** Ancho minimo de una vuelta. Debajo de esto se repite mas veces la lista. */
 const RECORRIDO_MINIMO = 2600;
@@ -86,9 +86,11 @@ export function BrandCarousel({
               <Image
                 src={marca.logo}
                 alt={marca.nombre}
-                width={400}
-                height={160}
+                width={220}
+                height={88}
+                sizes="220px"
                 quality={90}
+                draggable={false}
                 className="logo-marca w-auto object-contain opacity-70 grayscale transition duration-300 hover:opacity-100 hover:grayscale-0"
               />
             ) : (

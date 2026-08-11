@@ -10,23 +10,29 @@ export const runtime = "nodejs";
  * Tarjeta para compartir en redes. Se genera en el momento, así cada proyecto
  * tiene su propia imagen sin que nadie tenga que exportarla a mano.
  *
- * La composición va centrada y dentro de una columna angosta, y no es una
- * decisión estética: WhatsApp no muestra la imagen apaisada, la recorta al
- * cuadrado del centro. Con el texto alineado a la izquierda, ese recorte se
- * comía el principio del título. Todo lo que importa entra en los 630 px
- * centrales, que es lo único que sobrevive al recorte.
+ * Está pensada para el peor caso, que es WhatsApp: no muestra la imagen
+ * apaisada, la recorta al cuadrado del centro y lo dibuja a unos 120 px de
+ * lado. A ese tamaño no entra una composición con varios elementos: lo único
+ * que se lee es el título, así que el título se lleva casi todo el espacio y
+ * el resto es apenas un marco.
  */
 
-/** Ancho del cuadrado que conserva WhatsApp, menos un margen de respeto. */
-const COLUMNA = 600;
+/** Ancho util: es lo que sobrevive al recorte cuadrado de WhatsApp. */
+const COLUMNA = 560;
 
 export async function GET(request: NextRequest) {
   const params = request.nextUrl.searchParams;
   const title = params.get("title")?.slice(0, 90) ?? site.name;
   const kicker = params.get("kicker")?.slice(0, 60) ?? site.tagline;
 
-  // Los títulos largos bajan de cuerpo para no desbordar la columna.
-  const cuerpo = title.length > 44 ? 44 : title.length > 24 ? 56 : 70;
+  /**
+   * En la portada el titulo ya es el nombre del estudio; repetirlo arriba solo
+   * agrega ruido en una miniatura donde cada pixel cuenta.
+   */
+  const repiteMarca = title.trim().toUpperCase() === site.name.toUpperCase();
+
+  // Cuerpo grande a proposito. Los titulos largos bajan para no desbordar.
+  const cuerpo = title.length > 46 ? 60 : title.length > 26 ? 78 : 104;
 
   return new ImageResponse(
     (
@@ -51,11 +57,12 @@ export async function GET(request: NextRequest) {
             textAlign: "center",
           }}
         >
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          {!repiteMarca && (
             <span
               style={{
+                marginBottom: 34,
                 color: "#f4f3f0",
-                fontSize: 28,
+                fontSize: 26,
                 fontWeight: 800,
                 letterSpacing: "-0.02em",
                 textTransform: "uppercase",
@@ -63,36 +70,15 @@ export async function GET(request: NextRequest) {
             >
               Onnis&amp;Meeks
             </span>
-            <div
-              style={{
-                width: 26,
-                height: 26,
-                border: "5px solid #f26a1b",
-                display: "flex",
-              }}
-            />
-          </div>
+          )}
 
           <span
             style={{
-              marginTop: 54,
-              color: "#f5a623",
-              fontSize: 21,
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-            }}
-          >
-            {kicker}
-          </span>
-
-          <span
-            style={{
-              marginTop: 20,
               color: "#f4f3f0",
               fontSize: cuerpo,
               fontWeight: 800,
-              lineHeight: 1.04,
-              letterSpacing: "-0.035em",
+              lineHeight: 0.98,
+              letterSpacing: "-0.045em",
               textTransform: "uppercase",
             }}
           >
@@ -101,13 +87,25 @@ export async function GET(request: NextRequest) {
 
           <div
             style={{
-              marginTop: 46,
+              marginTop: 34,
               display: "flex",
-              width: 108,
-              height: 8,
+              width: 132,
+              height: 12,
               backgroundColor: "#f26a1b",
             }}
           />
+
+          <span
+            style={{
+              marginTop: 30,
+              color: "#f5a623",
+              fontSize: 26,
+              letterSpacing: "0.16em",
+              textTransform: "uppercase",
+            }}
+          >
+            {kicker}
+          </span>
         </div>
       </div>
     ),
