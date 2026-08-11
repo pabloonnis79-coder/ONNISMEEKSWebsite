@@ -97,6 +97,21 @@
     overflow-wrap: normal;
     word-break: keep-all;
     hyphens: none;
+
+    /*
+      Android agranda el texto por su cuenta cuando el usuario sube el tamano
+      de letra del sistema, y multiplica tambien estos cuerpos, que ya estan
+      calculados contra el ancho de la pantalla. Con el ajuste al 130%,
+      "TRABAJAMOS" pasaba de 289 px a 381 en una columna de 335: se salia por
+      el costado.
+
+      Se desactiva solo para los titulares gigantes, que son decorativos y ya
+      se leen de sobra. Los textos de lectura siguen agrandandose con la
+      preferencia del sistema, que es donde esa preferencia importa. El zoom
+      con los dedos tampoco se toca.
+    */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   .flame-text {
