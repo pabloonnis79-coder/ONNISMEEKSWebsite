@@ -191,6 +191,17 @@ drop policy if exists "messages admin read" on public.contact_messages;
 create policy "messages admin read" on public.contact_messages
   for select to authenticated using (true);
 
+-- El panel mueve mensajes entre consultas y spam, y los borra. Eso va con la
+-- sesion del panel, no con la clave de servicio: si el dia de manana se filtra
+-- una vista, el alcance sigue siendo el de un usuario logueado.
+drop policy if exists "messages admin update" on public.contact_messages;
+create policy "messages admin update" on public.contact_messages
+  for update to authenticated using (true) with check (true);
+
+drop policy if exists "messages admin delete" on public.contact_messages;
+create policy "messages admin delete" on public.contact_messages
+  for delete to authenticated using (true);
+
 -- Lectura publica: solo lo publicado y no oculto.
 drop policy if exists "projects readable" on public.projects;
 create policy "projects readable" on public.projects

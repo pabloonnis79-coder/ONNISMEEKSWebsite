@@ -520,6 +520,53 @@ export async function saveReels(
   }
 }
 
+/* --------------------------------------------------------------- mensajes -- */
+
+/** Borra una consulta. Es definitivo: no hay papelera. */
+export async function deleteMessage(formData: FormData) {
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+
+  const supabase = await client();
+  const { error } = await supabase.from("contact_messages").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin/mensajes");
+}
+
+/**
+ * Mueve un mensaje entre las dos pestañas. Sirve para las dos direcciones: un
+ * cliente real que el filtro marcó de más, o spam que se le escapó.
+ */
+export async function setMessageSource(formData: FormData) {
+  const id = String(formData.get("id") ?? "");
+  const source = formData.get("source") === "spam" ? "spam" : "web";
+  if (!id) return;
+
+  const supabase = await client();
+  const { error } = await supabase
+    .from("contact_messages")
+    .update({ source })
+    .eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin/mensajes");
+}
+
+/** Vacía la pestaña de spam de una. */
+export async function deleteAllSpam() {
+  const supabase = await client();
+  const { error } = await supabase
+    .from("contact_messages")
+    .delete()
+    .eq("source", "spam");
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin/mensajes");
+}
+
 /* ---------------------------------------------------------------- sesión -- */
 
 export async function signOut() {

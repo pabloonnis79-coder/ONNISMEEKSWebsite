@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useRef } from "react";
 import { useFormStatus } from "react-dom";
 import { CheckCircleIcon, WarningCircleIcon } from "@phosphor-icons/react";
 import { sendContactMessage, type ContactState } from "./actions";
@@ -27,6 +27,16 @@ function SubmitButton() {
 
 export function ContactForm() {
   const [state, formAction] = useActionState(sendContactMessage, initial);
+  const cargado = useRef<HTMLInputElement>(null);
+
+  /**
+   * Marca de cuándo se cargó el formulario. Va en un efecto y no en el HTML
+   * porque el servidor entrega esta página estática y cacheada: el reloj que
+   * importa es el del navegador de quien la abre, no el del build.
+   */
+  useEffect(() => {
+    if (cargado.current) cargado.current.value = String(Date.now());
+  }, []);
 
   if (state.status === "ok") {
     return (
@@ -143,6 +153,8 @@ export function ContactForm() {
         <label htmlFor="website">No completar</label>
         <input id="website" name="website" tabIndex={-1} autoComplete="off" />
       </div>
+
+      <input ref={cargado} type="hidden" name="cargado" defaultValue="" />
 
       {state.status === "error" && state.message && (
         <p

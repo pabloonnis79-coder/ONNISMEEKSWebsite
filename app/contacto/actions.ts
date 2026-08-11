@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { avisarConsulta } from "@/lib/email/notify";
+import { evaluarSpam } from "@/lib/spam";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isSupabaseConfigured } from "@/lib/supabase/server";
 
@@ -17,6 +18,8 @@ const schema = z.object({
     .max(4000),
   // Campo trampa: los formularios automáticos lo completan, las personas no.
   website: z.string().max(0).optional().or(z.literal("")),
+  // Cuándo se cargó el formulario. Lo pone el navegador al montar.
+  cargado: z.string().optional().or(z.literal("")),
 });
 
 export type ContactState = {
@@ -36,6 +39,7 @@ export async function sendContactMessage(
     budget: formData.get("budget"),
     message: formData.get("message"),
     website: formData.get("website"),
+    cargado: formData.get("cargado"),
   });
 
   if (!parsed.success) {
@@ -61,7 +65,15 @@ export async function sendContactMessage(
     };
   }
 
-  const { name, email, company, budget, message } = parsed.data;
+  const { name, email, company, budget, message, cargado } = parsed.data;
+
+  const veredicto = evaluarSpam({
+    name,
+    email,
+    company,
+    message,
+    cargadoEn: cargado ? Number(cargado) : null,
+  });
 
   try {
     const supabase = createAdminClient();
@@ -71,13 +83,20 @@ export async function sendContactMessage(
       company: company || null,
       budget: budget || null,
       message,
+      // El spam se guarda igual, aparte. Un filtro que borra se come tarde o
+      // temprano una consulta real y nadie se entera.
+      source: veredicto.esSpam ? "spam" : "web",
     });
 
     if (error) throw new Error(error.message);
 
     // El mensaje ya está a salvo en la base. El aviso por correo va después y
-    // aparte: si Resend está caído o sin configurar, la consulta no se pierde.
-    await avisarConsulta({ name, email, company, budget, message });
+    // aparte: si el SMTP falla o no está configurado, la consulta no se pierde.
+    if (!veredicto.esSpam) {
+      await avisarConsulta({ name, email, company, budget, message });
+    } else {
+      console.warn("[contacto] marcado como spam:", veredicto.motivos.join(", "));
+    }
 
     return {
       status: "ok",
