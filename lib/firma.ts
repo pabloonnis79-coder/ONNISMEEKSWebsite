@@ -55,7 +55,7 @@ function columnaTexto(d: DatosFirma, conBorde: boolean): string {
 <div style="font-size:10px;font-weight:bold;color:${NARANJA};letter-spacing:1.6px;text-transform:uppercase;padding-top:5px;">${escapar(d.cargo)}</div>
 <div style="font-size:12px;color:${GRIS};padding-top:7px;">${escapar(site.name)} &nbsp;·&nbsp; ${escapar(site.tagline)}</div>
 <div style="font-size:12px;color:${GRIS};padding-top:11px;line-height:1.7;">${contacto}<br>
-<a href="${WEB}" style="color:${NARANJA};text-decoration:none;font-weight:bold;">${WEB.replace(/^https?:\/\//, "")}</a> &nbsp;·&nbsp; <a href="${site.social.youtube}" style="color:${GRIS};text-decoration:none;">YouTube</a></div>
+<a href="${WEB}" style="color:${NARANJA};text-decoration:none;font-weight:bold;">${WEB.replace(/^https?:\/\//, "")}</a> &nbsp;·&nbsp; <a href="${site.social.instagram}" style="color:${GRIS};text-decoration:none;">Instagram</a> &nbsp;·&nbsp; <a href="${site.social.youtube}" style="color:${GRIS};text-decoration:none;">YouTube</a></div>
 </td>`;
 }
 

@@ -46,8 +46,8 @@ export const site = {
   social: {
     youtube:
       process.env.NEXT_PUBLIC_YOUTUBE_URL ?? "https://www.youtube.com/@ONNIS_MEEKS",
-    // TODO: confirmar los perfiles reales del estudio.
-    instagram: "https://instagram.com/onnismeeks",
+    instagram: "https://www.instagram.com/onnismeeks",
+    // TODO: confirmar el perfil real de LinkedIn. Este es una suposicion.
     linkedin: "https://linkedin.com/company/onnismeeks",
     vimeo: "",
   },
