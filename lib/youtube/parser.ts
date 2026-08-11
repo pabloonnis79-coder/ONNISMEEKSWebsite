@@ -227,6 +227,21 @@ export function parseDescription(description: string): ParsedDescription {
       continue;
     }
 
+    /*
+      El machete del canal va al final de toda descripcion: la raya divisoria,
+      el "seguinos", los enlaces a las redes. Ahi se corta la acumulacion, si no
+      esas lineas se le pegan al ultimo campo que haya quedado abierto. Con la
+      plantilla ese campo es TAGS, y "Seguinos en Instagram" terminaba publicado
+      como etiqueta del proyecto.
+
+      No se corta el recorrido entero porque la clave siguiente vuelve a abrir
+      un campo: alguien puede usar una raya para separar dos bloques.
+    */
+    if (NOISE_LINE.test(line)) {
+      current = null;
+      continue;
+    }
+
     if (current) blocks.get(current)!.push(line);
   }
 
