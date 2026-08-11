@@ -66,6 +66,13 @@ export default async function AdminPage() {
           <SyncButton />
 
           <Link
+            href="/admin/formato"
+            className="inline-flex h-10 items-center rounded-full border border-flame-warm px-5 text-[12px] font-semibold uppercase tracking-[0.1em] text-flame-warm transition-colors hover:bg-flame-warm hover:text-ink"
+          >
+            Cómo cargar un proyecto
+          </Link>
+
+          <Link
             href="/admin/secciones"
             className="inline-flex h-10 items-center rounded-full border border-line px-5 text-[12px] font-semibold uppercase tracking-[0.1em] text-paper transition-colors hover:border-flame-warm hover:text-flame-warm"
           >
