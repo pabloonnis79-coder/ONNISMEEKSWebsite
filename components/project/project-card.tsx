@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowUpRightIcon } from "@phosphor-icons/react/dist/ssr";
-import { HoverVideo } from "@/components/media/hover-video";
+import { CoverPlayer } from "@/components/project/cover-player";
+import { Tilt } from "@/components/ui/tilt";
 import type { Project } from "@/lib/types";
 import { cn, formatDuration, youtubeThumb } from "@/lib/utils";
 
@@ -30,34 +31,30 @@ export function ProjectCard({
       href={`/proyectos/${project.slug}`}
       className="group block focus-visible:outline-offset-8"
     >
-      <div
-        className={cn(
-          "relative w-full overflow-hidden",
-          size === "lg"
-            ? "aspect-[16/10]"
-            : size === "reel"
-              ? "aspect-video"
-              : size === "sm"
-                ? "aspect-[4/3]"
-                : "aspect-[3/2]",
-        )}
-      >
-        <HoverVideo
-          youtubeId={project.youtubeId}
-          poster={poster}
-          alt={`${title}${project.clientName ? ` para ${project.clientName}` : ""}`}
-          priority={priority}
-          auto={auto}
-          sizes={sizes ?? "(max-width: 768px) 100vw, 50vw"}
-        />
-
+      <Tilt>
         <div
-          aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-t from-ink/70 via-transparent to-transparent opacity-70 transition-opacity duration-500 group-hover:opacity-40"
-        />
-
-        <span className="absolute bottom-0 left-0 h-[3px] w-full origin-left scale-x-0 flame-bg transition-transform duration-700 ease-[var(--ease-out-expo)] group-hover:scale-x-100" />
-      </div>
+          className={cn(
+            "relative w-full overflow-hidden",
+            size === "lg"
+              ? "aspect-[16/10]"
+              : size === "reel"
+                ? "aspect-video"
+                : size === "sm"
+                  ? "aspect-[4/3]"
+                  : "aspect-[3/2]",
+          )}
+        >
+          <CoverPlayer
+            youtubeId={project.youtubeId}
+            poster={poster}
+            alt={`${title}${project.clientName ? ` para ${project.clientName}` : ""}`}
+            duracion={duration}
+            priority={priority}
+            auto={auto}
+            sizes={sizes ?? "(max-width: 768px) 100vw, 50vw"}
+          />
+        </div>
+      </Tilt>
 
       <div
         className={cn(

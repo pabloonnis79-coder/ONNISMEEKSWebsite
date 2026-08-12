@@ -21,6 +21,7 @@ export function HoverVideo({
   auto = false,
   sizes = "(max-width: 768px) 100vw, 50vw",
   className,
+  onAvance,
 }: {
   youtubeId: string | null;
   poster: string | null;
@@ -29,6 +30,8 @@ export function HoverVideo({
   auto?: boolean;
   sizes?: string;
   className?: string;
+  /** Avance de la reproduccion, de 0 a 1. Lo informa el reproductor. */
+  onAvance?: (fraccion: number) => void;
 }) {
   const contenedor = useRef<HTMLDivElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -97,7 +100,7 @@ export function HoverVideo({
       )}
 
       {mostrarVideo && youtubeId && (
-        <YoutubeLoop key={youtubeId} youtubeId={youtubeId} />
+        <YoutubeLoop key={youtubeId} youtubeId={youtubeId} onAvance={onAvance} />
       )}
     </div>
   );
