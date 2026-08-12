@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createPublicClient, isSupabaseConfigured } from "@/lib/supabase/public";
+import { getVideos, isYouTubeConfigured } from "@/lib/youtube/api";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -17,7 +18,13 @@ export const CLAVE_MARCAS_ESCALA = "brand_logos_scale";
 /** Clave de los reels verticales. */
 export const CLAVE_REELS = "reels";
 
-export type Reel = { youtubeId: string; titulo: string; cliente: string };
+export type Reel = {
+  youtubeId: string;
+  titulo: string;
+  cliente: string;
+  /** Segundos. No se carga a mano: lo trae getReelsConDuracion desde YouTube. */
+  duracion?: number;
+};
 
 /** Cuantos reels admite la seccion. */
 export const MAX_REELS = 8;
@@ -174,6 +181,35 @@ export async function getReels(): Promise<Reel[]> {
       };
     })
     .filter((r) => r.youtubeId);
+}
+
+/**
+ * Los mismos reels, con la duracion que informa YouTube.
+ *
+ * La duracion no se guarda en el panel a proposito: es un dato del video, no
+ * una decision editorial, y pedirsela a quien carga el reel es pedirle que
+ * copie a mano algo que ya existe y que ademas cambia si vuelve a subir la
+ * pieza.
+ *
+ * Es una sola llamada para los ocho ids. Si falla o si no hay clave, los reels
+ * salen igual sin el dato: una insignia de menos no justifica una portada
+ * rota.
+ */
+export async function getReelsConDuracion(): Promise<Reel[]> {
+  const reels = await getReels();
+  if (reels.length === 0 || !isYouTubeConfigured()) return reels;
+
+  try {
+    // Un dia de cache: la duracion de un video no cambia, y sin cache esta
+    // sola peticion obligaria a la portada a renderizarse en cada visita.
+    const videos = await getVideos(reels.map((r) => r.youtubeId), 86400);
+    const porId = new Map(videos.map((v) => [v.id, v.durationSeconds ?? undefined]));
+
+    return reels.map((r) => ({ ...r, duracion: porId.get(r.youtubeId) }));
+  } catch (error) {
+    console.error("[reels] no se pudo leer la duracion:", error);
+    return reels;
+  }
 }
 
 export async function getAuthorities(): Promise<Autoridad[]> {

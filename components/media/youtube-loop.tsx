@@ -45,10 +45,14 @@ function cargarApi(): Promise<any> {
 /** Margen tras el aviso de reproduccion, para que se apague la barra. */
 const ESPERA_CHROME_MS = 900;
 
+/** Cada cuanto se le pregunta al reproductor por donde va. */
+const PULSO_AVANCE_MS = 250;
+
 export function YoutubeLoop({
   youtubeId,
   className,
   vertical = false,
+  onAvance,
 }: {
   youtubeId: string;
   className?: string;
@@ -58,14 +62,32 @@ export function YoutubeLoop({
    * como una franja en el medio.
    */
   vertical?: boolean;
+  /**
+   * Avance de la reproduccion, de 0 a 1. Se informa cuatro veces por segundo,
+   * que para dibujar una barra sobra: pedirlo por cuadro seria consultar a un
+   * iframe sesenta veces por segundo para mover unos pocos pixeles.
+   */
+  onAvance?: (fraccion: number) => void;
 }) {
   const contenedorId = `yt-${useId().replace(/[:]/g, "")}`;
   const player = useRef<any>(null);
   const revelar = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [visible, setVisible] = useState(false);
 
+  /*
+    La devolucion de llamada vive en un ref para que cambiar su identidad entre
+    renders no obligue a destruir y recrear el reproductor. Se copia dentro de
+    un efecto y no durante el render: escribir un ref mientras se renderiza
+    rompe el render concurrente, porque React puede descartar ese intento.
+  */
+  const avisar = useRef(onAvance);
+  useEffect(() => {
+    avisar.current = onAvance;
+  }, [onAvance]);
+
   useEffect(() => {
     let vivo = true;
+    let pulso: ReturnType<typeof setInterval> | null = null;
 
     cargarApi().then((YT) => {
       if (!vivo || !YT?.Player) return;
@@ -99,6 +121,20 @@ export function YoutubeLoop({
               revelar.current = setTimeout(() => {
                 if (vivo) setVisible(true);
               }, ESPERA_CHROME_MS);
+
+              // El pulso arranca recien al reproducir: antes no hay avance que
+              // informar y la duracion todavia puede venir en cero.
+              if (avisar.current && !pulso) {
+                pulso = setInterval(() => {
+                  const p = player.current;
+                  if (!vivo || !p?.getDuration) return;
+
+                  const total = p.getDuration();
+                  if (!total) return;
+
+                  avisar.current?.(Math.min(1, p.getCurrentTime() / total));
+                }, PULSO_AVANCE_MS);
+              }
             }
           },
         },
@@ -107,6 +143,7 @@ export function YoutubeLoop({
 
     return () => {
       vivo = false;
+      if (pulso) clearInterval(pulso);
       if (revelar.current) clearTimeout(revelar.current);
       try {
         player.current?.destroy?.();

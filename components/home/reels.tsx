@@ -1,11 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
 import { YoutubeLoop } from "@/components/media/youtube-loop";
 import type { Reel } from "@/lib/db/settings";
-import { youtubeThumb } from "@/lib/utils";
+import { formatDuration, youtubeThumb } from "@/lib/utils";
 
 /**
  * Reels verticales, en 9:16, como se publican en Instagram.
@@ -48,8 +48,19 @@ export function Reels({ reels }: { reels: Reel[] }) {
 
 function ReelCard({ reel, priority }: { reel: Reel; priority: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
+  const barra = useRef<HTMLDivElement>(null);
   const [enPantalla, setEnPantalla] = useState(false);
   const reduce = useReducedMotion();
+
+  /*
+    El avance se escribe directo sobre el transform de la barra. Guardarlo en
+    estado seria volver a renderizar la tarjeta cuatro veces por segundo, con
+    la imagen y el reproductor adentro, para mover una linea de dos pixeles.
+  */
+  const dibujarAvance = useCallback((fraccion: number) => {
+    const nodo = barra.current;
+    if (nodo) nodo.style.transform = `scaleX(${fraccion})`;
+  }, []);
 
   useEffect(() => {
     if (reduce) return;
@@ -82,8 +93,36 @@ function ReelCard({ reel, priority }: { reel: Reel; priority: boolean }) {
         />
 
         {enPantalla && (
-          <YoutubeLoop key={reel.youtubeId} youtubeId={reel.youtubeId} vertical />
+          <YoutubeLoop
+            key={reel.youtubeId}
+            youtubeId={reel.youtubeId}
+            vertical
+            onAvance={dibujarAvance}
+          />
         )}
+
+        {/* Velo de abajo: sin esto, la insignia se pierde sobre un plano claro. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-ink/85 to-transparent"
+        />
+
+        {reel.duracion ? (
+          <span className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-ink/70 px-2.5 py-1 font-mono text-[10px] tabular-nums text-paper backdrop-blur-sm">
+            {formatDuration(reel.duracion)}
+          </span>
+        ) : null}
+
+        {/* Barra de avance, pegada al borde inferior. */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-[2px] bg-paper/15"
+        >
+          <div
+            ref={barra}
+            className="h-full w-full origin-left scale-x-0 flame-bg"
+          />
+        </div>
       </div>
 
       {(reel.titulo || reel.cliente) && (

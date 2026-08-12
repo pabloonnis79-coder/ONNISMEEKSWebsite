@@ -16,7 +16,7 @@ import {
   getBrandLogos,
   getBrandScale,
   getPhotoGalleries,
-  getReels,
+  getReelsConDuracion,
   getSectionVideos,
 } from "@/lib/db/settings";
 import { site } from "@/lib/site";
@@ -33,7 +33,7 @@ export default async function HomePage() {
       getAuthorities(),
       getBrandLogos(),
       getPhotoGalleries(),
-      getReels(),
+      getReelsConDuracion(),
       getBrandScale(),
     ]);
 

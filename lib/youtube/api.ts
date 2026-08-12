@@ -28,12 +28,25 @@ class YouTubeError extends Error {
   }
 }
 
-async function call<T>(path: string, params: Record<string, string>): Promise<T> {
+/**
+ * `revalidate` en segundos guarda la respuesta en el cache de Next. Sin eso
+ * cada llamada va sin cache, que es lo correcto para la sincronizacion —ahi se
+ * quiere el estado de este momento— pero rompe una pagina estatica: una sola
+ * peticion sin cache la obliga a renderizarse en cada visita.
+ */
+async function call<T>(
+  path: string,
+  params: Record<string, string>,
+  revalidate?: number,
+): Promise<T> {
   const url = new URL(`${API}/${path}`);
   for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
   url.searchParams.set("key", apiKey());
 
-  const res = await fetch(url, { cache: "no-store" });
+  const res = await fetch(
+    url,
+    revalidate === undefined ? { cache: "no-store" } : { next: { revalidate } },
+  );
   if (!res.ok) {
     const body = await res.text();
     throw new YouTubeError(
@@ -99,8 +112,16 @@ export async function listUploadIds(max = 200): Promise<string[]> {
   return ids.slice(0, max);
 }
 
-/** Full video records. Batched 50 at a time, which is the API limit. */
-export async function getVideos(ids: string[]): Promise<YouTubeVideo[]> {
+/**
+ * Full video records. Batched 50 at a time, which is the API limit.
+ *
+ * `revalidate` en segundos para las llamadas que no necesitan el dato fresco,
+ * como la duracion de un video, que no cambia.
+ */
+export async function getVideos(
+  ids: string[],
+  revalidate?: number,
+): Promise<YouTubeVideo[]> {
   const out: YouTubeVideo[] = [];
 
   for (let i = 0; i < ids.length; i += 50) {
@@ -117,7 +138,7 @@ export async function getVideos(ids: string[]): Promise<YouTubeVideo[]> {
         };
         contentDetails: { duration: string };
       }>;
-    }>("videos", { part: "snippet,contentDetails", id: batch.join(",") });
+    }>("videos", { part: "snippet,contentDetails", id: batch.join(",") }, revalidate);
 
     for (const item of data.items ?? []) {
       const thumbs = item.snippet.thumbnails ?? {};
