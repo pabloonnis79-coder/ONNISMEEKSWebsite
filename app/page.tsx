@@ -39,17 +39,30 @@ export default async function HomePage() {
   const projects = todos.slice(0, 5);
   const lead = todos.find((p) => p.youtubeId) ?? todos[0];
 
+  /**
+   * El video que va a correr de fondo. El showreel manda; si no hubiera,
+   * queda el video de sección cargado desde el panel y, en última instancia,
+   * el último trabajo publicado.
+   */
+  const heroId = site.showreel.youtubeId || sectionVideos.hero || lead?.youtubeId || null;
+
+  /**
+   * La imagen de espera es el fotograma del mismo video que va a arrancar. Si
+   * fuera la portada de otro proyecto, al empezar la reproducción se veria un
+   * cambio de imagen que delata el truco.
+   */
   const poster =
     site.showreel.poster ||
+    (heroId ? youtubeThumb(heroId) : null) ||
     lead?.coverUrl ||
-    (lead?.youtubeId ? youtubeThumb(lead.youtubeId) : null);
+    null;
 
   return (
     <>
       <Hero
         poster={poster}
-        showreelId={site.showreel.youtubeId || (sectionVideos.hero ?? "")}
-        backdropId={sectionVideos.hero ?? lead?.youtubeId ?? null}
+        showreelId={site.showreel.youtubeId}
+        backdropId={heroId}
       />
       <ServicesMarquee />
       <ServicePanels

@@ -53,7 +53,15 @@ export const site = {
   },
 
   showreel: {
-    youtubeId: process.env.NEXT_PUBLIC_SHOWREEL_YOUTUBE_ID ?? "",
+    /**
+     * El showreel que corre de fondo en la portada.
+     *
+     * Se lee con `|| default` y no con `?? default`: la variable existe en
+     * Vercel pero puede estar vacia, y una cadena vacia no es null, asi que
+     * `??` la daria por buena y el hero se quedaria sin video. El operador
+     * `||` trata el vacio como ausencia, que es lo que hace falta aca.
+     */
+    youtubeId: process.env.NEXT_PUBLIC_SHOWREEL_YOUTUBE_ID?.trim() || "p8cNjtQnJ40",
     /** Loop corto y liviano para el fondo del hero. Opcional. */
     loopMp4: process.env.NEXT_PUBLIC_SHOWREEL_MP4 ?? "",
     poster: process.env.NEXT_PUBLIC_SHOWREEL_POSTER ?? "",
