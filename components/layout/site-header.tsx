@@ -134,10 +134,16 @@ export function SiteHeader() {
                           onClick={() => setOpen(false)}
                           className="group flex items-baseline gap-4 py-3 md:py-4"
                         >
-                          <span className="font-mono text-[11px] text-paper-faint">
+                          {/*
+                            El indice tiene ancho fijo para que todos los
+                            titulos arranquen en la misma vertical: con 01 y 10
+                            el mono no basta, porque el gap se mide desde el
+                            final del numero.
+                          */}
+                          <span className="w-7 shrink-0 font-mono text-[11px] tabular-nums text-paper-faint transition-colors duration-300 group-hover:text-flame-warm md:w-9 md:text-xs">
                             {String(i + 1).padStart(2, "0")}
                           </span>
-                          <span className="display font-display text-[10vw] font-extrabold uppercase leading-[0.9] tracking-[-0.04em] text-paper transition-colors duration-300 group-hover:text-flame md:text-[5.2vw]">
+                          <span className="display min-w-0 font-display text-[10vw] font-black uppercase leading-[0.9] tracking-[-0.04em] text-paper transition-colors duration-300 group-hover:text-flame md:text-[5.2vw]">
                             {item.label}
                           </span>
                         </Link>
