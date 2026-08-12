@@ -24,18 +24,28 @@ export function Wordmark({
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <span
         className={cn(
-          "font-display font-extrabold uppercase tracking-[-0.03em] text-paper",
+          "marca-destello font-display font-extrabold uppercase tracking-[-0.03em] text-paper",
           type,
         )}
       >
         Onnis&amp;Meeks
       </span>
-      <BrandSquare size={mark} />
+      <BrandSquare size={mark} destello />
     </span>
   );
 }
 
-export function BrandSquare({ size = 16 }: { size?: number }) {
+/**
+ * El destello es opcional porque este cuadrado tambien se usa suelto, en el pie
+ * y en las fichas. Ahi no acompania a nada y un parpadeo aislado distrae.
+ */
+export function BrandSquare({
+  size = 16,
+  destello = false,
+}: {
+  size?: number;
+  destello?: boolean;
+}) {
   return (
     <svg
       width={size}
@@ -43,7 +53,7 @@ export function BrandSquare({ size = 16 }: { size?: number }) {
       viewBox="0 0 16 16"
       fill="none"
       aria-hidden="true"
-      className="shrink-0"
+      className={cn("shrink-0", destello && "marca-brillo")}
     >
       <defs>
         <linearGradient id="om-flame" x1="0" y1="16" x2="16" y2="0">

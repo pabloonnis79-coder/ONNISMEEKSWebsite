@@ -210,6 +210,76 @@
 }
 
 /*
+  Destello de la marca. Un brillo recorre el texto de izquierda a derecha y,
+  cuando sale por el borde, el cuadrado se enciende un instante.
+
+  El barrido dura poco mas de un segundo dentro de un ciclo de cuatro y medio:
+  el resto del tiempo el logo esta quieto. Un logo que brilla sin parar deja de
+  leerse como marca y pasa a leerse como banner.
+*/
+@keyframes om-destello {
+  0%,
+  4% {
+    background-position: -150% 0;
+  }
+  30%,
+  100% {
+    background-position: 250% 0;
+  }
+}
+
+/* El cuadrado se enciende cuando el brillo termina de cruzar el texto. */
+@keyframes om-brillo {
+  0%,
+  20%,
+  48%,
+  100% {
+    filter: drop-shadow(0 0 0 rgba(242, 106, 27, 0));
+  }
+  32% {
+    filter: drop-shadow(0 0 5px rgba(242, 106, 27, 0.8));
+  }
+}
+
+/*
+  El recorte del degrade sobre el texto solo se aplica donde el navegador lo
+  soporta. Sin la consulta, un navegador viejo pinta el texto transparente y la
+  marca desaparece del encabezado.
+*/
+@supports (background-clip: text) or (-webkit-background-clip: text) {
+  .marca-destello {
+    background-image: linear-gradient(
+      100deg,
+      var(--color-paper) 42%,
+      var(--color-flame-warm) 50%,
+      var(--color-paper) 58%
+    );
+    background-size: 250% 100%;
+    background-repeat: no-repeat;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: om-destello 4.5s ease-in-out infinite;
+  }
+}
+
+.marca-brillo {
+  animation: om-brillo 4.5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marca-destello,
+  .marca-brillo {
+    animation: none;
+  }
+
+  .marca-destello {
+    background-image: none;
+    color: var(--color-paper);
+  }
+}
+
+/*
   Boton de WhatsApp: llama la atencion sin volverse molesto.
 
   El truco esta en el ritmo. La sacudida dura medio segundo dentro de un ciclo
