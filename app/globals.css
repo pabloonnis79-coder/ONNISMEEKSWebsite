@@ -41,6 +41,8 @@
     --z-nav: 40;
     --z-overlay: 50;
     --z-grain: 60;
+    /* El cursor va arriba de todo, incluso del grano. */
+    --z-cursor: 70;
   }
 
   html {
@@ -206,6 +208,74 @@
 @media (prefers-reduced-motion: reduce) {
   .marquee-track {
     animation: none;
+  }
+}
+
+/*
+  Cursor propio. Los dos elementos existen siempre en el HTML pero arrancan
+  invisibles: recien el componente, si encuentra un puntero fino, les pone la
+  opacidad y empieza a moverlos.
+
+  El centrado va en la propiedad "translate" y no dentro del transform porque
+  el transform lo pisa el JavaScript en cada cuadro. Separados, el anillo puede
+  crecer sin que haya que recalcular su desplazamiento a mano.
+*/
+.cursor-punto,
+.cursor-anillo {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: var(--z-cursor);
+  translate: -50% -50%;
+  opacity: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.cursor-punto {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--color-paper);
+}
+
+.cursor-anillo {
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  border: 1px solid var(--color-paper-faint);
+  background: transparent;
+  transition:
+    width 0.35s var(--ease-out-expo, ease),
+    height 0.35s var(--ease-out-expo, ease),
+    border-color 0.35s ease,
+    background-color 0.35s ease;
+}
+
+.cursor-anillo-activo {
+  width: 64px;
+  height: 64px;
+  border-color: var(--color-flame);
+  background: rgb(242 106 27 / 0.12);
+}
+
+/*
+  El cursor del sistema se esconde solo cuando el propio esta funcionando, y se
+  devuelve donde hace falta: sobre un campo de texto la barrita indica donde va
+  a caer lo que se escriba, y eso ningun circulo lo reemplaza.
+*/
+html.cursor-propio,
+html.cursor-propio * {
+  cursor: none;
+}
+
+html.cursor-propio :is(input, textarea, [contenteditable="true"]) {
+  cursor: text;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cursor-anillo {
+    transition: none;
   }
 }
 

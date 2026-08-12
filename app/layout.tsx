@@ -6,6 +6,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { DemoNotice } from "@/components/layout/demo-notice";
 import { WhatsappButton } from "@/components/layout/whatsapp-button";
+import { CustomCursor } from "@/components/layout/custom-cursor";
 import { JsonLd } from "@/components/json-ld";
 import { organizationSchema, websiteSchema } from "@/lib/seo";
 import { site } from "@/lib/site";
@@ -119,6 +120,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SiteFooter />
         <DemoNotice />
         <WhatsappButton />
+        <CustomCursor />
 
         <JsonLd data={organizationSchema()} />
         <JsonLd data={websiteSchema()} />
