@@ -40,11 +40,15 @@ export default async function HomePage() {
   const lead = todos.find((p) => p.youtubeId) ?? todos[0];
 
   /**
-   * El video que va a correr de fondo. El showreel manda; si no hubiera,
-   * queda el video de sección cargado desde el panel y, en última instancia,
-   * el último trabajo publicado.
+   * El video que corre de fondo en el hero, por orden de prioridad.
+   *
+   * Primero manda el panel. Es la única de las tres fuentes que el estudio
+   * puede cambiar solo, así que tiene que ganar: si no, cambiar el video ahí
+   * no haría nada y no habría manera de darse cuenta de por qué. Después el
+   * showreel del despliegue, y al final el último trabajo publicado, para que
+   * el hero nunca quede sin video.
    */
-  const heroId = site.showreel.youtubeId || sectionVideos.hero || lead?.youtubeId || null;
+  const heroId = sectionVideos.hero || site.showreel.youtubeId || lead?.youtubeId || null;
 
   /**
    * La imagen de espera es el fotograma del mismo video que va a arrancar. Si
@@ -59,9 +63,11 @@ export default async function HomePage() {
 
   return (
     <>
+      {/* El botón de sonido abre lo mismo que se ve de fondo: con dos ids
+          distintos, apretar play cambiaba de video sin motivo. */}
       <Hero
         poster={poster}
-        showreelId={site.showreel.youtubeId}
+        showreelId={heroId ?? ""}
         backdropId={heroId}
       />
       <ServicesMarquee />
