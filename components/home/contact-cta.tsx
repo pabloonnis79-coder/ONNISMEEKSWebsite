@@ -1,4 +1,5 @@
 import { ActionLink } from "@/components/ui/action";
+import { Magnetic } from "@/components/ui/magnetic";
 import { Reveal } from "@/components/ui/reveal";
 import { site } from "@/lib/site";
 
@@ -25,9 +26,11 @@ export function ContactCta() {
             >
               {site.contact.email}
             </a>
-            <ActionLink href="/contacto" arrow>
-              Contacto
-            </ActionLink>
+            <Magnetic>
+              <ActionLink href="/contacto" arrow>
+                Contacto
+              </ActionLink>
+            </Magnetic>
           </div>
         </Reveal>
       </div>

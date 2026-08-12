@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import { PlayIcon } from "@phosphor-icons/react";
 import { ActionLink } from "@/components/ui/action";
+import { Magnetic } from "@/components/ui/magnetic";
 import { RevealLines } from "@/components/ui/reveal";
 import { VideoLightbox } from "@/components/media/video-lightbox";
 import { VideoBackdrop } from "@/components/media/video-backdrop";
@@ -87,22 +88,28 @@ export function Hero({
             transition={{ duration: 0.8, delay: 0.68, ease: [0.16, 1, 0.3, 1] }}
             className="flex flex-wrap items-center gap-3"
           >
-            <ActionLink href="/proyectos" arrow>
-              Ver proyectos
-            </ActionLink>
-            <ActionLink href="/contacto" variant="ghost">
-              Contacto
-            </ActionLink>
+            <Magnetic>
+              <ActionLink href="/proyectos" arrow>
+                Ver proyectos
+              </ActionLink>
+            </Magnetic>
+            <Magnetic>
+              <ActionLink href="/contacto" variant="ghost">
+                Contacto
+              </ActionLink>
+            </Magnetic>
 
             {showreelId && (
-              <button
-                type="button"
-                onClick={() => setOpen(true)}
-                aria-label="Reproducir showreel con sonido"
-                className="ml-1 inline-flex h-12 w-12 items-center justify-center rounded-full border border-line text-paper transition-colors duration-300 hover:border-flame-warm hover:text-flame-warm"
-              >
-                <PlayIcon size={17} weight="fill" />
-              </button>
+              <Magnetic className="ml-1">
+                <button
+                  type="button"
+                  onClick={() => setOpen(true)}
+                  aria-label="Reproducir showreel con sonido"
+                  className="inline-flex h-12 w-12 items-center justify-center rounded-full border border-line text-paper transition-colors duration-300 hover:border-flame-warm hover:text-flame-warm"
+                >
+                  <PlayIcon size={17} weight="fill" />
+                </button>
+              </Magnetic>
             )}
           </motion.div>
         </div>
