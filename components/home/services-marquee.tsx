@@ -18,9 +18,20 @@ export function ServicesMarquee() {
       className="border-y border-line bg-ink-800 py-6 md:py-8"
     >
       <div className="edge-fade-x overflow-hidden">
+        {/*
+          El piso de 38 s manda mientras haya pocos servicios; el factor por
+          item toma el control si mañana la lista crece, para que una tira mas
+          larga no pase mas rapido por pantalla.
+
+          La separacion va como margen dentro de cada item y no como gap del
+          contenedor: asi la tira mide exactamente N items y correr el 50%
+          equivale a una vuelta justa. Con gap sobraria medio espacio y el
+          ciclo daria un tironcito, que es lo que hubo que corregir en el
+          carrusel de marcas.
+        */}
         <div
           className="marquee-track flex w-max items-center"
-          style={{ ["--marquee-duration" as string]: `${Math.max(34, items.length * 6)}s` }}
+          style={{ ["--marquee-duration" as string]: `${Math.max(38, items.length * 7)}s` }}
         >
           {loop.map((item, i) => (
             <span key={`${item}-${i}`} className="flex items-center" aria-hidden={i >= items.length}>
