@@ -214,6 +214,28 @@
 }
 
 /*
+  Resplandor del manifiesto.
+
+  Va con inset negativo para que el borde difuminado quede fuera de la seccion:
+  si el degrade terminara justo en el borde, el recorte del overflow dibujaria
+  una linea recta donde tiene que haber niebla. El movimiento lo escribe el
+  JavaScript sobre el transform, asi que aca no hay ninguna posicion fija.
+*/
+.manifiesto-halo {
+  position: absolute;
+  inset: -20% -10%;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    55% 45% at 32% 42%,
+    rgb(242 106 27 / 0.14),
+    rgb(242 106 27 / 0.05) 45%,
+    transparent 70%
+  );
+  will-change: transform;
+}
+
+/*
   Cortina de apertura de la portada.
 
   El circulo arranca en 150% y se cierra hasta cero: la pagina aparece desde
