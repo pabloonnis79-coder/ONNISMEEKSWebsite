@@ -10,6 +10,7 @@ import { getClients, getFeaturedProjects } from "@/lib/db/projects";
 import { Authorities } from "@/components/home/authorities";
 import { BrandCarousel } from "@/components/home/brand-carousel";
 import { Reels } from "@/components/home/reels";
+import { OpeningCurtain } from "@/components/home/opening-curtain";
 import {
   getAuthorities,
   getBrandLogos,
@@ -63,6 +64,8 @@ export default async function HomePage() {
 
   return (
     <>
+      <OpeningCurtain />
+
       {/* El botón de sonido abre lo mismo que se ve de fondo: con dos ids
           distintos, apretar play cambiaba de video sin motivo. */}
       <Hero

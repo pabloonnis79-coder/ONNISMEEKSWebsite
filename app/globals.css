@@ -43,6 +43,8 @@
     --z-grain: 60;
     /* El cursor va arriba de todo, incluso del grano. */
     --z-cursor: 70;
+    /* Y la cortina de apertura, arriba del cursor mientras dura. */
+    --z-cortina: 80;
   }
 
   html {
@@ -208,6 +210,47 @@
 @media (prefers-reduced-motion: reduce) {
   .marquee-track {
     animation: none;
+  }
+}
+
+/*
+  Cortina de apertura de la portada.
+
+  El circulo arranca en 150% y se cierra hasta cero: la pagina aparece desde
+  las esquinas hacia adentro y lo ultimo que queda es un punto en el medio. El
+  150% no es al azar: el radio en porcentaje se mide contra la diagonal de la
+  pantalla, asi que hace falta pasarse del 100% para que en un monitor muy
+  ancho las esquinas tambien queden tapadas al empezar.
+
+  pointer-events en none desde el principio: mientras la cortina esta encima,
+  un clic apurado tiene que llegar igual al boton que hay debajo.
+*/
+@keyframes om-cortina {
+  from {
+    clip-path: circle(150% at 50% 50%);
+  }
+  to {
+    clip-path: circle(0% at 50% 50%);
+  }
+}
+
+.cortina {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-cortina);
+  background-color: var(--color-ink);
+  pointer-events: none;
+  animation: om-cortina 1.1s var(--ease-out-expo) forwards;
+}
+
+/*
+  Con menos movimiento pedido, la cortina no existe. No alcanza con acortarla:
+  una pantalla que se abre igual sigue siendo una pantalla que se mueve, y el
+  contenido esta detras esperando de todos modos.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .cortina {
+    display: none;
   }
 }
 
