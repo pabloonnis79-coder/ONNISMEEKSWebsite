@@ -40,7 +40,15 @@ export function SiteHeader() {
     <>
       <header
         className={cn(
-          "fixed inset-x-0 top-0 z-[var(--z-nav)] transition-colors duration-500",
+          /*
+            El desenfoque va en la lista de propiedades a animar. transition-colors
+            no lo incluye, asi que el fondo se fundia en medio segundo pero el
+            blur aparecia y desaparecia de golpe, y el corte se notaba justo al
+            volver al tope. El prefijo -webkit- es para Safari, que todavia lo
+            necesita.
+          */
+          "fixed inset-x-0 top-0 z-[var(--z-nav)] duration-500",
+          "transition-[background-color,border-color,backdrop-filter,-webkit-backdrop-filter]",
           scrolled && !open
             ? "border-b border-line bg-ink/85 backdrop-blur-xl"
             : "border-b border-transparent",
