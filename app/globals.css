@@ -212,6 +212,29 @@
 }
 
 /*
+  Lineas guia editoriales.
+
+  El z-index negativo las manda detras de todo el contenido, incluido el texto,
+  que es plano y no crea capa propia. Funciona porque el color de fondo esta en
+  el body y el html no tiene ninguno: en ese caso el navegador lo asciende al
+  lienzo de la pagina y deja de pertenecer al body, asi que una capa negativa
+  dentro del body queda encima del fondo y debajo de todo lo demas. Si algun dia
+  se le pone un fondo al html, estas lineas desaparecen.
+*/
+.lineas-guia {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.lineas-guia-trazo {
+  width: 1px;
+  flex: none;
+  background-color: rgb(244 243 240 / 0.05);
+}
+
+/*
   Barra de progreso de lectura, pegada al borde izquierdo.
 
   El riel ocupa toda la altura y la barra de adentro se escala desde arriba.
