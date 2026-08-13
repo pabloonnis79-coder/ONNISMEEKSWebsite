@@ -71,6 +71,41 @@
     color: #0e0e0d;
   }
 
+  /*
+    En pantalla tactil no se selecciona texto.
+
+    Mantener el dedo apoyado sobre un titular abria el menu de copiar y
+    compartir, con el texto resaltado y el diccionario del sistema encima. En un
+    telefono ese gesto casi nunca es "quiero copiar esto": es alguien tocando
+    la pantalla, o intentando hacer scroll desde donde no habia lugar.
+
+    Va con (pointer: coarse) y no con un ancho de pantalla: lo que decide no es
+    el tamano sino como se toca. Una notebook chica sigue pudiendo seleccionar,
+    y una tablet grande no.
+  */
+  @media (pointer: coarse) {
+    body {
+      -webkit-user-select: none;
+      user-select: none;
+      /* Corta tambien el globo de iOS al mantener apoyado sobre imagenes. */
+      -webkit-touch-callout: none;
+    }
+
+    /*
+      Y se devuelve donde copiar es justamente el punto: los campos de un
+      formulario, y el correo y el telefono, que la gente sí quiere llevarse.
+    */
+    input,
+    textarea,
+    [contenteditable="true"],
+    a[href^="mailto:"],
+    a[href^="tel:"] {
+      -webkit-user-select: text;
+      user-select: text;
+      -webkit-touch-callout: default;
+    }
+  }
+
   :focus-visible {
     outline: 2px solid var(--color-flame-warm);
     outline-offset: 3px;
