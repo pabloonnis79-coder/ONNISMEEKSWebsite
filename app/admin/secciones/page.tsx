@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeftIcon } from "@phosphor-icons/react/dist/ssr";
 import { SectionsForm } from "./sections-form";
-import { getSectionVideos } from "@/lib/db/settings";
+import { getSectionMp4, getSectionVideos } from "@/lib/db/settings";
 import { services } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 export default async function SectionVideosPage() {
-  const actuales = await getSectionVideos();
+  const [actuales, archivos] = await Promise.all([getSectionVideos(), getSectionMp4()]);
   const conFotos = services.filter((s) => s.media === "fotos");
 
   return (
@@ -44,7 +44,7 @@ export default async function SectionVideosPage() {
       )}
 
       <div className="mt-10">
-        <SectionsForm actuales={actuales} />
+        <SectionsForm actuales={actuales} archivos={archivos} />
       </div>
     </div>
   );

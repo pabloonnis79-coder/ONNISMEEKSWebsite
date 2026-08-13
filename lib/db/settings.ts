@@ -7,6 +7,8 @@ import { getVideos, isYouTubeConfigured } from "@/lib/youtube/api";
 
 /** Clave donde vive el video de fondo de cada seccion. */
 export const CLAVE_VIDEOS_SECCION = "section_videos";
+/** Clave del MP4 propio de cada seccion, que tiene prioridad sobre YouTube. */
+export const CLAVE_MP4_SECCION = "section_mp4";
 /** Clave donde viven las autoridades del estudio. */
 export const CLAVE_AUTORIDADES = "authorities";
 /** Clave de las galerias de fotografia, agrupadas por categoria. */
@@ -111,7 +113,24 @@ async function leerAjuste(key: string): Promise<unknown> {
 }
 
 export async function getSectionVideos(): Promise<VideosDeSeccion> {
-  const value = await leerAjuste(CLAVE_VIDEOS_SECCION);
+  return leerMapaDeTextos(CLAVE_VIDEOS_SECCION);
+}
+
+/**
+ * MP4 propio de cada seccion, subido desde el panel.
+ *
+ * Cuando hay uno cargado le gana al video de YouTube: es un archivo servido
+ * directo, sin reproductor de terceros encima, asi que no hay controles que
+ * esconder ni script que esperar. Para un fondo en bucle es lo mas limpio que
+ * existe.
+ */
+export async function getSectionMp4(): Promise<VideosDeSeccion> {
+  return leerMapaDeTextos(CLAVE_MP4_SECCION);
+}
+
+/** Lee un ajuste que guarda pares seccion/texto y descarta lo que no lo sea. */
+async function leerMapaDeTextos(clave: string): Promise<VideosDeSeccion> {
+  const value = await leerAjuste(clave);
   if (!value || typeof value !== "object") return {};
 
   return Object.fromEntries(

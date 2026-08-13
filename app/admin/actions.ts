@@ -11,6 +11,7 @@ import {
   CLAVE_REELS,
   ESCALA_MARCAS_POR_DEFECTO,
   ESCALAS_MARCAS,
+  CLAVE_MP4_SECCION,
   CLAVE_VIDEOS_SECCION,
   normalizarImagen,
 } from "@/lib/db/settings";
@@ -283,14 +284,46 @@ export async function saveSectionVideos(
     };
   }
 
+  /*
+    Los MP4 viajan en el mismo formulario pero se guardan aparte: son otra
+    fuente para lo mismo, y mezclarlos en una sola clave obligaria a migrar lo
+    que ya esta guardado.
+  */
+  const mp4: Record<string, string> = {};
+  const malos: string[] = [];
+
+  for (const [campo, bruto] of formData.entries()) {
+    if (!campo.startsWith("mp4_")) continue;
+
+    const slug = campo.slice("mp4_".length);
+    const texto = String(bruto).trim();
+    if (!texto) continue;
+
+    if (!/^https?:\/\//.test(texto)) {
+      malos.push(slug);
+      continue;
+    }
+    mp4[slug] = texto;
+  }
+
+  if (malos.length > 0) {
+    return {
+      status: "error",
+      message: `El archivo de ${malos.join(", ")} tiene que ser un enlace que empiece con http. Subilo con el botón y se completa solo.`,
+    };
+  }
+
   try {
     const supabase = await client();
-    const { error } = await supabase
-      .from("site_settings")
-      .upsert(
-        { key: CLAVE_VIDEOS_SECCION, value, updated_at: new Date().toISOString() },
-        { onConflict: "key" },
-      );
+    const ahora = new Date().toISOString();
+
+    const { error } = await supabase.from("site_settings").upsert(
+      [
+        { key: CLAVE_VIDEOS_SECCION, value, updated_at: ahora },
+        { key: CLAVE_MP4_SECCION, value: mp4, updated_at: ahora },
+      ],
+      { onConflict: "key" },
+    );
 
     if (error) throw new Error(error.message);
 

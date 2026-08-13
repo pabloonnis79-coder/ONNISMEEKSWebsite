@@ -44,10 +44,13 @@ function videoPara(
 export function ServicePanels({
   projects,
   sectionVideos,
+  mp4Secciones = {},
   galerias = [],
 }: {
   projects: Project[];
   sectionVideos: VideosDeSeccion;
+  /** Archivos propios por seccion. Le ganan al video de YouTube. */
+  mp4Secciones?: VideosDeSeccion;
   /** Fotos cargadas desde el panel, para la seccion de fotografia. */
   galerias?: GaleriaFoto[];
 }) {
@@ -91,6 +94,7 @@ export function ServicePanels({
               <PhotoGrid stills={stills} />
             ) : (
               <VideoBackdrop
+                mp4={mp4Secciones[service.slug] ?? null}
                 youtubeId={media?.youtubeId ?? null}
                 poster={media?.cover ?? null}
                 alt=""

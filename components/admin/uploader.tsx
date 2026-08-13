@@ -16,11 +16,14 @@ export function Uploader({
   carpeta,
   multiple = false,
   etiqueta = "Subir archivo",
+  acepta = "image/*",
   onSubido,
 }: {
   carpeta: string;
   multiple?: boolean;
   etiqueta?: string;
+  /** Que tipos ofrece el selector de archivos del sistema. */
+  acepta?: string;
   onSubido: (urls: string[]) => void;
 }) {
   const inputId = `subir-${useId().replace(/[:]/g, "")}`;
@@ -64,7 +67,7 @@ export function Uploader({
         ref={input}
         id={inputId}
         type="file"
-        accept="image/*"
+        accept={acepta}
         multiple={multiple}
         onChange={(e) => void subir(e.target.files)}
         className="sr-only"

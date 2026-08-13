@@ -17,6 +17,7 @@ import {
   getBrandScale,
   getPhotoGalleries,
   getReelsConDuracion,
+  getSectionMp4,
   getSectionVideos,
 } from "@/lib/db/settings";
 import { site } from "@/lib/site";
@@ -25,7 +26,7 @@ import { youtubeThumb } from "@/lib/utils";
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const [todos, clients, sectionVideos, autoridades, marcas, galerias, reels, escalaMarcas] =
+  const [todos, clients, sectionVideos, autoridades, marcas, galerias, reels, escalaMarcas, mp4Secciones] =
     await Promise.all([
       getFeaturedProjects(14),
       getClients(),
@@ -35,6 +36,7 @@ export default async function HomePage() {
       getPhotoGalleries(),
       getReelsConDuracion(),
       getBrandScale(),
+      getSectionMp4(),
     ]);
 
   const projects = todos.slice(0, 5);
@@ -72,11 +74,13 @@ export default async function HomePage() {
         poster={poster}
         showreelId={heroId ?? ""}
         backdropId={heroId}
+        mp4={mp4Secciones.hero ?? null}
       />
       <ServicesMarquee />
       <ServicePanels
         projects={todos}
         sectionVideos={sectionVideos}
+        mp4Secciones={mp4Secciones}
         galerias={galerias}
       />
       <FeaturedWork projects={projects} />

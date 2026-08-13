@@ -19,10 +19,13 @@ export function Hero({
   poster,
   showreelId,
   backdropId,
+  mp4 = null,
 }: {
   poster: string | null;
   showreelId: string;
   backdropId: string | null;
+  /** Archivo propio para el fondo. Si esta, se usa en lugar de YouTube. */
+  mp4?: string | null;
 }) {
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotion();
@@ -30,6 +33,7 @@ export function Hero({
   return (
     <section className="relative flex min-h-[100dvh] flex-col justify-end overflow-hidden">
       <VideoBackdrop
+        mp4={mp4}
         youtubeId={showreelId || backdropId}
         poster={poster}
         alt=""
