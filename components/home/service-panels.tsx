@@ -2,10 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr";
 import { VideoBackdrop } from "@/components/media/video-backdrop";
+import { PanelPlay } from "@/components/home/panel-play";
 import { services } from "@/lib/site";
 import type { Project } from "@/lib/types";
 import type { GaleriaFoto, VideosDeSeccion } from "@/lib/db/settings";
-import { youtubeThumb } from "@/lib/utils";
+import { cn, youtubeThumb } from "@/lib/utils";
 
 /**
  * Un panel casi de pantalla completa por seccion, con el nombre en grande.
@@ -77,10 +78,15 @@ export function ServicePanels({
           ? null
           : videoPara(service.slug, service.name, sectionVideos, projects, usados);
 
+        // Los paneles alternan lado: el primero a la izquierda, el segundo a
+        // la derecha. Cinco bloques identicos uno abajo del otro se leen como
+        // una lista; alternando, cada uno se lee como una pieza.
+        const derecha = i % 2 === 1;
+
         return (
           <article
             key={service.slug}
-            className="relative flex min-h-[86vh] items-end overflow-hidden border-t border-line"
+            className="relative flex min-h-[78vh] items-end overflow-hidden border-t border-line"
           >
             {esFoto ? (
               <PhotoGrid stills={stills} />
@@ -101,15 +107,40 @@ export function ServicePanels({
               className="absolute inset-0 bg-gradient-to-t from-ink via-ink/45 to-transparent"
             />
 
-            <div className="relative mx-auto w-full max-w-[1600px] px-5 pb-16 md:px-10 md:pb-24">
+            {/* Solo donde hay video que escuchar. */}
+            {media?.youtubeId && (
+              <PanelPlay youtubeId={media.youtubeId} titulo={service.name} />
+            )}
+
+            <div
+              className={cn(
+                "relative mx-auto w-full max-w-[1600px] px-5 pb-16 md:px-10 md:pb-24",
+                derecha && "md:text-right",
+              )}
+            >
               {/* 11vw y no 13: "audiovisual" y "fotográfica" son 11 caracteres,
                   que a 13vw piden 93vw de ancho y no entran en un teléfono. */}
-              <h2 className="display max-w-[14ch] font-display text-[11vw] font-extrabold uppercase tracking-[-0.05em] text-paper sm:text-[9vw] lg:text-[min(6.4vw,102.4px)]">
+              <h2
+                className={cn(
+                  "display max-w-[14ch] font-display text-[11vw] font-extrabold uppercase tracking-[-0.05em] text-paper sm:text-[9vw] lg:text-[min(6.4vw,102.4px)]",
+                  derecha && "md:ml-auto",
+                )}
+              >
                 {service.name}
               </h2>
 
-              <div className="mt-6 flex flex-col gap-6 md:mt-8 md:flex-row md:items-end md:justify-between">
-                <p className="max-w-[54ch] text-base leading-relaxed text-paper-dim md:text-lg">
+              <div
+                className={cn(
+                  "mt-6 flex flex-col gap-6 md:mt-8 md:flex-row md:items-end md:justify-between",
+                  derecha && "md:flex-row-reverse",
+                )}
+              >
+                <p
+                  className={cn(
+                    "max-w-[54ch] text-base leading-relaxed text-paper-dim md:text-lg",
+                    derecha && "md:ml-auto",
+                  )}
+                >
                   {service.summary}
                 </p>
 
