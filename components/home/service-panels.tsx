@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr";
 import { VideoBackdrop } from "@/components/media/video-backdrop";
-import { PanelPlay } from "@/components/home/panel-play";
 import { services } from "@/lib/site";
 import type { Project } from "@/lib/types";
 import type { GaleriaFoto, VideosDeSeccion } from "@/lib/db/settings";
@@ -106,11 +105,6 @@ export function ServicePanels({
               aria-hidden="true"
               className="absolute inset-0 bg-gradient-to-t from-ink via-ink/45 to-transparent"
             />
-
-            {/* Solo donde hay video que escuchar. */}
-            {media?.youtubeId && (
-              <PanelPlay youtubeId={media.youtubeId} titulo={service.name} />
-            )}
 
             <div
               className={cn(
