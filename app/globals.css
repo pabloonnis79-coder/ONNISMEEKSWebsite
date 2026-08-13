@@ -207,6 +207,17 @@
   will-change: transform;
 }
 
+/*
+  En pantalla grande los logos son mas altos y una vuelta mide mas, asi que
+  necesita mas tiempo para avanzar al mismo ritmo. Quien no defina la segunda
+  variable —la tira de servicios, por ejemplo— se queda con la primera.
+*/
+@media (min-width: 768px) {
+  .marquee-track {
+    animation-duration: var(--marquee-duration-md, var(--marquee-duration, 46s));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .marquee-track {
     animation: none;
@@ -543,6 +554,16 @@ html.cursor-propio :is(input, textarea, [contenteditable="true"]) {
   La separacion es margen de cada logo, no gap del contenedor: con gap el ancho
   de la tira es N logos mas N-1 espacios, y correr el 50% no equivale a una
   vuelta exacta.
+*/
+/*
+  Se probo content-visibility para saltear el dibujado mientras la tira esta
+  fuera de pantalla, y hubo que sacarlo: difiere el layout de un elemento que
+  esta animado, y al volver a entrar las dos mitades quedaban con anchos
+  distintos. Medido: el empalme pasaba de 0 a 1044 px de desfase, o sea un salto
+  hacia atras a mitad de vuelta.
+
+  Para no dibujar de mas alcanza con que el navegador componga la tira en su
+  propia capa, que es lo que hace will-change en .marquee-track.
 */
 .logo-hueco {
   margin-right: var(--logo-sep, 56px);
