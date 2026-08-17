@@ -4,7 +4,8 @@ import { Reveal } from "@/components/ui/reveal";
 import { ActionLink } from "@/components/ui/action";
 import { JsonLd } from "@/components/json-ld";
 import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
-import { capabilities, services, site } from "@/lib/site";
+import { capabilities, site } from "@/lib/site";
+import { getServicios } from "@/lib/db/servicios";
 
 export const metadata: Metadata = pageMetadata({
   title: "Servicios",
@@ -13,7 +14,9 @@ export const metadata: Metadata = pageMetadata({
   path: "/servicios",
 });
 
-export default function ServicesPage() {
+export default async function ServicesPage() {
+  const services = await getServicios();
+
   return (
     <>
       <JsonLd

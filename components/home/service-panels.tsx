@@ -2,7 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRightIcon } from "@phosphor-icons/react/dist/ssr";
 import { VideoBackdrop } from "@/components/media/video-backdrop";
-import { services } from "@/lib/site";
+import type { Service } from "@/lib/site";
 import type { Project } from "@/lib/types";
 import type { GaleriaFoto, VideosDeSeccion } from "@/lib/db/settings";
 import { cn, youtubeThumb } from "@/lib/utils";
@@ -42,11 +42,13 @@ function videoPara(
 }
 
 export function ServicePanels({
+  servicios,
   projects,
   sectionVideos,
   mp4Secciones = {},
   galerias = [],
 }: {
+  servicios: Service[];
   projects: Project[];
   sectionVideos: VideosDeSeccion;
   /** Archivos propios por seccion. Le ganan al video de YouTube. */
@@ -74,7 +76,7 @@ export function ServicePanels({
 
   return (
     <section aria-label="Servicios">
-      {services.map((service, i) => {
+      {servicios.map((service, i) => {
         const esFoto = service.media === "fotos";
         const media = esFoto
           ? null

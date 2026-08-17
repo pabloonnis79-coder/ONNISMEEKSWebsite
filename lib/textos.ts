@@ -11,6 +11,8 @@
  * lo editado. Cambiarlo equivale a perder el texto que el estudio haya escrito.
  */
 
+import { services } from "@/lib/site";
+
 export type CampoTexto = {
   id: string;
   etiqueta: string;
@@ -165,6 +167,42 @@ export const GRUPOS: GrupoTexto[] = [
     ],
   },
 ];
+
+/**
+ * Los cinco servicios.
+ *
+ * Los campos se arman desde la lista que ya existe en lib/site, en vez de
+ * copiarlos a mano: asi el valor original no puede quedar desfasado del codigo.
+ *
+ * El slug no se toca desde el panel a proposito: es la direccion de la pagina
+ * del servicio. Cambiarlo romperia los enlaces que alguien haya compartido.
+ */
+GRUPOS.push({
+  titulo: "Servicios",
+  descripcion:
+    "Los cinco bloques de la portada y sus páginas. La dirección de cada página no cambia aunque cambie el nombre.",
+  campos: services.flatMap((s) => [
+    {
+      id: `servicio.${s.slug}.nombre`,
+      etiqueta: `${s.name} — nombre`,
+      valor: s.name,
+    },
+    {
+      id: `servicio.${s.slug}.resumen`,
+      etiqueta: `${s.name} — descripción`,
+      ayuda: "Se ve en la portada y arriba de la página del servicio.",
+      largo: "parrafo",
+      valor: s.summary,
+    },
+    {
+      id: `servicio.${s.slug}.incluye`,
+      etiqueta: `${s.name} — qué incluye`,
+      ayuda: "Uno por línea. Es la lista que aparece en la página del servicio.",
+      largo: "parrafo",
+      valor: s.includes.join("\n"),
+    },
+  ]),
+});
 
 /** Todos los campos en una sola lista, para buscar por id. */
 export const CAMPOS: CampoTexto[] = GRUPOS.flatMap((g) => g.campos);

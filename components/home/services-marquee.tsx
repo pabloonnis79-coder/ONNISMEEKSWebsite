@@ -1,5 +1,5 @@
 import { BrandSquare } from "@/components/brand/wordmark";
-import { services } from "@/lib/site";
+
 
 /**
  * Tira de servicios en movimiento, entre el hero y los paneles. Cumple la
@@ -8,8 +8,8 @@ import { services } from "@/lib/site";
  *
  * Es la unica marquesina de la pagina. Dos compiten entre si y ninguna se lee.
  */
-export function ServicesMarquee() {
-  const items = services.map((s) => s.name);
+export function ServicesMarquee({ nombres }: { nombres: string[] }) {
+  const items = nombres;
   const loop = [...items, ...items];
 
   return (

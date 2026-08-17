@@ -11,6 +11,7 @@ import { getPhotoGalleries, getSectionVideos } from "@/lib/db/settings";
 import { PhotoGalleries } from "@/components/gallery/photo-galleries";
 import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 import { services, site } from "@/lib/site";
+import { getServicios } from "@/lib/db/servicios";
 import { youtubeThumb } from "@/lib/utils";
 
 export const revalidate = 600;
@@ -25,7 +26,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const service = services.find((s) => s.slug === slug);
+  const service = (await getServicios()).find((s) => s.slug === slug);
   if (!service) return { title: "Servicio no encontrado" };
 
   return pageMetadata({
@@ -41,7 +42,7 @@ export default async function ServicePage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const service = services.find((s) => s.slug === slug);
+  const service = (await getServicios()).find((s) => s.slug === slug);
   if (!service) notFound();
 
   const [todos, sectionVideos, galerias] = await Promise.all([

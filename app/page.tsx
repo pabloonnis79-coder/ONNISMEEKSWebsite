@@ -20,6 +20,7 @@ import {
   getSectionMp4,
   getSectionVideos,
 } from "@/lib/db/settings";
+import { getServicios } from "@/lib/db/servicios";
 import { getTextos } from "@/lib/db/textos";
 import { site } from "@/lib/site";
 import { youtubeThumb } from "@/lib/utils";
@@ -27,7 +28,7 @@ import { youtubeThumb } from "@/lib/utils";
 export const revalidate = 300;
 
 export default async function HomePage() {
-  const [todos, clients, sectionVideos, autoridades, marcas, galerias, reels, escalaMarcas, mp4Secciones, t] =
+  const [todos, clients, sectionVideos, autoridades, marcas, galerias, reels, escalaMarcas, mp4Secciones, t, servicios] =
     await Promise.all([
       getFeaturedProjects(14),
       getClients(),
@@ -39,6 +40,7 @@ export default async function HomePage() {
       getBrandScale(),
       getSectionMp4(),
       getTextos(),
+      getServicios(),
     ]);
 
   const projects = todos.slice(0, 5);
@@ -81,8 +83,9 @@ export default async function HomePage() {
         titulo2={t["home.hero.titulo2"]}
         bajada={t["home.hero.bajada"]}
       />
-      <ServicesMarquee />
+      <ServicesMarquee nombres={servicios.map((s) => s.name)} />
       <ServicePanels
+        servicios={servicios}
         projects={todos}
         sectionVideos={sectionVideos}
         mp4Secciones={mp4Secciones}
