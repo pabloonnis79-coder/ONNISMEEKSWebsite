@@ -155,6 +155,41 @@ function parseVideos(value: FormDataEntryValue | null) {
 
 export type SaveState = { status: "idle" | "ok" | "error"; message?: string };
 
+/**
+ * La direccion que le corresponde a un proyecto por su cliente y su nombre.
+ */
+function baseDelSlug(clientName: string, nombre: string) {
+  return slugify([clientName, nombre].filter(Boolean).join(" ")) || "proyecto";
+}
+
+/**
+ * Una direccion libre a partir de `base`: base, base-2, base-3...
+ *
+ * Se miran los slugs que ya existen y se busca el primer hueco. Contar cuantos
+ * hay no sirve: si habia tres y se borro el del medio, el conteo vuelve a
+ * proponer uno que ya esta tomado y la carga falla.
+ *
+ * `idPropio` se excluye para que un proyecto no choque contra si mismo al
+ * volver a guardarlo.
+ */
+async function slugLibre(
+  supabase: Awaited<ReturnType<typeof client>>,
+  base: string,
+  idPropio?: string,
+): Promise<string> {
+  let query = supabase.from("projects").select("slug").like("slug", `${base}%`);
+  if (idPropio) query = query.neq("id", idPropio);
+
+  const { data } = await query;
+  const tomados = new Set((data ?? []).map((r: any) => r.slug));
+
+  if (!tomados.has(base)) return base;
+
+  let n = 2;
+  while (tomados.has(`${base}-${n}`)) n += 1;
+  return `${base}-${n}`;
+}
+
 export async function saveProject(
   _prev: SaveState,
   formData: FormData,
@@ -198,6 +233,26 @@ export async function saveProject(
 
   try {
     const supabase = await client();
+
+    const { data: actual } = await supabase
+      .from("projects")
+      .select("slug, status")
+      .eq("id", id)
+      .maybeSingle();
+
+    /*
+      La direccion se rehace con el titulo real mientras el proyecto siga en
+      borrador. Al crearlo todavia no hay titulo, asi que sale de uno
+      provisorio: sin esto queda en /proyectos/proyecto-nuevo para siempre.
+
+      Publicado ya no se toca. Desde ahi la direccion pudo compartirse o
+      indexarse, y cambiarla en silencio rompe los enlaces que ya andan.
+    */
+    if (actual?.status === "draft") {
+      const base = baseDelSlug(clientName, patch.project_name || patch.title);
+      if (base !== actual.slug) patch.slug = await slugLibre(supabase, base, id);
+    }
+
     const { data, error } = await supabase
       .from("projects")
       .update(patch)
@@ -207,6 +262,9 @@ export async function saveProject(
 
     if (error) throw new Error(error.message);
 
+    // Tambien la vieja: si la direccion cambio, la anterior no puede quedar
+    // servida desde la cache.
+    if (actual?.slug && actual.slug !== data?.slug) refresh(actual.slug);
     refresh(data?.slug);
     return { status: "ok", message: "Cambios guardados" };
   } catch (error) {
@@ -224,15 +282,7 @@ export async function createManualProject(formData: FormData) {
 
   const title = String(formData.get("title") ?? "").trim() || "Proyecto sin título";
   const clientName = String(formData.get("client_name") ?? "").trim();
-  const base = slugify([clientName, title].filter(Boolean).join(" ")) || "proyecto";
-
-  const { data: existing } = await supabase
-    .from("projects")
-    .select("slug")
-    .like("slug", `${base}%`);
-
-  const slug =
-    (existing ?? []).length > 0 ? `${base}-${(existing ?? []).length + 1}` : base;
+  const slug = await slugLibre(supabase, baseDelSlug(clientName, title));
 
   const { data, error } = await supabase
     .from("projects")
