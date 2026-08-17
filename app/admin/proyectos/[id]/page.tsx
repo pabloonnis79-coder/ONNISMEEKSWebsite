@@ -4,6 +4,37 @@ import { notFound } from "next/navigation";
 import { ArrowLeftIcon } from "@phosphor-icons/react/dist/ssr";
 import { createClient } from "@/lib/supabase/server";
 import { EditForm } from "./edit-form";
+import type { VideoDelCanal } from "./video-picker";
+import { getVideos, isYouTubeConfigured, listUploadIds } from "@/lib/youtube/api";
+
+/**
+ * Los ultimos videos del canal, para elegir cual va en el proyecto.
+ *
+ * Con cache de un dia: la lista cambia cuando se sube algo nuevo, no a cada
+ * rato, y sin cache cada visita al editor gastaria cuota de la API.
+ *
+ * Si falla, se devuelve vacio y el formulario deja pegar el enlace a mano. No
+ * poder listar el canal no puede impedir editar un proyecto.
+ */
+async function videosDelCanal(): Promise<VideoDelCanal[]> {
+  if (!isYouTubeConfigured()) return [];
+
+  try {
+    const ids = await listUploadIds(60);
+    if (ids.length === 0) return [];
+
+    const videos = await getVideos(ids, 86400);
+    return videos.map((v) => ({
+      id: v.id,
+      titulo: v.title,
+      duracion: v.durationSeconds,
+      fecha: v.publishedAt,
+    }));
+  } catch (error) {
+    console.error("[admin] no pude listar el canal:", error);
+    return [];
+  }
+}
 
 export const metadata: Metadata = {
   title: "Editar proyecto",
@@ -20,7 +51,10 @@ export default async function EditProjectPage({
   const { id } = await params;
   const supabase = await createClient();
 
-  const { data } = await supabase.from("projects").select("*").eq("id", id).maybeSingle();
+  const [{ data }, videos] = await Promise.all([
+    supabase.from("projects").select("*").eq("id", id).maybeSingle(),
+    videosDelCanal(),
+  ]);
   if (!data) notFound();
 
   return (
@@ -53,7 +87,7 @@ export default async function EditProjectPage({
       </p>
 
       <div className="mt-10">
-        <EditForm project={data} />
+        <EditForm project={data} videosDelCanal={videos} />
       </div>
     </div>
   );

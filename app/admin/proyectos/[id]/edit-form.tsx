@@ -4,6 +4,7 @@ import { useActionState, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { UploadSimpleIcon } from "@phosphor-icons/react";
 import { saveProject, type SaveState } from "@/app/admin/actions";
+import { VideoPicker, type VideoDelCanal } from "./video-picker";
 import { createClient } from "@/lib/supabase/browser";
 import { slugify } from "@/lib/utils";
 
@@ -50,7 +51,13 @@ function SaveBar({ state }: { state: SaveState }) {
   );
 }
 
-export function EditForm({ project }: { project: any }) {
+export function EditForm({
+  project,
+  videosDelCanal = [],
+}: {
+  project: any;
+  videosDelCanal?: VideoDelCanal[];
+}) {
   const [state, formAction] = useActionState(saveProject, initial);
   const [gallery, setGallery] = useState<string>(
     (project.gallery ?? []).map((g: any) => g.url).join("\n"),
@@ -99,6 +106,13 @@ export function EditForm({ project }: { project: any }) {
         name="locked_fields"
         value={(project.locked_fields ?? []).join(",")}
       />
+
+      <div className="mb-8 border-b border-line pb-8">
+        <Label htmlFor="youtube_id" hint="Elegilo de la lista del canal o pegá el enlace. Es el video que se ve en la ficha.">
+          Video
+        </Label>
+        <VideoPicker inicial={project.youtube_id ?? ""} videos={videosDelCanal} />
+      </div>
 
       <div className="grid gap-6 md:grid-cols-2">
         <div>

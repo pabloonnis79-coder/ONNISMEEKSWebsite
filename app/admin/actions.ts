@@ -176,6 +176,7 @@ export async function saveProject(
     story: String(formData.get("story") ?? "").trim() || null,
     results: String(formData.get("results") ?? "").trim() || null,
     cover_url: String(formData.get("cover_url") ?? "").trim() || null,
+    youtube_id: String(formData.get("youtube_id") ?? "").trim() || null,
     services: parseLines(formData.get("services")),
     tags: parseLines(formData.get("tags")),
     credits: parseCredits(formData.get("credits")),
