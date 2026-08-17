@@ -14,7 +14,7 @@ import { team } from "@/lib/content";
 export const revalidate = 600;
 
 export const metadata: Metadata = pageMetadata({
-  title: "Estudio",
+  title: "Estudio: quiénes somos y cómo trabajamos",
   description:
     "Quiénes somos, cómo trabajamos y con qué equipo. Productora audiovisual con proceso completo puertas adentro.",
   path: "/estudio",

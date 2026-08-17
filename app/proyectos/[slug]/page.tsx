@@ -12,7 +12,7 @@ import {
   getProjectBySlug,
   getRelatedProject,
 } from "@/lib/db/projects";
-import { breadcrumbSchema, pageMetadata, projectSchema } from "@/lib/seo";
+import { breadcrumbSchema, pageMetadata, projectSchema, projectTitle } from "@/lib/seo";
 import type { Project } from "@/lib/types";
 import { formatDateEs, formatDuration, truncate, youtubeThumb } from "@/lib/utils";
 
@@ -41,7 +41,7 @@ export async function generateMetadata({
   const title = project.projectName ?? project.title;
 
   return pageMetadata({
-    title: project.seoTitle ?? title,
+    title: projectTitle(project),
     description:
       project.seoDescription ??
       truncate(project.aiSummary ?? project.story ?? title, 155),

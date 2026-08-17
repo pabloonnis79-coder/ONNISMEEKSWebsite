@@ -6,7 +6,7 @@ import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Contacto",
+  title: "Contacto: contanos qué hay que filmar",
   description:
     "Contanos qué hay que filmar. Respondemos dentro de las 48 horas hábiles con una primera propuesta.",
   path: "/contacto",

@@ -12,7 +12,7 @@ import type { Metadata } from "next";
 export const revalidate = 300;
 
 export const metadata: Metadata = pageMetadata({
-  title: "Proyectos",
+  title: "Proyectos: publicidad y branded content",
   description:
     "Publicidad, branded content, documental de marca e institucional. Buscá por cliente, año, categoría o servicio.",
   path: "/proyectos",
@@ -78,6 +78,7 @@ export default async function ProjectsPage({
                   project={project}
                   priority={i < 3}
                   size="reel"
+                  heading="h2"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
               </Reveal>

@@ -9,7 +9,7 @@ import { posts } from "@/lib/content";
 import { formatDateEs } from "@/lib/utils";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Notas",
+  title: "Notas de producción audiovisual",
   description:
     "Apuntes de producción, decisiones técnicas y casos de estudio del equipo.",
   path: "/notas",

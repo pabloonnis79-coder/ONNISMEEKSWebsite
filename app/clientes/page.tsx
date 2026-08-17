@@ -11,7 +11,7 @@ import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 export const revalidate = 600;
 
 export const metadata: Metadata = pageMetadata({
-  title: "Clientes",
+  title: "Clientes y marcas con las que trabajamos",
   description:
     "Marcas, organizaciones y agencias con las que trabajamos. Cada cliente tiene su ficha con todos los proyectos realizados.",
   path: "/clientes",

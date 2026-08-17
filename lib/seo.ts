@@ -48,6 +48,76 @@ export function pageMetadata(input: {
   };
 }
 
+/* --------------------------------------------- titulo de cada proyecto ---- */
+
+/** Los buscadores cortan el titulo mas o menos ahi. Lo que sigue se pierde. */
+const LARGO_MAXIMO = 60;
+/** Debajo de esto el titulo desaprovecha el lugar que da el buscador. */
+const LARGO_MINIMO = 30;
+
+/**
+ * El titulo de la ficha de un proyecto, con la marca al final.
+ *
+ * El nombre solo casi nunca alcanza —"Globant | ONNIS & MEEKS" son veintitres
+ * caracteres— y algunos se pasan de largo y quedan cortados en los resultados.
+ * Se completa con lo que ya sabemos del proyecto y se recorta si hace falta.
+ *
+ * Ojo: esto acomoda el tamano, no arregla el nombre. Un proyecto que en el
+ * canal se llama "recap case ih" va a seguir apareciendo asi hasta que alguien
+ * escriba el campo PROYECTO en la descripcion de YouTube.
+ */
+export function projectTitle(project: {
+  seoTitle?: string | null;
+  projectName?: string | null;
+  title: string;
+  category?: string | null;
+  clientName?: string | null;
+}): string {
+  const marca = ` | ${site.name}`;
+
+  // El titulo que dejo la sincronizacion ya trae la marca pegada.
+  const nombre = (project.seoTitle ?? project.projectName ?? project.title)
+    .replace(marca, "")
+    .trim();
+
+  const yaNombrado = (texto: string) => nombre.toLowerCase().includes(texto.toLowerCase());
+
+  /*
+    Se agrega lo que sirve para buscar y todavia no esta en el nombre: el rubro
+    del proyecto si lo tiene cargado, y si no, lo que es. El cliente se suma
+    solo cuando no aparece ya en el nombre, que es lo mas comun: la ficha de
+    Globant no gana nada con decir Globant dos veces.
+  */
+  const agregados = [
+    project.clientName && !yaNombrado(project.clientName) ? project.clientName : null,
+    project.category && !yaNombrado(project.category) ? project.category : "Producción audiovisual",
+  ].filter(Boolean);
+
+  let titulo = nombre;
+
+  for (const agregado of agregados) {
+    if (titulo.length + marca.length >= LARGO_MINIMO) break;
+    titulo = `${titulo} — ${agregado}`;
+  }
+
+  if (titulo.length + marca.length <= LARGO_MAXIMO) return titulo + marca;
+
+  /*
+    Recorte por palabra entera. Cortar al caracter exacto parte la ultima
+    palabra al medio y se lee peor que perderla.
+  */
+  const disponible = LARGO_MAXIMO - marca.length - 1;
+  const palabras = titulo.split(" ");
+  let corto = "";
+
+  for (const palabra of palabras) {
+    if (`${corto} ${palabra}`.trim().length > disponible) break;
+    corto = `${corto} ${palabra}`.trim();
+  }
+
+  return `${corto || titulo.slice(0, disponible)}…${marca}`;
+}
+
 export function organizationSchema() {
   return {
     "@context": "https://schema.org",

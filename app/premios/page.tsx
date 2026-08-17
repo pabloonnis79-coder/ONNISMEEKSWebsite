@@ -8,7 +8,7 @@ import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 import { awards } from "@/lib/content";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Premios",
+  title: "Premios y festivales",
   description:
     "Reconocimientos, selecciones oficiales y festivales donde participaron las piezas del estudio.",
   path: "/premios",

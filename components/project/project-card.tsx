@@ -11,6 +11,7 @@ export function ProjectCard({
   size = "md",
   sizes,
   auto = false,
+  heading = "h3",
 }: {
   project: Project;
   priority?: boolean;
@@ -19,12 +20,22 @@ export function ProjectCard({
   sizes?: string;
   /** Reproduce el video al entrar en pantalla, sin esperar al cursor. */
   auto?: boolean;
+  /**
+   * Que nivel de encabezado usa el nombre del proyecto.
+   *
+   * Los encabezados son el indice de la pagina y no pueden saltear niveles. En
+   * casi todas las pantallas la tarjeta cuelga de un H2 de seccion, asi que va
+   * en H3. En el listado de proyectos cuelga directo del H1 de la pagina, y ahi
+   * el H3 dejaba un hueco: hay que pasarle H2.
+   */
+  heading?: "h2" | "h3";
 }) {
   const poster =
     project.coverUrl ?? (project.youtubeId ? youtubeThumb(project.youtubeId) : null);
 
   const title = project.projectName ?? project.title;
   const duration = formatDuration(project.durationSeconds);
+  const Titulo = heading;
 
   return (
     <Link
@@ -63,7 +74,7 @@ export function ProjectCard({
         )}
       >
         <div className="min-w-0">
-          <h3
+          <Titulo
             className={cn(
               "font-display font-extrabold uppercase leading-[0.95] tracking-[-0.035em] text-paper transition-colors duration-300 group-hover:text-flame-warm",
               size === "lg"
@@ -74,7 +85,7 @@ export function ProjectCard({
             )}
           >
             {title}
-          </h3>
+          </Titulo>
           <p
             className={cn(
               "text-paper-dim",

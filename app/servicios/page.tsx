@@ -8,7 +8,7 @@ import { capabilities, site } from "@/lib/site";
 import { getServicios } from "@/lib/db/servicios";
 
 export const metadata: Metadata = pageMetadata({
-  title: "Servicios",
+  title: "Servicios de producción audiovisual",
   description:
     "Dirección, producción ejecutiva, fotografía, aéreas, post, color, sonido y fotografía de campaña. Todo el proceso en un mismo estudio.",
   path: "/servicios",
