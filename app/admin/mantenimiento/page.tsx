@@ -47,14 +47,14 @@ function Tarjeta({ c }: { c: Chequeo }) {
 
       <p className="mt-3 max-w-[70ch] text-sm leading-relaxed text-paper">{c.resumen}</p>
 
+      {/*
+        Las direcciones se cortan en cualquier lado. Una con parametros de
+        seguimiento no tiene espacios donde cortar y se sale de la pantalla: el
+        dato queda ahi pero no se puede leer.
+      */}
       {c.detalle && c.detalle.length > 0 && (
         <ul className="mt-3 flex flex-col gap-1.5">
           {c.detalle.map((d) => (
-            {/*
-              Cortado en cualquier lado. Una direccion con parametros de
-              seguimiento no tiene espacios donde cortar y se sale de la
-              pantalla: el dato queda ahi pero no se puede leer.
-            */}
             <li
               key={d}
               className="font-mono text-[12px] leading-relaxed text-paper-dim [overflow-wrap:anywhere]"
