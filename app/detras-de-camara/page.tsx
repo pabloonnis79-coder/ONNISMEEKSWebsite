@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ActionLink } from "@/components/ui/action";
 import { JsonLd } from "@/components/json-ld";
 import { getProjects } from "@/lib/db/projects";
+import { getTextos } from "@/lib/db/textos";
 import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 
 export const revalidate = 600;
@@ -16,6 +17,7 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default async function BehindTheScenesPage() {
+  const t = await getTextos();
   const projects = await getProjects({}, 60);
 
   const clips = projects.flatMap((project) =>
@@ -40,11 +42,10 @@ export default async function BehindTheScenesPage() {
       <div className="mx-auto max-w-[1600px] px-5 pt-32 md:px-10 md:pt-40">
         <header className="max-w-[20ch]">
           <h1 className="display font-display text-[12vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[10vw] lg:text-[min(6.4vw,102.4px)]">
-            Detrás de cámara
+            {t["bts.titulo"]}
           </h1>
           <p className="mt-6 max-w-[52ch] text-base leading-relaxed text-paper-dim md:text-lg">
-            Cómo se arma cada pieza antes de que quede prolija. Material de
-            rodaje, pruebas y descartes.
+            {t["bts.bajada"]}
           </p>
         </header>
       </div>
@@ -53,14 +54,10 @@ export default async function BehindTheScenesPage() {
         <div className="mx-auto max-w-[1600px] px-5 py-20 md:px-10 md:py-28">
           <div className="border border-line px-6 py-16 md:px-12 md:py-24">
             <h2 className="max-w-[24ch] font-display text-2xl font-extrabold uppercase tracking-[-0.035em] md:text-4xl">
-              Todavía no hay material de rodaje cargado
+              {t["bts.vacio.titulo"]}
             </h2>
             <p className="mt-5 max-w-[56ch] text-paper-dim">
-              El making of y las fotos se agregan desde la descripción del video
-              en YouTube, con los campos{" "}
-              <code className="font-mono text-sm text-flame-warm">MAKINGOF:</code> y{" "}
-              <code className="font-mono text-sm text-flame-warm">GALERIA:</code>, o
-              desde el panel de administración.
+              {t["bts.vacio.texto"]}
             </p>
             <ActionLink href="/proyectos" variant="ghost" className="mt-8">
               Ver proyectos
@@ -72,7 +69,7 @@ export default async function BehindTheScenesPage() {
       {clips.length > 0 && (
         <section className="py-16 md:py-24">
           <h2 className="mx-auto mb-8 max-w-[1600px] px-5 font-mono text-[11px] uppercase tracking-[0.22em] text-flame md:px-10">
-            Making of
+            {t["bts.makingof.titulo"]}
           </h2>
 
           {/* Tira horizontal con scroll nativo: funciona igual con rueda, trackpad,
@@ -117,7 +114,7 @@ export default async function BehindTheScenesPage() {
       {stills.length > 0 && (
         <section className="mx-auto max-w-[1600px] border-t border-line px-5 py-16 md:px-10 md:py-24">
           <h2 className="mb-10 font-mono text-[11px] uppercase tracking-[0.22em] text-flame">
-            Fotos de rodaje
+            {t["bts.fotos.titulo"]}
           </h2>
           <ul className="columns-1 gap-4 sm:columns-2 lg:columns-3 [&>li]:mb-4">
             {stills.map(({ project, image }, i) => (

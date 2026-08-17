@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ActionLink } from "@/components/ui/action";
 import { Reveal } from "@/components/ui/reveal";
 import { JsonLd } from "@/components/json-ld";
+import { getTextos } from "@/lib/db/textos";
 import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 import { awards } from "@/lib/content";
 
@@ -13,7 +14,9 @@ export const metadata: Metadata = pageMetadata({
   path: "/premios",
 });
 
-export default function AwardsPage() {
+export default async function AwardsPage() {
+  const t = await getTextos();
+
   // Se agrupa por año para que la lista no sea una tabla de filas iguales.
   const byYear = awards.reduce<Map<number, typeof awards>>((acc, award) => {
     const list = acc.get(award.year) ?? [];
@@ -36,22 +39,20 @@ export default function AwardsPage() {
       <div className="mx-auto max-w-[1600px] px-5 pb-24 pt-32 md:px-10 md:pb-32 md:pt-40">
         <header className="mb-14 md:mb-20">
           <h1 className="display font-display text-[13vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[11vw] lg:text-[min(7vw,112px)]">
-            Premios
+            {t["premios.titulo"]}
           </h1>
           <p className="mt-6 max-w-[52ch] text-base leading-relaxed text-paper-dim md:text-lg">
-            Festivales, selecciones oficiales y reconocimientos de la industria.
+            {t["premios.bajada"]}
           </p>
         </header>
 
         {awards.length === 0 ? (
           <div className="border border-line px-6 py-16 md:px-12 md:py-24">
             <h2 className="max-w-[20ch] font-display text-2xl font-extrabold uppercase tracking-[-0.035em] md:text-4xl">
-              Esta sección todavía no tiene contenido cargado
+              {t["premios.vacio.titulo"]}
             </h2>
             <p className="mt-5 max-w-[54ch] text-paper-dim">
-              Los premios se cargan en{" "}
-              <code className="font-mono text-sm text-flame-warm">lib/content.ts</code>{" "}
-              y la página se arma sola, agrupada por año.
+              {t["premios.vacio.texto"]}
             </p>
             <ActionLink href="/proyectos" variant="ghost" className="mt-8">
               Ver proyectos

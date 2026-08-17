@@ -285,6 +285,105 @@ GRUPOS.push(
   },
 );
 
+GRUPOS.push(
+  {
+    titulo: "Página Premios",
+    descripcion: "Mientras no haya premios cargados se ve el texto de abajo.",
+    campos: [
+      { id: "premios.titulo", etiqueta: "Título", valor: "Premios" },
+      {
+        id: "premios.bajada",
+        etiqueta: "Bajada",
+        largo: "parrafo",
+        valor:
+          "Festivales, selecciones oficiales y reconocimientos de la industria.",
+      },
+      {
+        id: "premios.vacio.titulo",
+        etiqueta: "Sin premios, título",
+        valor: "Todavía no hay premios cargados",
+      },
+      {
+        id: "premios.vacio.texto",
+        etiqueta: "Sin premios, texto",
+        largo: "parrafo",
+        valor:
+          "Cuando sumemos el primero, esta página se arma sola y los agrupa por año.",
+      },
+    ],
+  },
+  {
+    titulo: "Página Notas",
+    campos: [
+      { id: "notas.titulo", etiqueta: "Título", valor: "Notas" },
+      {
+        id: "notas.bajada",
+        etiqueta: "Bajada",
+        largo: "parrafo",
+        valor:
+          "Apuntes de producción y decisiones técnicas que tomamos en cada proyecto.",
+      },
+      {
+        id: "notas.vacio.titulo",
+        etiqueta: "Sin notas, título",
+        valor: "Todavía no publicamos la primera nota",
+      },
+      {
+        id: "notas.vacio.texto",
+        etiqueta: "Sin notas, texto",
+        largo: "parrafo",
+        valor: "La sección ya está lista para cuando tengamos algo que contar.",
+      },
+    ],
+  },
+  {
+    titulo: "Página Detrás de cámara",
+    campos: [
+      {
+        id: "bts.titulo",
+        etiqueta: "Título",
+        valor: "Detrás de cámara",
+      },
+      {
+        id: "bts.bajada",
+        etiqueta: "Bajada",
+        largo: "parrafo",
+        valor:
+          "Cómo se arma cada pieza antes de que quede prolija. Material de rodaje, pruebas y descartes.",
+      },
+      {
+        id: "bts.vacio.titulo",
+        etiqueta: "Sin material, título",
+        valor: "Todavía no hay material de rodaje cargado",
+      },
+      {
+        id: "bts.vacio.texto",
+        etiqueta: "Sin material, texto",
+        largo: "parrafo",
+        valor:
+          "El making of y las fotos de rodaje se agregan desde la descripción del video en YouTube o desde el panel.",
+      },
+      { id: "bts.makingof.titulo", etiqueta: "Título del making of", valor: "Making of" },
+      { id: "bts.fotos.titulo", etiqueta: "Título de las fotos", valor: "Fotos de rodaje" },
+    ],
+  },
+  {
+    titulo: "Página no encontrada",
+    descripcion: "Lo que ve alguien que llega a una dirección que ya no existe.",
+    campos: [
+      { id: "error404.antetitulo", etiqueta: "Antetítulo", valor: "Error 404" },
+      { id: "error404.titulo", etiqueta: "Título", valor: "Esta página no existe" },
+      {
+        id: "error404.texto",
+        etiqueta: "Texto",
+        largo: "parrafo",
+        valor:
+          "Puede que el proyecto haya cambiado de dirección o que el enlace esté incompleto.",
+      },
+    ],
+  },
+);
+
 /**
  * Los cinco servicios.
  *

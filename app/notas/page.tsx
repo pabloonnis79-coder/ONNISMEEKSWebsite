@@ -3,6 +3,7 @@ import Image from "next/image";
 import { ActionLink } from "@/components/ui/action";
 import { Reveal } from "@/components/ui/reveal";
 import { JsonLd } from "@/components/json-ld";
+import { getTextos } from "@/lib/db/textos";
 import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 import { posts } from "@/lib/content";
 import { formatDateEs } from "@/lib/utils";
@@ -14,7 +15,9 @@ export const metadata: Metadata = pageMetadata({
   path: "/notas",
 });
 
-export default function NotesPage() {
+export default async function NotesPage() {
+  const t = await getTextos();
+
   return (
     <>
       <JsonLd
@@ -27,24 +30,20 @@ export default function NotesPage() {
       <div className="mx-auto max-w-[1600px] px-5 pb-24 pt-32 md:px-10 md:pb-32 md:pt-40">
         <header className="mb-14 md:mb-20">
           <h1 className="display font-display text-[13vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[11vw] lg:text-[min(7vw,112px)]">
-            Notas
+            {t["notas.titulo"]}
           </h1>
           <p className="mt-6 max-w-[52ch] text-base leading-relaxed text-paper-dim md:text-lg">
-            Apuntes de producción y decisiones técnicas que tomamos en cada
-            proyecto.
+            {t["notas.bajada"]}
           </p>
         </header>
 
         {posts.length === 0 ? (
           <div className="border border-line px-6 py-16 md:px-12 md:py-24">
             <h2 className="max-w-[22ch] font-display text-2xl font-extrabold uppercase tracking-[-0.035em] md:text-4xl">
-              Todavía no publicamos la primera nota
+              {t["notas.vacio.titulo"]}
             </h2>
             <p className="mt-5 max-w-[54ch] text-paper-dim">
-              Las notas se cargan en{" "}
-              <code className="font-mono text-sm text-flame-warm">lib/content.ts</code>.
-              La estructura ya está lista para sumar el contenido cuando haga
-              falta.
+              {t["notas.vacio.texto"]}
             </p>
             <ActionLink href="/proyectos" variant="ghost" className="mt-8">
               Ver proyectos
