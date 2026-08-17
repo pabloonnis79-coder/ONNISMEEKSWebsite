@@ -7,7 +7,8 @@ import { BrandSquare } from "@/components/brand/wordmark";
 import { JsonLd } from "@/components/json-ld";
 import { getFeaturedProjects } from "@/lib/db/projects";
 import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
-import { capabilities, site } from "@/lib/site";
+import { site } from "@/lib/site";
+import { getTextos } from "@/lib/db/textos";
 import { team } from "@/lib/content";
 
 export const revalidate = 600;
@@ -21,6 +22,27 @@ export const metadata: Metadata = pageMetadata({
 
 export default async function StudioPage() {
   const years = new Date().getFullYear() - site.foundingYear;
+  const t = await getTextos();
+
+  /*
+    Los parrafos admiten {año} y {años}. Se reemplazan al mostrar y no al
+    guardar: asi el numero de años se actualiza solo cada primero de enero, en
+    vez de quedar congelado en el que habia el dia que se escribio el texto.
+  */
+  const conDatos = (texto: string) =>
+    texto
+      .replaceAll("{año}", String(site.foundingYear))
+      .replaceAll("{años}", String(years));
+
+  // Parte del titulo va en naranja: se busca dentro, igual que en la portada.
+  const tituloEstudio = t["estudio.titulo"];
+  const resaltado = t["estudio.resaltado"].trim();
+  const corte = resaltado ? tituloEstudio.indexOf(resaltado) : -1;
+
+  const capacidades = t["estudio.capacidades.items"]
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
 
   const [ultimo] = await getFeaturedProjects(1);
   const portada = ultimo?.coverUrl
@@ -42,7 +64,15 @@ export default async function StudioPage() {
 
       <div className="mx-auto max-w-[1600px] px-5 pt-32 md:px-10 md:pt-40">
         <h1 className="display max-w-[18ch] font-display text-[11vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[9vw] lg:text-[min(6vw,96px)]">
-          Un estudio, <span className="flame-text">todo el proceso</span>
+          {corte < 0 ? (
+            tituloEstudio
+          ) : (
+            <>
+              {tituloEstudio.slice(0, corte)}
+              <span className="flame-text">{resaltado}</span>
+              {tituloEstudio.slice(corte + resaltado.length)}
+            </>
+          )}
         </h1>
       </div>
 
@@ -50,21 +80,9 @@ export default async function StudioPage() {
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-7">
             <div className="space-y-6 text-base leading-relaxed text-paper-dim md:text-lg">
-              <p className="max-w-[62ch]">
-                ONNIS &amp; MEEKS trabaja desde {site.foundingYear} produciendo
-                piezas audiovisuales para marcas, organizaciones y agencias. En{" "}
-                {years} años armamos un equipo que cubre todas las etapas, desde
-                la idea hasta el archivo final entregado.
-              </p>
-              <p className="max-w-[62ch]">
-                No tercerizamos las decisiones importantes. La misma persona que
-                escucha el brief está en el rodaje y firma el corte final. Eso
-                hace que la pieza que se aprueba sea la pieza que se entrega.
-              </p>
-              <p className="max-w-[62ch]">
-                Trabajamos con presupuesto cerrado. Si algo no entra, lo decimos
-                antes de firmar y proponemos cómo resolverlo de otra manera.
-              </p>
+              <p className="max-w-[62ch]">{conDatos(t["estudio.parrafo1"])}</p>
+              <p className="max-w-[62ch]">{conDatos(t["estudio.parrafo2"])}</p>
+              <p className="max-w-[62ch]">{conDatos(t["estudio.parrafo3"])}</p>
             </div>
           </div>
 
@@ -113,10 +131,10 @@ export default async function StudioPage() {
       <section className="border-y border-line bg-ink-800">
         <div className="mx-auto max-w-[1600px] px-5 py-20 md:px-10 md:py-28">
           <h2 className="font-mono text-[11px] uppercase tracking-[0.22em] text-flame">
-            Lo que producimos
+            {t["estudio.capacidades.titulo"]}
           </h2>
           <ul className="mt-10 grid grid-cols-1 gap-x-10 sm:grid-cols-2 lg:grid-cols-4">
-            {capabilities.map((item, i) => (
+            {capacidades.map((item, i) => (
               <li key={item}>
                 <Reveal delay={(i % 4) * 0.05}>
                   <p className="display border-t border-line py-5 font-display text-2xl font-extrabold uppercase tracking-[-0.035em] text-paper md:text-3xl">
@@ -132,7 +150,7 @@ export default async function StudioPage() {
       {team.length > 0 && (
         <section className="mx-auto max-w-[1600px] px-5 py-20 md:px-10 md:py-28">
           <h2 className="display font-display text-[10vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[6.5vw] lg:text-[min(4vw,64px)]">
-            Equipo
+            {t["estudio.equipo.titulo"]}
           </h2>
           <ul className="mt-12 grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-3 lg:grid-cols-4">
             {team.map((member) => (
@@ -161,10 +179,10 @@ export default async function StudioPage() {
       <section className="border-t border-line">
         <div className="mx-auto flex max-w-[1600px] flex-col gap-8 px-5 py-20 md:flex-row md:items-center md:justify-between md:px-10 md:py-28">
           <h2 className="display max-w-[18ch] font-display text-[10vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[6.5vw] lg:text-[min(4vw,64px)]">
-            Contanos qué hay que filmar
+            {t["estudio.cierre.titulo"]}
           </h2>
           <ActionLink href="/contacto" arrow className="self-start">
-            Contacto
+            {t["estudio.cierre.enlace"]}
           </ActionLink>
         </div>
       </section>

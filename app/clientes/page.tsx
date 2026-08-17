@@ -5,6 +5,7 @@ import { ArrowUpRightIcon } from "@phosphor-icons/react/dist/ssr";
 import { Reveal } from "@/components/ui/reveal";
 import { JsonLd } from "@/components/json-ld";
 import { getClients, getFacets } from "@/lib/db/projects";
+import { getTextos } from "@/lib/db/textos";
 import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 
 export const revalidate = 600;
@@ -17,7 +18,11 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default async function ClientsPage() {
-  const [clients, facets] = await Promise.all([getClients(), getFacets()]);
+  const [clients, facets, t] = await Promise.all([
+    getClients(),
+    getFacets(),
+    getTextos(),
+  ]);
   const counts = new Map(facets.clients.map((c) => [c.slug, c.count]));
 
   return (
@@ -32,18 +37,16 @@ export default async function ClientsPage() {
       <div className="mx-auto max-w-[1600px] px-5 pb-24 pt-32 md:px-10 md:pb-32 md:pt-40">
         <header className="mb-14 md:mb-20">
           <h1 className="display font-display text-[13vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[11vw] lg:text-[min(7vw,112px)]">
-            Clientes
+            {t["clientes.titulo"]}
           </h1>
           <p className="mt-6 max-w-[52ch] text-base leading-relaxed text-paper-dim md:text-lg">
-            La ficha de cada marca reúne todo lo que filmamos con ella, con los
-            servicios que contrató y el año de cada pieza.
+            {t["clientes.bajada"]}
           </p>
         </header>
 
         {clients.length === 0 ? (
           <p className="border border-line px-6 py-16 text-paper-dim md:px-12">
-            Todavía no hay clientes cargados. Se crean solos con la primera
-            sincronización del canal.
+            {t["clientes.vacio"]}
           </p>
         ) : (
           <ul className="grid grid-cols-1 gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-3">

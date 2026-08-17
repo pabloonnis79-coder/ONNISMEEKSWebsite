@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { ContactForm } from "./contact-form";
 import { JsonLd } from "@/components/json-ld";
+import { getTextos } from "@/lib/db/textos";
 import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
 
@@ -11,7 +12,9 @@ export const metadata: Metadata = pageMetadata({
   path: "/contacto",
 });
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const t = await getTextos();
+
   return (
     <>
       <JsonLd
@@ -25,11 +28,10 @@ export default function ContactPage() {
         <div className="grid gap-14 lg:grid-cols-12 lg:gap-16">
           <div className="lg:col-span-5">
             <h1 className="display font-display text-[11vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[9vw] lg:text-[min(4.6vw,73.6px)]">
-              Contanos qué hay que filmar
+              {t["contacto.titulo"]}
             </h1>
             <p className="mt-7 max-w-[42ch] text-base leading-relaxed text-paper-dim md:text-lg">
-              Contestamos dentro de las 48 horas hábiles. Si ya tenés brief,
-              adjuntalo por correo y ganamos una vuelta.
+              {t["contacto.bajada"]}
             </p>
 
             <dl className="mt-12 space-y-7">

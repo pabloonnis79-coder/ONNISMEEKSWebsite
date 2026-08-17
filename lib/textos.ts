@@ -11,7 +11,7 @@
  * lo editado. Cambiarlo equivale a perder el texto que el estudio haya escrito.
  */
 
-import { services } from "@/lib/site";
+import { capabilities, services } from "@/lib/site";
 
 export type CampoTexto = {
   id: string;
@@ -167,6 +167,123 @@ export const GRUPOS: GrupoTexto[] = [
     ],
   },
 ];
+
+GRUPOS.push(
+  {
+    titulo: "Página Estudio",
+    campos: [
+      {
+        id: "estudio.titulo",
+        etiqueta: "Título",
+        valor: "Un estudio, todo el proceso",
+      },
+      {
+        id: "estudio.resaltado",
+        etiqueta: "Parte en naranja",
+        ayuda: "Tiene que ser un pedazo exacto del título.",
+        valor: "todo el proceso",
+      },
+      {
+        id: "estudio.parrafo1",
+        etiqueta: "Primer párrafo",
+        largo: "parrafo",
+        ayuda:
+          "Se puede escribir {año} y {años} y el sitio los completa con el año de fundación y los años que lleva el estudio.",
+        valor:
+          "ONNIS & MEEKS trabaja desde {año} produciendo piezas audiovisuales para marcas, organizaciones y agencias. En {años} años armamos un equipo que cubre todas las etapas, desde la idea hasta el archivo final entregado.",
+      },
+      {
+        id: "estudio.parrafo2",
+        etiqueta: "Segundo párrafo",
+        largo: "parrafo",
+        valor:
+          "No tercerizamos las decisiones importantes. La misma persona que escucha el brief está en el rodaje y firma el corte final. Eso hace que la pieza que se aprueba sea la pieza que se entrega.",
+      },
+      {
+        id: "estudio.parrafo3",
+        etiqueta: "Tercer párrafo",
+        largo: "parrafo",
+        valor:
+          "Trabajamos con presupuesto cerrado. Si algo no entra, lo decimos antes de firmar y proponemos cómo resolverlo de otra manera.",
+      },
+      {
+        id: "estudio.capacidades.titulo",
+        etiqueta: "Título de la lista",
+        valor: "Lo que producimos",
+      },
+      {
+        id: "estudio.capacidades.items",
+        etiqueta: "Lo que producimos",
+        ayuda: "Uno por línea.",
+        largo: "parrafo",
+        valor: capabilities.join("\n"),
+      },
+      { id: "estudio.equipo.titulo", etiqueta: "Título del equipo", valor: "Equipo" },
+      {
+        id: "estudio.cierre.titulo",
+        etiqueta: "Cierre, título",
+        valor: "Contanos qué hay que filmar",
+      },
+      { id: "estudio.cierre.enlace", etiqueta: "Cierre, botón", valor: "Contacto" },
+    ],
+  },
+  {
+    titulo: "Página Contacto",
+    campos: [
+      {
+        id: "contacto.titulo",
+        etiqueta: "Título",
+        valor: "Contanos qué hay que filmar",
+      },
+      {
+        id: "contacto.bajada",
+        etiqueta: "Bajada",
+        largo: "parrafo",
+        valor:
+          "Contestamos dentro de las 48 horas hábiles. Si ya tenés brief, adjuntalo por correo y ganamos una vuelta.",
+      },
+    ],
+  },
+  {
+    titulo: "Página Proyectos",
+    campos: [
+      { id: "proyectos.titulo", etiqueta: "Título", valor: "Proyectos" },
+      {
+        id: "proyectos.bajada",
+        etiqueta: "Bajada",
+        largo: "parrafo",
+        valor:
+          "Cada ficha se arma sola con lo que publicamos en YouTube. Filtrá por cliente, año, categoría o servicio.",
+      },
+      {
+        id: "proyectos.vacio.titulo",
+        etiqueta: "Sin resultados, título",
+        ayuda: "Se ve cuando un filtro no devuelve nada.",
+        valor: "No hay proyectos con ese filtro",
+      },
+    ],
+  },
+  {
+    titulo: "Página Clientes",
+    campos: [
+      { id: "clientes.titulo", etiqueta: "Título", valor: "Clientes" },
+      {
+        id: "clientes.bajada",
+        etiqueta: "Bajada",
+        largo: "parrafo",
+        valor:
+          "La ficha de cada marca reúne todo lo que filmamos con ella, con los servicios que contrató y el año de cada pieza.",
+      },
+      {
+        id: "clientes.vacio",
+        etiqueta: "Sin clientes todavía",
+        largo: "parrafo",
+        valor:
+          "Todavía no hay clientes cargados. Se crean solos con la primera sincronización del canal.",
+      },
+    ],
+  },
+);
 
 /**
  * Los cinco servicios.

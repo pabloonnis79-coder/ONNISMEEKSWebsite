@@ -5,6 +5,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { ActionLink } from "@/components/ui/action";
 import { JsonLd } from "@/components/json-ld";
 import { getFacets, getProjects } from "@/lib/db/projects";
+import { getTextos } from "@/lib/db/textos";
 import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 import type { Metadata } from "next";
 
@@ -30,6 +31,7 @@ export default async function ProjectsPage({
 
   const year = Number(one("anio"));
 
+  const t = await getTextos();
   const [projects, facets] = await Promise.all([
     getProjects({
       q: one("q"),
@@ -53,11 +55,10 @@ export default async function ProjectsPage({
       <div className="mx-auto max-w-[1600px] px-5 pb-24 pt-32 md:px-10 md:pb-32 md:pt-40">
         <header className="mb-12 md:mb-16">
           <h1 className="display max-w-[12ch] font-display text-[13vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[11vw] lg:text-[min(7vw,112px)]">
-            Proyectos
+            {t["proyectos.titulo"]}
           </h1>
           <p className="mt-6 max-w-[52ch] text-base leading-relaxed text-paper-dim md:text-lg">
-            Cada ficha se arma sola con lo que publicamos en YouTube. Filtrá por
-            cliente, año, categoría o servicio.
+            {t["proyectos.bajada"]}
           </p>
         </header>
 
