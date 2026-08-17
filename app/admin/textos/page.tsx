@@ -36,6 +36,11 @@ export default async function TextosPage() {
         botón para volver atrás. Si lo dejás vacío también vuelve al original:
         el sitio nunca queda con un espacio en blanco.
       </p>
+      <p className="mt-3 max-w-[64ch] text-sm leading-relaxed text-paper-faint">
+        Cada sección tiene su propio botón de guardar, y cualquiera de ellos
+        guarda toda la página. Así podés corregir cosas en dos lugares distintos
+        y no perder ninguna.
+      </p>
 
       <div className="mt-12">
         <TextsForm actuales={actuales} />
