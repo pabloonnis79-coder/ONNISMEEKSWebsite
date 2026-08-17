@@ -18,6 +18,7 @@ import {
 import { CLAVE_TEXTOS } from "@/lib/db/textos";
 import { CAMPOS } from "@/lib/textos";
 import { extraerYoutubeId, slugify, uniq } from "@/lib/utils";
+import { CLAVE_REVISION, correrRevision } from "@/lib/db/mantenimiento";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -731,6 +732,32 @@ export async function deleteAllSpam() {
   if (error) throw new Error(error.message);
 
   revalidatePath("/admin/mensajes");
+}
+
+/* --------------------------------------------------------- mantenimiento -- */
+
+/**
+ * Revisa el sitio y guarda el resultado.
+ *
+ * Va con un boton y no al abrir la pantalla: habla con YouTube y con los sitios
+ * de los clientes, tarda unos segundos y gasta cuota de la API. Correrlo en cada
+ * visita seria pagar eso por nada. Queda guardado con la fecha, que es lo que
+ * hace honesto un informe viejo.
+ */
+export async function runRevision() {
+  const supabase = await client();
+  const revision = await correrRevision(supabase);
+
+  const { error } = await supabase
+    .from("site_settings")
+    .upsert(
+      { key: CLAVE_REVISION, value: revision, updated_at: new Date().toISOString() },
+      { onConflict: "key" },
+    );
+
+  if (error) throw new Error(error.message);
+
+  revalidatePath("/admin/mantenimiento");
 }
 
 /* ---------------------------------------------------------------- sesión -- */
