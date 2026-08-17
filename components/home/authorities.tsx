@@ -8,7 +8,13 @@ import type { Autoridad } from "@/lib/db/settings";
  * Se cargan desde el panel. Si no hay ninguna, la seccion no se renderiza:
  * es preferible que no aparezca a que aparezca vacia o con gente inventada.
  */
-export function Authorities({ people }: { people: Autoridad[] }) {
+export function Authorities({
+  people,
+  titulo,
+}: {
+  people: Autoridad[];
+  titulo: string;
+}) {
   if (people.length === 0) return null;
 
   return (
@@ -18,7 +24,7 @@ export function Authorities({ people }: { people: Autoridad[] }) {
     >
       <div className="mx-auto max-w-[1600px] px-5 py-20 md:px-10 md:py-28">
         <h2 className="display max-w-[14ch] font-display text-[11vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[7vw] lg:text-[min(4.4vw,70.4px)]">
-          Quiénes dirigen
+          {titulo}
         </h2>
 
         <ul className="mt-14 grid grid-cols-1 gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-3 md:mt-20">

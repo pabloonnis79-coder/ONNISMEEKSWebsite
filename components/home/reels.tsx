@@ -15,7 +15,15 @@ import { formatDuration, youtubeThumb } from "@/lib/utils";
  * pieza arranca sola al entrar en cuadro y se apaga al salir, asi nunca hay
  * mas de uno o dos reproductores corriendo.
  */
-export function Reels({ reels }: { reels: Reel[] }) {
+export function Reels({
+  reels,
+  antetitulo,
+  titulo,
+}: {
+  reels: Reel[];
+  antetitulo: string;
+  titulo: string;
+}) {
   if (reels.length === 0) return null;
 
   return (
@@ -25,10 +33,10 @@ export function Reels({ reels }: { reels: Reel[] }) {
     >
       <div className="mx-auto mb-10 max-w-[1600px] px-5 md:mb-14 md:px-10">
         <p className="mb-5 font-mono text-[11px] uppercase tracking-[0.22em] text-flame">
-          Formato vertical
+          {antetitulo}
         </p>
         <h2 className="display max-w-[16ch] font-display text-[11vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[7vw] lg:text-[min(4.4vw,70.4px)]">
-          Piezas para redes
+          {titulo}
         </h2>
       </div>
 

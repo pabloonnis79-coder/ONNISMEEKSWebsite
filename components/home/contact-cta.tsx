@@ -3,7 +3,13 @@ import { Magnetic } from "@/components/ui/magnetic";
 import { Reveal } from "@/components/ui/reveal";
 import { site } from "@/lib/site";
 
-export function ContactCta() {
+export function ContactCta({
+  titulo,
+  enlace,
+}: {
+  titulo: string;
+  enlace: string;
+}) {
   return (
     <section className="relative overflow-hidden border-t border-line bg-ink-800">
       <div
@@ -14,7 +20,7 @@ export function ContactCta() {
       <div className="relative mx-auto max-w-[1600px] px-5 py-24 md:px-10 md:py-36">
         <Reveal>
           <h2 className="display max-w-[16ch] font-display text-[12vw] font-extrabold uppercase tracking-[-0.05em] sm:text-[8.5vw] lg:text-[min(5.6vw,89.6px)]">
-            Contanos qué hay que filmar
+            {titulo}
           </h2>
         </Reveal>
 
@@ -28,7 +34,7 @@ export function ContactCta() {
             </a>
             <Magnetic>
               <ActionLink href="/contacto" arrow>
-                Contacto
+                {enlace}
               </ActionLink>
             </Magnetic>
           </div>

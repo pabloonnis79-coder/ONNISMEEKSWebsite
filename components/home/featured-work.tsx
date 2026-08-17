@@ -16,7 +16,17 @@ const COL_CLASS: Record<number, string> = {
   5: "lg:col-span-5",
 };
 
-export function FeaturedWork({ projects }: { projects: Project[] }) {
+export function FeaturedWork({
+  projects,
+  antetitulo,
+  titulo,
+  enlace,
+}: {
+  projects: Project[];
+  antetitulo: string;
+  titulo: string;
+  enlace: string;
+}) {
   if (projects.length === 0) {
     return (
       <section className="mx-auto max-w-[1600px] px-5 py-24 md:px-10 md:py-32">
@@ -36,13 +46,13 @@ export function FeaturedWork({ projects }: { projects: Project[] }) {
       <Reveal className="mb-14 flex flex-wrap items-end justify-between gap-6 md:mb-20">
         <div>
           <p className="mb-5 font-mono text-[11px] uppercase tracking-[0.22em] text-flame">
-            Trabajos
+            {antetitulo}
           </p>
           <h2 className="display max-w-[14ch] font-display text-[11vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[8vw] lg:text-[min(5vw,80px)]">
-            Lo último que salió del estudio
+            {titulo}
           </h2>
         </div>
-        <TextLink href="/proyectos">Ver todos</TextLink>
+        <TextLink href="/proyectos">{enlace}</TextLink>
       </Reveal>
 
       <div className="grid grid-cols-1 gap-x-6 gap-y-16 lg:grid-cols-12 lg:gap-y-24">

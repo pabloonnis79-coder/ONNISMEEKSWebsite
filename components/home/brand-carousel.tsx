@@ -47,9 +47,11 @@ const VELOCIDAD = 90;
 export function BrandCarousel({
   marcas,
   escala = 1,
+  titulo,
 }: {
   marcas: Marca[];
   escala?: number;
+  titulo: string;
 }) {
   if (marcas.length === 0) return null;
 
@@ -102,7 +104,7 @@ export function BrandCarousel({
       className="relative border-y border-line bg-ink py-10 md:py-14"
     >
       <p className="mx-auto mb-8 max-w-[1600px] px-5 font-mono text-[11px] uppercase tracking-[0.22em] text-paper-faint md:px-10">
-        Confían en nosotros
+        {titulo}
       </p>
 
       <div

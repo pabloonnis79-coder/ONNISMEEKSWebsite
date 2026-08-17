@@ -20,12 +20,18 @@ export function Hero({
   showreelId,
   backdropId,
   mp4 = null,
+  titulo1,
+  titulo2,
+  bajada,
 }: {
   poster: string | null;
   showreelId: string;
   backdropId: string | null;
   /** Archivo propio para el fondo. Si esta, se usa en lugar de YouTube. */
   mp4?: string | null;
+  titulo1: string;
+  titulo2: string;
+  bajada: string;
 }) {
   const [open, setOpen] = useState(false);
   const reduce = useReducedMotion();
@@ -57,19 +63,20 @@ export function Hero({
             RevealLines, y un max-width acá obligaba a "TERMINAMOS" a partirse. */}
         <h1 className="display font-display text-[10.5vw] font-extrabold uppercase tracking-[-0.045em] text-paper sm:text-[9vw] lg:text-[min(6.2vw,99.2px)]">
           {/*
-            Hasta 1024 el titular va en tres líneas: "contenido que" en una
-            sola línea con "Creamos" no entra en un teléfono, y partir la
-            palabra queda peor que agregar el corte.
+            La primera linea se parte por el ultimo espacio hasta 1024: en un
+            telefono no entra entera, y cortar la palabra queda peor que agregar
+            el salto.
           */}
           <RevealLines
             lines={[
-              <>
-                Creamos
-                <br className="lg:hidden" /> contenido
-              </>,
-              <>
-                que <span className="flame-text">impulsa marcas</span>
-              </>,
+              <span key="1">
+                {titulo1.slice(0, titulo1.lastIndexOf(" ") + 1)}
+                <br className="lg:hidden" />
+                {titulo1.slice(titulo1.lastIndexOf(" ") + 1)}
+              </span>,
+              <span key="2" className="flame-text">
+                {titulo2}
+              </span>,
             ]}
             delay={0.15}
           />
@@ -82,8 +89,7 @@ export function Hero({
             transition={{ duration: 0.8, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
             className="max-w-[46ch] text-base leading-relaxed text-paper-dim md:text-lg"
           >
-            Estrategia, producción y postproducción para empresas que quieren
-            diferenciarse.
+            {bajada}
           </motion.p>
 
           <motion.div

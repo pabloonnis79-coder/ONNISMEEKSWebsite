@@ -15,6 +15,8 @@ import {
   CLAVE_VIDEOS_SECCION,
   normalizarImagen,
 } from "@/lib/db/settings";
+import { CLAVE_TEXTOS } from "@/lib/db/textos";
+import { CAMPOS } from "@/lib/textos";
 import { extraerYoutubeId, slugify, uniq } from "@/lib/utils";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -568,6 +570,62 @@ export async function saveReels(
     return {
       status: "ok",
       message: value.length === 0 ? "Sin reels cargados." : `${value.length} reels publicados.`,
+    };
+  } catch (error) {
+    return {
+      status: "error",
+      message: error instanceof Error ? error.message : "No se pudo guardar",
+    };
+  }
+}
+
+/* ---------------------------------------------------------------- textos -- */
+
+export async function saveTextos(
+  _prev: SaveState,
+  formData: FormData,
+): Promise<SaveState> {
+  /*
+    Se guarda solo lo que difiere del original. Guardar una copia entera
+    significaria que una correccion hecha despues en el codigo nunca llega:
+    quedaria tapada por lo que se copio el primer dia.
+
+    Un campo vaciado tampoco se guarda, asi vuelve al original en vez de dejar
+    un hueco en el sitio.
+  */
+  const value: Record<string, string> = {};
+
+  for (const campo of CAMPOS) {
+    const bruto = formData.get(`texto_${campo.id}`);
+    if (bruto === null) continue;
+
+    const texto = String(bruto).trim();
+    if (!texto || texto === campo.valor.trim()) continue;
+
+    value[campo.id] = texto;
+  }
+
+  try {
+    const supabase = await client();
+    const { error } = await supabase
+      .from("site_settings")
+      .upsert(
+        { key: CLAVE_TEXTOS, value, updated_at: new Date().toISOString() },
+        { onConflict: "key" },
+      );
+
+    if (error) throw new Error(error.message);
+
+    revalidatePath("/");
+    revalidatePath("/admin/textos");
+
+    const n = Object.keys(value).length;
+    return {
+      status: "ok",
+      message:
+        n === 0
+          ? "Todo vuelve a los textos originales."
+          : `Guardado. ${n} ${n === 1 ? "texto propio" : "textos propios"}.`,
     };
   } catch (error) {
     return {

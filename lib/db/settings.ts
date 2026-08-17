@@ -94,7 +94,7 @@ export type Autoridad = {
  * Lee una clave de configuracion. Si la tabla todavia no existe porque no se
  * corrio la migracion, devuelve null en vez de tirar abajo la pagina.
  */
-async function leerAjuste(key: string): Promise<unknown> {
+export async function leerAjuste(key: string): Promise<unknown> {
   if (!isSupabaseConfigured()) return null;
 
   const supabase = createPublicClient();

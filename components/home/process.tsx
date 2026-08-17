@@ -1,21 +1,25 @@
 import { ProcessSteps } from "@/components/home/process-steps";
 
-const steps = [
-  {
-    verb: "Pensar",
-    body: "Leemos el brief, discutimos el objetivo real y devolvemos un tratamiento con presupuesto cerrado. Si hay que cambiar la idea para que entre en el presupuesto, lo decimos antes y no después.",
-  },
-  {
-    verb: "Filmar",
-    body: "Plan de rodaje, equipo técnico y permisos a cargo nuestro. La marca aprueba la dirección de arte antes de que se encienda la primera luz.",
-  },
-  {
-    verb: "Terminar",
-    body: "Montaje, color, sonido y todas las versiones que necesita cada canal. Se entrega el máster y los archivos fuente, con los nombres ordenados.",
-  },
-];
+export type PasoProceso = { verb: string; body: string };
 
-export function Process() {
+export function Process({
+  titulo,
+  bajada,
+  steps,
+}: {
+  titulo: string;
+  bajada: string;
+  steps: PasoProceso[];
+}) {
+  /*
+    El titular va en dos lineas, cortando por el ultimo espacio. Se calcula acá
+    y no se pide como dos campos separados: quien escribe "Cómo trabajamos" no
+    tiene por que pensar donde corta la linea.
+  */
+  const corte = titulo.trim().lastIndexOf(" ");
+  const primera = corte > 0 ? titulo.slice(0, corte) : titulo;
+  const segunda = corte > 0 ? titulo.slice(corte + 1) : "";
+
   return (
     <section className="border-t border-line">
       <div className="mx-auto grid max-w-[1600px] gap-12 px-5 py-24 md:px-10 md:py-32 lg:grid-cols-12 lg:gap-16">
@@ -27,13 +31,16 @@ export function Process() {
         <div className="min-w-0 lg:col-span-4">
           <div className="lg:sticky lg:top-28">
             <h2 className="display font-display text-[11vw] font-extrabold uppercase tracking-[-0.045em] sm:text-[8vw] lg:text-[min(3.6vw,57.6px)]">
-              Cómo
-              <br />
-              trabajamos
+              {primera}
+              {segunda && (
+                <>
+                  <br />
+                  {segunda}
+                </>
+              )}
             </h2>
             <p className="mt-6 max-w-[38ch] text-sm leading-relaxed text-paper-dim">
-              Tres momentos, un solo interlocutor. No hay reventa de servicios ni
-              equipos que aparecen recién el día del rodaje.
+              {bajada}
             </p>
           </div>
         </div>
