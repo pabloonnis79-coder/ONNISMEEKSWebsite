@@ -89,6 +89,50 @@ async function chequearVideos(proyectos: any[]): Promise<Chequeo> {
  * estando perfectos. Lo unico honesto es decir cual no se pudo confirmar y que
  * lo abra una persona.
  */
+/**
+ * Un navegador cualquiera. Muchos sitios contestan mal —o no contestan— a un
+ * pedido sin identificacion, porque asi frenan a los robots que los rastrean.
+ */
+const NAVEGADOR =
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0 Safari/537.36";
+
+/**
+ * Visita un sitio. Devuelve el problema, o null si contesta.
+ *
+ * Primero pregunta si existe (HEAD, que no baja la pagina) y si eso no sale
+ * bien la pide entera (GET). Hay servidores que directamente no saben responder
+ * la primera pregunta: el sitio de CBSE deja la consulta colgada hasta que
+ * vence el tiempo, y abre perfecto en cualquier navegador. Quedarse en el
+ * primer intento es acusar de caido a un sitio que anda.
+ */
+async function visitar(url: string): Promise<string | null> {
+  const opciones = {
+    headers: { "user-agent": NAVEGADOR, accept: "text/html" },
+    redirect: "follow" as const,
+    cache: "no-store" as const,
+  };
+
+  let ultimo = "no contestó";
+
+  /*
+    El primer intento espera poco y el segundo espera lo que haga falta. Un
+    sitio que ignora la pregunta corta no va a contestarla por esperarlo mas, y
+    esos segundos los paga la revision entera: con quince en los dos, un solo
+    sitio mudo la estiraba de dos segundos a dieciocho.
+  */
+  for (const [method, espera] of [["HEAD", 5000], ["GET", 12000]] as const) {
+    try {
+      const res = await fetch(url, { ...opciones, method, signal: AbortSignal.timeout(espera) });
+      if (res.ok) return null;
+      ultimo = `respondió ${res.status}`;
+    } catch {
+      ultimo = "no contestó";
+    }
+  }
+
+  return ultimo;
+}
+
 async function chequearEnlaces(): Promise<Chequeo> {
   const base = { id: "enlaces", titulo: "Sitios de los clientes" };
   const marcas = (await getBrandLogos()).filter((m) => /^https?:\/\//.test(m.sitio));
@@ -99,23 +143,10 @@ async function chequearEnlaces(): Promise<Chequeo> {
 
   const dudosos: string[] = [];
 
-  await Promise.all(
-    marcas.map(async (m) => {
-      try {
-        // Ocho segundos: un sitio lento no es un sitio caido, pero la revision
-        // tampoco puede quedarse esperando para siempre.
-        const res = await fetch(m.sitio, {
-          method: "HEAD",
-          redirect: "follow",
-          signal: AbortSignal.timeout(8000),
-          cache: "no-store",
-        });
-        if (!res.ok) dudosos.push(`${m.nombre} · ${m.sitio} · respondió ${res.status}`);
-      } catch {
-        dudosos.push(`${m.nombre} · ${m.sitio} · no contestó`);
-      }
-    }),
-  );
+  await Promise.all(marcas.map(async (m) => {
+    const problema = await visitar(m.sitio);
+    if (problema) dudosos.push(`${m.nombre} · ${m.sitio} · ${problema}`);
+  }));
 
   if (dudosos.length === 0) {
     return { ...base, estado: "bien", resumen: `Los ${marcas.length} sitios contestan.` };
