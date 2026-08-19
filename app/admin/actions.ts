@@ -13,12 +13,19 @@ import {
   ESCALAS_MARCAS,
   CLAVE_MP4_SECCION,
   CLAVE_VIDEOS_SECCION,
+  leerAjuste,
   normalizarImagen,
 } from "@/lib/db/settings";
 import { CLAVE_TEXTOS } from "@/lib/db/textos";
 import { CAMPOS } from "@/lib/textos";
 import { extraerYoutubeId, slugify, uniq } from "@/lib/utils";
-import { CLAVE_REVISION, correrRevision } from "@/lib/db/mantenimiento";
+import {
+  CLAVE_REVISION,
+  chequearArchivos,
+  correrRevision,
+  inventarioDeArchivos,
+  type Revision,
+} from "@/lib/db/mantenimiento";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
@@ -756,6 +763,54 @@ export async function runRevision() {
     );
 
   if (error) throw new Error(error.message);
+
+  revalidatePath("/admin/mantenimiento");
+}
+
+/**
+ * Borra archivos que no se publican en ningun lado.
+ *
+ * La lista que muestra la pantalla puede tener horas: alguien pudo usar una de
+ * esas fotos desde que se corrio la revision. Asi que no se borra lo que dice la
+ * lista, se vuelve a mirar quien esta suelto ahora y se borra la interseccion.
+ * Lo que aparecio en el medio se salva solo.
+ */
+export async function liberarEspacio(formData: FormData) {
+  const pedidos = formData.getAll("ruta").map(String).filter(Boolean);
+  if (pedidos.length === 0) return;
+
+  const supabase = await client();
+  const { sueltos } = await inventarioDeArchivos(supabase);
+  const libres = new Set(sueltos.map((a) => a.ruta));
+  const aBorrar = pedidos.filter((ruta) => libres.has(ruta));
+
+  if (aBorrar.length > 0) {
+    const { error } = await supabase.storage.from("media").remove(aBorrar);
+    if (error) throw new Error(error.message);
+  }
+
+  /*
+    Se rehace solo el chequeo de archivos y se deja el resto del informe como
+    estaba. Correr la revision entera pediria de nuevo el canal y los doce sitios
+    de los clientes para contestar algo que ya sabemos.
+  */
+  const guardada = (await leerAjuste(CLAVE_REVISION)) as Revision | null;
+  if (guardada?.chequeos) {
+    const actualizado = await chequearArchivos(supabase);
+    const { error } = await supabase.from("site_settings").upsert(
+      {
+        key: CLAVE_REVISION,
+        value: {
+          ...guardada,
+          chequeos: guardada.chequeos.map((c) => (c.id === "archivos" ? actualizado : c)),
+        },
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: "key" },
+    );
+
+    if (error) throw new Error(error.message);
+  }
 
   revalidatePath("/admin/mantenimiento");
 }

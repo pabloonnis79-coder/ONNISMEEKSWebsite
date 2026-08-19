@@ -2,6 +2,7 @@ import "server-only";
 
 import { createPublicClient, isSupabaseConfigured } from "@/lib/supabase/public";
 import { getBrandLogos, leerAjuste } from "@/lib/db/settings";
+import { formatoTamano } from "@/lib/utils";
 import { getVideos, isYouTubeConfigured } from "@/lib/youtube/api";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -26,6 +27,8 @@ export type Chequeo = {
   detalle?: string[];
   /** Que hacer al respecto, cuando no es obvio. */
   ayuda?: string;
+  /** Lo que se puede borrar para liberar lugar. Solo el chequeo de archivos. */
+  archivos?: ArchivoSuelto[];
 };
 
 export type Revision = {
@@ -244,58 +247,138 @@ function chequearSincronizacion(proyectos: any[]): Chequeo {
   };
 }
 
+/** Las carpetas donde el panel deja lo que sube. */
+const CARPETAS = ["autoridades", "marcas", "portadas", "proyectos"];
+
+/**
+ * Cuanto tiene que haber vivido un archivo antes de poder borrarlo.
+ *
+ * Entre subir una foto y guardar el formulario donde se la usa pasa un rato, y
+ * en ese rato el archivo existe sin que nadie lo nombre todavia: es
+ * indistinguible de uno abandonado. Un dia de gracia hace imposible borrar algo
+ * que alguien esta cargando en este momento.
+ */
+const HORAS_DE_GRACIA = 24;
+
+export type ArchivoSuelto = {
+  /** Carpeta y nombre, que es lo que hay que pasarle al borrado. */
+  ruta: string;
+  nombre: string;
+  bytes: number;
+  /** Para poder mirarlo antes de borrarlo. */
+  url: string;
+  fecha: string;
+};
+
+/**
+ * Que archivos hay guardados y cuales no aparecen en ningun lado.
+ *
+ * "No aparece en ningun lado" se decide buscando el nombre del archivo en todo
+ * lo que la base guarda: fichas de proyecto y ajustes del panel. Es una busqueda
+ * de texto sobre el contenido entero, no una lista de campos conocidos, para que
+ * no se escape una direccion metida en un campo que nadie penso.
+ */
+export async function inventarioDeArchivos(supabase: any): Promise<{
+  total: number;
+  bytes: number;
+  sueltos: ArchivoSuelto[];
+}> {
+  const [{ data: proyectos }, { data: ajustes }] = await Promise.all([
+    supabase.from("projects").select("*"),
+    supabase.from("site_settings").select("key, value"),
+  ]);
+
+  /*
+    La propia revision guardada se saca de la cuenta. Adentro tiene la lista de
+    archivos sueltos con sus nombres, asi que dejarla haria que cada archivo se
+    encuentre a si mismo y ninguno figure como suelto nunca mas.
+  */
+  const usado =
+    JSON.stringify(proyectos ?? []) +
+    JSON.stringify((ajustes ?? []).filter((a: any) => a.key !== CLAVE_REVISION));
+
+  const cliente = createPublicClient();
+  const limite = Date.now() - HORAS_DE_GRACIA * 3_600_000;
+
+  let total = 0;
+  let bytes = 0;
+  const sueltos: ArchivoSuelto[] = [];
+
+  /*
+    Se entra a las subcarpetas. Lo que se sube desde una ficha va a
+    proyectos/<direccion-del-proyecto>/, y mirando un solo nivel esos archivos
+    eran invisibles: la carpeta figuraba como si fuera un archivo de cero bytes
+    —que ademas no se puede borrar, porque borrar toma rutas de archivo— y lo
+    que tenia adentro no se contaba en ningun lado.
+  */
+  const recorrer = async (carpeta: string, profundidad: number): Promise<void> => {
+    const { data, error } = await cliente.storage.from("media").list(carpeta, { limit: 1000 });
+    if (error) return;
+
+    for (const f of data ?? []) {
+      const ruta = `${carpeta}/${f.name}`;
+
+      // Sin metadata es una carpeta, no un archivo.
+      if (!f.metadata) {
+        if (profundidad > 0) await recorrer(ruta, profundidad - 1);
+        continue;
+      }
+
+      const tamano = (f.metadata as any).size ?? 0;
+      total += 1;
+      bytes += tamano;
+
+      const nacimiento = new Date(f.created_at ?? f.updated_at ?? 0).getTime();
+      if (usado.includes(f.name) || nacimiento > limite) continue;
+
+      sueltos.push({
+        ruta,
+        nombre: f.name,
+        bytes: tamano,
+        url: cliente.storage.from("media").getPublicUrl(ruta).data.publicUrl,
+        fecha: f.created_at ?? f.updated_at ?? "",
+      });
+    }
+  };
+
+  for (const carpeta of CARPETAS) await recorrer(carpeta, 1);
+
+  sueltos.sort((a, b) => b.bytes - a.bytes);
+  return { total, bytes, sueltos };
+}
+
 /**
  * Archivos que quedaron en el servidor y ya no muestra nadie.
  *
  * Se juntan solos: cada vez que se reemplaza un logo o una foto, la anterior
  * queda ahi. No molesta hasta que llena el lugar disponible.
- *
- * Solo avisa. Borrar es otra cosa y va aparte: un archivo que hoy parece
- * huérfano puede estar en un texto que todavia no lei.
  */
-async function chequearArchivos(proyectos: any[], ajustes: any[]): Promise<Chequeo> {
+export async function chequearArchivos(supabase: any): Promise<Chequeo> {
   const base = { id: "archivos", titulo: "Archivos guardados" };
 
   if (!isSupabaseConfigured()) {
     return { ...base, estado: "revisar", resumen: "No pude leer el almacenamiento." };
   }
 
-  const usado = JSON.stringify(proyectos) + JSON.stringify(ajustes);
-  const supabase = createPublicClient();
+  const { total, bytes, sueltos } = await inventarioDeArchivos(supabase);
 
-  let total = 0;
-  let bytes = 0;
-  let sueltos = 0;
-  let bytesSueltos = 0;
-
-  for (const carpeta of ["autoridades", "marcas", "portadas", "proyectos"]) {
-    const { data, error } = await supabase.storage.from("media").list(carpeta, { limit: 1000 });
-    if (error) continue;
-
-    for (const f of data ?? []) {
-      const tamano = (f.metadata as any)?.size ?? 0;
-      total += 1;
-      bytes += tamano;
-
-      if (!usado.includes(f.name)) {
-        sueltos += 1;
-        bytesSueltos += tamano;
-      }
-    }
+  if (sueltos.length === 0) {
+    return {
+      ...base,
+      estado: "bien",
+      resumen: `${total} archivos, ${formatoTamano(bytes)} en total. No sobra ninguno.`,
+    };
   }
 
-  const mb = (n: number) => `${(n / 1_048_576).toFixed(1)} MB`;
-
-  if (sueltos === 0) {
-    return { ...base, estado: "bien", resumen: `${total} archivos, ${mb(bytes)} en total.` };
-  }
+  const libres = sueltos.reduce((n, a) => n + a.bytes, 0);
 
   return {
     ...base,
     estado: "revisar",
-    resumen: `${sueltos} de ${total} archivos ya no se usan (${mb(bytesSueltos)} de ${mb(bytes)}).`,
+    resumen: `${sueltos.length} de ${total} archivos no se publican en ningún lado (${formatoTamano(libres)} de ${formatoTamano(bytes)}).`,
     ayuda:
-      "Son fotos y logos que reemplazaste. No molestan mientras haya lugar; se van a poder borrar desde acá más adelante.",
+      "Son fotos y logos que reemplazaste. Miralos antes de borrar: una vez borrados no se recuperan.",
+    archivos: sueltos,
   };
 }
 
@@ -308,13 +391,8 @@ async function chequearArchivos(proyectos: any[], ajustes: any[]): Promise<Chequ
  * decena de sitios ajenos: en fila seria una espera larga sin motivo.
  */
 export async function correrRevision(supabase: any): Promise<Revision> {
-  const [{ data: proyectos }, { data: ajustes }] = await Promise.all([
-    supabase.from("projects").select("*"),
-    supabase.from("site_settings").select("key, value"),
-  ]);
-
+  const { data: proyectos } = await supabase.from("projects").select("*");
   const p = proyectos ?? [];
-  const a = ajustes ?? [];
 
   const chequeos = await Promise.all([
     chequearVideos(p),
@@ -322,7 +400,7 @@ export async function correrRevision(supabase: any): Promise<Revision> {
     Promise.resolve(chequearDestacados(p)),
     Promise.resolve(chequearFichas(p)),
     Promise.resolve(chequearSincronizacion(p)),
-    chequearArchivos(p, a),
+    chequearArchivos(supabase),
   ]);
 
   // Primero lo que esta mal. Lo que anda bien se lee al final, o no se lee.

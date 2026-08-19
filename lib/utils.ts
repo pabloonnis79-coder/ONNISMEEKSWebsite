@@ -99,3 +99,9 @@ export function hashString(input: string): string {
 export function uniq<T>(items: T[]): T[] {
   return Array.from(new Set(items));
 }
+
+/** Tamano de archivo en criollo. Debajo de un mega, en KB: "1.2 MB" no se lee. */
+export function formatoTamano(bytes: number): string {
+  if (bytes < 1_048_576) return `${Math.max(1, Math.round(bytes / 1024))} KB`;
+  return `${(bytes / 1_048_576).toFixed(1)} MB`;
+}

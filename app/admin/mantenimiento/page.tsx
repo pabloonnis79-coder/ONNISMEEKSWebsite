@@ -4,6 +4,7 @@ import { ArrowLeftIcon } from "@phosphor-icons/react/dist/ssr";
 import { runRevision } from "@/app/admin/actions";
 import { getUltimaRevision, type Chequeo, type Estado } from "@/lib/db/mantenimiento";
 import { Revisar } from "./revisar";
+import { Liberar } from "./liberar";
 
 export const metadata: Metadata = {
   title: "Mantenimiento",
@@ -68,6 +69,8 @@ function Tarjeta({ c }: { c: Chequeo }) {
       {c.ayuda && (
         <p className="mt-3 max-w-[70ch] text-xs leading-relaxed text-paper-faint">{c.ayuda}</p>
       )}
+
+      {c.archivos && c.archivos.length > 0 && <Liberar archivos={c.archivos} />}
     </li>
   );
 }
@@ -91,7 +94,8 @@ export default async function MantenimientoPage() {
       </h1>
       <p className="mt-3 max-w-[64ch] text-sm leading-relaxed text-paper-dim">
         Una revisión del sitio: qué se ve roto, qué conviene completar y qué se
-        está juntando sin usarse. Solo mira, no toca nada.
+        está juntando sin usarse. Mira y avisa; lo único que toca es lo que
+        borres a mano.
       </p>
 
       <div className="mt-10 flex flex-wrap items-center gap-5 border-y border-line py-6">
