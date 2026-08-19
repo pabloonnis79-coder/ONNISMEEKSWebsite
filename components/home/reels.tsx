@@ -3,7 +3,9 @@
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useReducedMotion } from "motion/react";
+import { PlayIcon } from "@phosphor-icons/react";
 import { YoutubeLoop } from "@/components/media/youtube-loop";
+import { ReelPlayer } from "@/components/home/reel-player";
 import type { Reel } from "@/lib/db/settings";
 import { formatDuration, youtubeThumb } from "@/lib/utils";
 
@@ -24,6 +26,9 @@ export function Reels({
   antetitulo: string;
   titulo: string;
 }) {
+  // Cual esta abierto a pantalla completa. null es la tira sola.
+  const [abierto, setAbierto] = useState<number | null>(null);
+
   if (reels.length === 0) return null;
 
   return (
@@ -46,16 +51,31 @@ export function Reels({
             key={`${reel.youtubeId}-${i}`}
             className="w-[70vw] shrink-0 snap-start sm:w-[42vw] lg:w-[26vw] xl:w-[20vw]"
           >
-            <ReelCard reel={reel} priority={i < 2} />
+            <ReelCard reel={reel} priority={i < 2} onAbrir={() => setAbierto(i)} />
           </li>
         ))}
       </ul>
+
+      <ReelPlayer
+        reels={reels}
+        indice={abierto}
+        onCerrar={() => setAbierto(null)}
+        onIr={setAbierto}
+      />
     </section>
   );
 }
 
-function ReelCard({ reel, priority }: { reel: Reel; priority: boolean }) {
-  const ref = useRef<HTMLDivElement>(null);
+function ReelCard({
+  reel,
+  priority,
+  onAbrir,
+}: {
+  reel: Reel;
+  priority: boolean;
+  onAbrir: () => void;
+}) {
+  const ref = useRef<HTMLButtonElement>(null);
   const barra = useRef<HTMLDivElement>(null);
   const [enPantalla, setEnPantalla] = useState(false);
   const reduce = useReducedMotion();
@@ -86,9 +106,17 @@ function ReelCard({ reel, priority }: { reel: Reel; priority: boolean }) {
 
   return (
     <figure>
-      <div
+      {/*
+        La tarjeta entera es el boton. Un reel mudo en loop es una vitrina; el
+        que quiere verlo de verdad tiene que poder tocarlo en cualquier parte,
+        no apuntarle a un icono chico.
+      */}
+      <button
         ref={ref}
-        className="relative aspect-[9/16] w-full overflow-hidden bg-ink-700"
+        type="button"
+        onClick={onAbrir}
+        aria-label={`Ver ${reel.titulo || "el reel"} a pantalla completa`}
+        className="group relative block aspect-[9/16] w-full overflow-hidden bg-ink-700 focus-visible:outline-offset-4"
       >
         <Image
           src={youtubeThumb(reel.youtubeId)}
@@ -131,7 +159,18 @@ function ReelCard({ reel, priority }: { reel: Reel; priority: boolean }) {
             className="h-full w-full origin-left scale-x-0 flame-bg"
           />
         </div>
-      </div>
+
+        {/*
+          Siempre visible, no solo al pasar el cursor: en un telefono no hay
+          cursor que pasar, y ahi es donde mas se mira esta seccion.
+        */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-1/2 inline-flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-paper/25 bg-ink/40 text-paper backdrop-blur-sm transition duration-300 group-hover:scale-110 group-hover:border-flame-warm group-hover:text-flame-warm"
+        >
+          <PlayIcon size={20} weight="fill" />
+        </span>
+      </button>
 
       {(reel.titulo || reel.cliente) && (
         <figcaption className="pt-3.5">
