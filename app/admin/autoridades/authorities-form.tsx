@@ -87,15 +87,31 @@ function SubirFoto({
   );
 }
 
+/** Tope de fichas. Alto a proposito: es un limite, no una expectativa. */
+const MAXIMO = 8;
+/** Cuantas se muestran de entrada, aunque el estudio tenga menos cargadas. */
+const MINIMO = 3;
+
 export function AuthoritiesForm({ actuales }: { actuales: Autoridad[] }) {
   const [state, formAction] = useActionState(saveAuthorities, initial);
+
+  /*
+    La cantidad de fichas crece con el equipo. Arranca en las que hay cargadas
+    —nunca menos de tres, que es como quedo armada la seccion— y suma una cuando
+    hace falta. Mostrar ocho vacias de entrada seria pedirle a alguien que
+    ignore cinco formularios en blanco cada vez que entra a corregir un cargo.
+  */
+  const [cuantas, setCuantas] = useState(() =>
+    Math.min(MAXIMO, Math.max(MINIMO, actuales.length)),
+  );
+
   const [fotos, setFotos] = useState<string[]>(() =>
-    [0, 1, 2].map((i) => actuales[i]?.foto ?? ""),
+    Array.from({ length: MAXIMO }, (_, i) => actuales[i]?.foto ?? ""),
   );
 
   return (
     <form action={formAction} className="flex flex-col gap-10">
-      {[0, 1, 2].map((i) => {
+      {Array.from({ length: cuantas }, (_, i) => i).map((i) => {
         const actual = actuales[i] ?? VACIA;
 
         return (
@@ -205,6 +221,16 @@ export function AuthoritiesForm({ actuales }: { actuales: Autoridad[] }) {
           </fieldset>
         );
       })}
+
+      {cuantas < MAXIMO && (
+        <button
+          type="button"
+          onClick={() => setCuantas((n) => n + 1)}
+          className="inline-flex h-10 w-fit items-center rounded-full border border-line px-5 text-[12px] font-semibold uppercase tracking-[0.1em] text-paper transition-colors hover:border-flame-warm hover:text-flame-warm"
+        >
+          Agregar otra persona
+        </button>
+      )}
 
       <div className="flex flex-wrap items-center gap-4 border-t border-line pt-6">
         <Guardar />

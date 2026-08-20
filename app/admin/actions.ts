@@ -409,7 +409,23 @@ export async function saveAuthorities(
 ): Promise<SaveState> {
   const value: Array<Record<string, string>> = [];
 
-  for (let i = 0; i < 3; i++) {
+  /*
+    Cuantas fichas vinieron lo dice el propio formulario, no un numero escrito
+    aca. Antes eran tres de este lado y tres del otro: agregar una cuarta pedia
+    tocar los dos y acordarse de los dos.
+
+    El tope es para no procesar cualquier cosa que llegue por la red, no un
+    limite de producto.
+  */
+  const cuantas = Math.min(
+    12,
+    [...formData.keys()].reduce((mayor, clave) => {
+      const m = /^nombre_(\d+)$/.exec(clave);
+      return m ? Math.max(mayor, Number(m[1]) + 1) : mayor;
+    }, 0),
+  );
+
+  for (let i = 0; i < cuantas; i++) {
     const nombre = String(formData.get(`nombre_${i}`) ?? "").trim();
     const apellido = String(formData.get(`apellido_${i}`) ?? "").trim();
     const cargo = String(formData.get(`cargo_${i}`) ?? "").trim();

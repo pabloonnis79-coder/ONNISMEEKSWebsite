@@ -17,6 +17,8 @@ export function Authorities({
 }) {
   if (people.length === 0) return null;
 
+  const columnas = people.length % 4 === 0 ? 4 : 3;
+
   return (
     <section
       aria-label="Autoridades"
@@ -27,10 +29,19 @@ export function Authorities({
           {titulo}
         </h2>
 
-        <ul className="mt-14 grid grid-cols-1 gap-x-10 gap-y-14 sm:grid-cols-2 lg:grid-cols-3 md:mt-20">
+        {/*
+          Las columnas siguen a la cantidad de personas. Con cuatro en una
+          grilla de tres, la cuarta queda sola en una fila entera y parece un
+          error de carga.
+        */}
+        <ul
+          className={`mt-14 grid grid-cols-1 gap-x-10 gap-y-14 sm:grid-cols-2 md:mt-20 ${
+            columnas === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3"
+          }`}
+        >
           {people.map((person, i) => (
             <li key={`${person.nombre}-${person.apellido}-${i}`}>
-              <Reveal delay={(i % 3) * 0.08}>
+              <Reveal delay={(i % columnas) * 0.08}>
                 <figure className="flex flex-col items-center text-center">
                   <div className="relative aspect-square w-full max-w-[280px] overflow-hidden rounded-full bg-ink-700">
                     {person.foto ? (
