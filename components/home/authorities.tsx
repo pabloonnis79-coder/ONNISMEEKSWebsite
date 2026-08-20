@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Reveal } from "@/components/ui/reveal";
+import { PortraitFocus } from "@/components/home/portrait-focus";
 import type { Autoridad } from "@/lib/db/settings";
 
 /**
@@ -59,62 +60,65 @@ export function Authorities({
           grilla de tres, la cuarta queda sola en una fila entera y parece un
           error de carga.
         */}
-        <ul
-          className={`mt-14 grid grid-cols-1 gap-x-10 gap-y-14 sm:grid-cols-4 md:mt-20 ${
-            columnas === 4 ? "lg:grid-cols-8" : "lg:grid-cols-6"
-          }`}
-        >
-          {people.map((person, i) => (
-            <li
-              key={`${person.nombre}-${person.apellido}-${i}`}
-              className={`sm:col-span-2 lg:col-span-2 ${
-                i === people.length - 1 && arranqueMedio ? arranqueMedio : ""
-              } ${i === primeraDeLaUltimaFila && arranqueLargo ? arranqueLargo : ""}`}
-            >
-              <Reveal delay={(i % columnas) * 0.08}>
-                <figure className="retrato group flex flex-col items-center text-center">
-                  <div className="relative aspect-square w-full max-w-[280px] rounded-full bg-ink-700">
-                    <span aria-hidden="true" className="retrato-anillo" />
-                    <span className="absolute inset-0 overflow-hidden rounded-full">
-                    {person.foto ? (
-                      <Image
-                        src={person.foto}
-                        alt={`${person.nombre} ${person.apellido}`.trim()}
-                        fill
-                        sizes="(max-width: 640px) 70vw, (max-width: 1024px) 40vw, 280px"
-                        quality={90}
-                        className="retrato-foto object-cover"
-                      />
-                    ) : (
-                      // Sin foto cargada, las iniciales sostienen el circulo.
-                      <span className="flex h-full w-full items-center justify-center font-display text-5xl font-extrabold uppercase text-paper-faint transition-colors duration-500 group-hover:text-paper">
-                        {(person.nombre[0] ?? "") + (person.apellido[0] ?? "")}
+        <PortraitFocus>
+          <ul
+            className={`mt-14 grid grid-cols-1 gap-x-10 gap-y-14 sm:grid-cols-4 md:mt-20 ${
+              columnas === 4 ? "lg:grid-cols-8" : "lg:grid-cols-6"
+            }`}
+          >
+            {people.map((person, i) => (
+              <li
+                key={`${person.nombre}-${person.apellido}-${i}`}
+                className={`sm:col-span-2 lg:col-span-2 ${
+                  i === people.length - 1 && arranqueMedio ? arranqueMedio : ""
+                } ${i === primeraDeLaUltimaFila && arranqueLargo ? arranqueLargo : ""}`}
+              >
+                <Reveal delay={(i % columnas) * 0.08}>
+                  <figure className="retrato group flex flex-col items-center text-center">
+                    <div className="relative aspect-square w-full max-w-[280px] rounded-full bg-ink-700">
+                      <span aria-hidden="true" className="retrato-anillo" />
+                      <span className="absolute inset-0 overflow-hidden rounded-full">
+                        {person.foto ? (
+                          <Image
+                            src={person.foto}
+                            alt={`${person.nombre} ${person.apellido}`.trim()}
+                            fill
+                            sizes="(max-width: 640px) 70vw, (max-width: 1024px) 40vw, 280px"
+                            quality={90}
+                            className="retrato-foto object-cover"
+                          />
+                        ) : (
+                          // Sin foto cargada, las iniciales sostienen el circulo.
+                          <span className="flex h-full w-full items-center justify-center font-display text-5xl font-extrabold uppercase text-paper-faint transition-colors duration-500 group-hover:text-paper">
+                            {(person.nombre[0] ?? "") +
+                              (person.apellido[0] ?? "")}
+                          </span>
+                        )}
                       </span>
-                    )}
-                    </span>
-                  </div>
+                    </div>
 
-                  <figcaption className="mt-7">
-                    <p className="font-display text-2xl font-extrabold uppercase leading-[0.95] tracking-[-0.035em] text-paper md:text-3xl">
-                      {person.nombre}
-                      {person.apellido && (
-                        <>
-                          <br />
-                          {person.apellido}
-                        </>
-                      )}
-                    </p>
-                    {person.cargo && (
-                      <p className="retrato-cargo mt-3 font-mono text-[11px] uppercase tracking-[0.2em] text-flame group-hover:text-flame-warm">
-                        {person.cargo}
+                    <figcaption className="mt-7">
+                      <p className="font-display text-2xl font-extrabold uppercase leading-[0.95] tracking-[-0.035em] text-paper md:text-3xl">
+                        {person.nombre}
+                        {person.apellido && (
+                          <>
+                            <br />
+                            {person.apellido}
+                          </>
+                        )}
                       </p>
-                    )}
-                  </figcaption>
-                </figure>
-              </Reveal>
-            </li>
-          ))}
-        </ul>
+                      {person.cargo && (
+                        <p className="retrato-cargo mt-3 font-mono text-[11px] uppercase tracking-[0.2em] text-flame group-hover:text-flame-warm">
+                          {person.cargo}
+                        </p>
+                      )}
+                    </figcaption>
+                  </figure>
+                </Reveal>
+              </li>
+            ))}
+          </ul>
+        </PortraitFocus>
       </div>
     </section>
   );

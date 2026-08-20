@@ -629,13 +629,52 @@ html.cursor-propio :is(input, textarea, [contenteditable="true"]) {
   borde. Es un anillo de verdad, no un borde: asi puede girar y aparecer desde
   un punto en vez de encenderse entero de golpe.
 */
+/*
+  El aro se define siempre, apagado. Lo estructural —posicion, forma, mascara—
+  no depende de si hay cursor: lo unico que cambia entre escritorio y telefono
+  es que lo enciende, el mouse o el scroll.
+*/
+.retrato-anillo {
+  position: absolute;
+  inset: -6px;
+  border-radius: 9999px;
+  opacity: 0;
+  transform: rotate(-90deg);
+  background: conic-gradient(
+    from 0deg,
+    var(--color-flame-deep),
+    var(--color-flame) 25%,
+    var(--color-flame-warm) 45%,
+    transparent 62%,
+    transparent 100%
+  );
+  /* Solo el borde: el centro se recorta y queda el aro. */
+  mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+  transition:
+    opacity 400ms ease,
+    transform 1100ms var(--ease-out-expo);
+  pointer-events: none;
+}
+
+.retrato-foto,
+.retrato-cargo {
+  transition:
+    filter 700ms var(--ease-out-expo),
+    transform 900ms var(--ease-out-expo),
+    color 400ms ease;
+}
+
+/*
+  Escritorio: lo elige la mano.
+
+  El gris de reposo vive aca adentro a proposito. En un telefono sin este bloque
+  las fotos llegan en color, que es lo que corresponde cuando no hay cursor que
+  pueda devolverselo.
+*/
 @media (hover: hover) and (pointer: fine) {
   .retrato-foto {
     filter: grayscale(1) brightness(0.82) contrast(1.05);
-    transform: scale(1);
-    transition:
-      filter 700ms var(--ease-out-expo),
-      transform 900ms var(--ease-out-expo);
   }
 
   .retrato:hover .retrato-foto {
@@ -643,52 +682,54 @@ html.cursor-propio :is(input, textarea, [contenteditable="true"]) {
     transform: scale(1.06);
   }
 
-  .retrato-anillo {
-    position: absolute;
-    inset: -6px;
-    border-radius: 9999px;
-    opacity: 0;
-    transform: rotate(-90deg);
-    background: conic-gradient(
-      from 0deg,
-      var(--color-flame-deep),
-      var(--color-flame) 25%,
-      var(--color-flame-warm) 45%,
-      transparent 62%,
-      transparent 100%
-    );
-    /* Solo el borde: el centro se recorta y queda el aro. */
-    mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
-    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
-    transition:
-      opacity 400ms ease,
-      transform 1100ms var(--ease-out-expo);
-    pointer-events: none;
-  }
-
   .retrato:hover .retrato-anillo {
     opacity: 1;
     transform: rotate(270deg);
   }
+}
 
-  /* El cargo pasa de la tinta al fuego, que es el unico acento del sitio. */
-  .retrato-cargo {
-    transition: color 400ms ease;
+/*
+  Telefono: lo elige el scroll.
+
+  Todo cuelga de .foco-encendido, que pone el JavaScript al arrancar. Sin el, las
+  cinco fotos quedan en color; lo contrario —cinco en gris y ninguna encendida—
+  seria una seccion rota si el script no llega a correr.
+*/
+@media (hover: none) {
+  .foco-encendido .retrato-foto {
+    filter: grayscale(1) brightness(0.82) contrast(1.05);
+  }
+
+  .foco-encendido .retrato-activo .retrato-foto {
+    filter: grayscale(0) brightness(1) contrast(1);
+    transform: scale(1.04);
+  }
+
+  .foco-encendido .retrato-activo .retrato-anillo {
+    opacity: 1;
+    transform: rotate(270deg);
+  }
+
+  .foco-encendido .retrato-activo .retrato-cargo {
+    color: var(--color-flame-warm);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .retrato-foto,
-  .retrato-anillo {
+  .retrato-anillo,
+  .retrato-cargo {
     transition-duration: 1ms;
   }
 
-  /* Sin giro: el anillo aparece y ya. */
-  .retrato:hover .retrato-anillo {
+  /* Sin giro ni crecimiento: el aro aparece y la foto se queda quieta. */
+  .retrato:hover .retrato-anillo,
+  .foco-encendido .retrato-activo .retrato-anillo {
     transform: rotate(-90deg);
   }
 
-  .retrato:hover .retrato-foto {
+  .retrato:hover .retrato-foto,
+  .foco-encendido .retrato-activo .retrato-foto {
     transform: none;
   }
 }
