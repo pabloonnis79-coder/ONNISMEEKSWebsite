@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { LoginForm } from "./login-form";
 import { isSupabaseConfigured } from "@/lib/supabase/server";
 
@@ -20,8 +21,16 @@ export default function LoginPage() {
       </p>
 
       {configured ? (
+        /*
+          El formulario lee la direccion a la que se queria entrar, y eso no se
+          sabe hasta que llega la peticion. Este limite le da a Next algo que
+          mostrar mientras tanto y le permite generar el resto de la pagina de
+          antemano.
+        */
         <div className="mt-10">
-          <LoginForm />
+          <Suspense fallback={<div className="h-40" />}>
+            <LoginForm />
+          </Suspense>
         </div>
       ) : (
         <p className="mt-10 border border-line px-5 py-6 text-sm leading-relaxed text-paper-dim">

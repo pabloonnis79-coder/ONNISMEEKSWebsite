@@ -799,6 +799,12 @@ export async function saveSecciones(
     */
     updateTag(ETIQUETA_SECCIONES);
     revalidatePath("/", "layout");
+    /*
+      El mapa del sitio aparte: se rehace cada hora por su cuenta y no lo alcanza
+      la revalidacion de las paginas. Sin esto siguio ofreciendo secciones
+      apagadas durante una hora.
+    */
+    revalidatePath("/sitemap.xml");
 
     const apagadas = value.length;
     return {
