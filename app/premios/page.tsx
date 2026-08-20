@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ActionLink } from "@/components/ui/action";
@@ -5,6 +6,7 @@ import { Reveal } from "@/components/ui/reveal";
 import { JsonLd } from "@/components/json-ld";
 import { getTextos } from "@/lib/db/textos";
 import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
+import { getSeccionesOcultas } from "@/lib/db/settings";
 import { awards } from "@/lib/content";
 
 export const metadata: Metadata = pageMetadata({
@@ -15,6 +17,13 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default async function AwardsPage() {
+  /*
+    Apagada desde el panel: no existe. Dejarla en pie pero fuera del menu la
+    convierte en una pagina huerfana, que el buscador igual encuentra y muestra
+    vacia.
+  */
+  if ((await getSeccionesOcultas()).includes("/premios")) notFound();
+
   const t = await getTextos();
 
   // Se agrupa por año para que la lista no sea una tabla de filas iguales.

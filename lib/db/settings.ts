@@ -1,5 +1,7 @@
 import "server-only";
 
+import { unstable_cache } from "next/cache";
+
 import { createPublicClient, isSupabaseConfigured } from "@/lib/supabase/public";
 import { getVideos, isYouTubeConfigured } from "@/lib/youtube/api";
 
@@ -19,6 +21,22 @@ export const CLAVE_MARCAS = "brand_logos";
 export const CLAVE_MARCAS_ESCALA = "brand_logos_scale";
 /** Clave de los reels verticales. */
 export const CLAVE_REELS = "reels";
+/** Clave de las secciones apagadas desde el panel. */
+export const CLAVE_SECCIONES = "sections_off";
+
+/**
+ * Las secciones que se pueden apagar.
+ *
+ * Solo estas tres, y no todo el menu, porque son las unicas que pueden quedar
+ * sin nada adentro. Las demas estan enlazadas desde adentro del sitio —los
+ * botones de contacto, "ver todos los proyectos", las fichas de cliente— y
+ * apagarlas dejaria enlaces muertos en paginas que siguen publicadas.
+ */
+export const SECCIONES_APAGABLES = [
+  { href: "/premios", label: "Premios" },
+  { href: "/notas", label: "Notas" },
+  { href: "/detras-de-camara", label: "Detrás de cámara" },
+] as const;
 
 export type Reel = {
   youtubeId: string;
@@ -230,6 +248,54 @@ export async function getReelsConDuracion(): Promise<Reel[]> {
     return reels;
   }
 }
+
+/** Etiqueta de la lectura de secciones, para poder rehacerla desde el panel. */
+export const ETIQUETA_SECCIONES = "secciones";
+
+/**
+ * Las secciones apagadas.
+ *
+ * Se guarda lo apagado y no lo encendido: asi una seccion nueva nace visible y
+ * nadie tiene que acordarse de encenderla. Lo que no figura, se muestra.
+ *
+ * Este dato lo lee el layout, o sea todas las paginas, y decide si una direccion
+ * existe o contesta 404. Va bajo etiqueta para que el panel pueda vencerla al
+ * guardar: sin eso, las paginas apagadas se siguen sirviendo desde la version
+ * ya generada y el cambio no se ve hasta que algo mas las rehaga.
+ */
+async function leerSeccionesOcultas(): Promise<string[]> {
+  if (!isSupabaseConfigured()) return [];
+
+  const supabase = createPublicClient();
+  const { data, error } = await supabase
+    .from("site_settings")
+    .select("value")
+    .eq("key", CLAVE_SECCIONES)
+    .maybeSingle();
+
+  /*
+    Si la lectura falla se muestran todas, que es el lado seguro: esconder una
+    seccion por un error de red seria peor. Pero se avisa: la primera version de
+    esto se tragaba el error en silencio y una seccion apagada seguia a la
+    vista sin que nada lo explicara.
+  */
+  if (error) {
+    console.error("[db] secciones:", error.message);
+    return [];
+  }
+
+  const value = (data as any)?.value;
+  if (!Array.isArray(value)) return [];
+
+  const apagables = new Set<string>(SECCIONES_APAGABLES.map((s) => s.href));
+  return value.filter((h): h is string => typeof h === "string" && apagables.has(h));
+}
+
+export const getSeccionesOcultas = unstable_cache(
+  leerSeccionesOcultas,
+  ["secciones-ocultas"],
+  { tags: [ETIQUETA_SECCIONES] },
+);
 
 export async function getAuthorities(): Promise<Autoridad[]> {
   const value = await leerAjuste(CLAVE_AUTORIDADES);

@@ -8,7 +8,9 @@ const socials = [
   { label: "LinkedIn", href: site.social.linkedin },
 ];
 
-export function SiteFooter() {
+export function SiteFooter({ ocultas = [] }: { ocultas?: string[] }) {
+  const indice = fullNav.filter((item) => !ocultas.includes(item.href));
+
   const year = new Date().getFullYear();
 
   return (
@@ -37,7 +39,7 @@ export function SiteFooter() {
               Sitio
             </p>
             <ul className="space-y-2.5">
-              {fullNav.map((item) => (
+              {indice.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}

@@ -9,7 +9,10 @@ import { Wordmark } from "@/components/brand/wordmark";
 import { fullNav, primaryNav, site } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
-export function SiteHeader() {
+export function SiteHeader({ ocultas = [] }: { ocultas?: string[] }) {
+  // El indice completo, menos lo que este apagado desde el panel.
+  const indice = fullNav.filter((item) => !ocultas.includes(item.href));
+
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
@@ -118,7 +121,7 @@ export function SiteHeader() {
             <div className="mx-auto flex h-full max-w-[1600px] flex-col justify-between px-5 pb-10 pt-24 md:px-10 md:pt-28">
               <nav aria-label="Índice del sitio">
                 <ul>
-                  {fullNav.map((item, i) => (
+                  {indice.map((item, i) => (
                     <li key={item.href} className="overflow-hidden border-b border-line">
                       <motion.div
                         initial={reduce ? false : { y: "100%", opacity: 0 }}

@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -6,6 +7,7 @@ import { JsonLd } from "@/components/json-ld";
 import { getProjects } from "@/lib/db/projects";
 import { getTextos } from "@/lib/db/textos";
 import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
+import { getSeccionesOcultas } from "@/lib/db/settings";
 
 export const revalidate = 600;
 
@@ -17,6 +19,13 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default async function BehindTheScenesPage() {
+  /*
+    Apagada desde el panel: no existe. Dejarla en pie pero fuera del menu la
+    convierte en una pagina huerfana, que el buscador igual encuentra y muestra
+    vacia.
+  */
+  if ((await getSeccionesOcultas()).includes("/detras-de-camara")) notFound();
+
   const t = await getTextos();
   const projects = await getProjects({}, 60);
 

@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, updateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -12,7 +12,10 @@ import {
   ESCALA_MARCAS_POR_DEFECTO,
   ESCALAS_MARCAS,
   CLAVE_MP4_SECCION,
+  CLAVE_SECCIONES,
   CLAVE_VIDEOS_SECCION,
+  ETIQUETA_SECCIONES,
+  SECCIONES_APAGABLES,
   leerAjuste,
   normalizarImagen,
 } from "@/lib/db/settings";
@@ -755,6 +758,64 @@ export async function deleteAllSpam() {
   if (error) throw new Error(error.message);
 
   revalidatePath("/admin/mensajes");
+}
+
+/* ------------------------------------------------- secciones del sitio ---- */
+
+/**
+ * Que secciones se muestran.
+ *
+ * Llegan las encendidas —una casilla sin tildar no viaja en un formulario— y se
+ * guarda lo contrario: la lista de apagadas. Guardar lo apagado hace que una
+ * seccion nueva nazca visible sin que nadie tenga que acordarse de encenderla.
+ */
+export async function saveSecciones(
+  _prev: SaveState,
+  formData: FormData,
+): Promise<SaveState> {
+  const encendidas = new Set(formData.getAll("visible").map(String));
+  const value = SECCIONES_APAGABLES.map((s) => s.href).filter((href) => !encendidas.has(href));
+
+  try {
+    const supabase = await client();
+    const { error } = await supabase
+      .from("site_settings")
+      .upsert(
+        { key: CLAVE_SECCIONES, value, updated_at: new Date().toISOString() },
+        { onConflict: "key" },
+      );
+
+    if (error) throw new Error(error.message);
+
+    /*
+      El menu y el pie viven en el layout, o sea en todas las paginas. Y las
+      apagadas pasan a contestar 404, asi que tambien hay que rehacer las suyas
+      y el mapa del sitio.
+    */
+    /*
+      updateTag y no revalidateTag: vence la etiqueta en el acto y garantiza que
+      quien guardo vea su propio cambio. Con revalidateTag el panel podia
+      contestar "guardado" y seguir mostrando lo de antes.
+    */
+    updateTag(ETIQUETA_SECCIONES);
+    revalidatePath("/", "layout");
+
+    const apagadas = value.length;
+    return {
+      status: "ok",
+      message:
+        apagadas === 0
+          ? "Se muestran todas."
+          : apagadas === 1
+            ? "Guardado. 1 sección apagada."
+            : `Guardado. ${apagadas} secciones apagadas.`,
+    };
+  } catch (error) {
+    return {
+      status: "error",
+      message: error instanceof Error ? error.message : "No se pudo guardar",
+    };
+  }
 }
 
 /* --------------------------------------------------------- mantenimiento -- */

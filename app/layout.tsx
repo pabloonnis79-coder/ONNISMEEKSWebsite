@@ -3,6 +3,7 @@ import { Archivo, Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
 import { SiteHeader } from "@/components/layout/site-header";
+import { getSeccionesOcultas } from "@/lib/db/settings";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { DemoNotice } from "@/components/layout/demo-notice";
 import { WhatsappButton } from "@/components/layout/whatsapp-button";
@@ -98,7 +99,9 @@ export const viewport: Viewport = {
   colorScheme: "dark",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const ocultas = await getSeccionesOcultas();
+
   return (
     <html
       lang="es-AR"
@@ -115,13 +118,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <GuideLines />
         <div className="grain" aria-hidden="true" />
         <ScrollProgress />
-        <SiteHeader />
+        <SiteHeader ocultas={ocultas} />
 
         <main id="contenido" className="flex-1">
           {children}
         </main>
 
-        <SiteFooter />
+        <SiteFooter ocultas={ocultas} />
         <DemoNotice />
         <WhatsappButton />
         <CustomCursor />
