@@ -9,6 +9,20 @@ const WEBMAIL = "https://accounts.zoho.com/";
 
 const nextConfig: NextConfig = {
   images: {
+    /**
+     * Las imagenes se sirven como estan, sin pasar por el optimizador.
+     *
+     * El plan gratuito de Vercel da una cantidad limitada de imagenes
+     * optimizadas por mes y el sitio la agoto: cada foto nueva contestaba
+     * "Payment required" y se veia el circulo vacio, mientras las viejas
+     * seguian andando porque ya estaban hechas. Un panel donde subir una foto
+     * a veces funciona y a veces no es peor que uno que sirve la foto tal cual.
+     *
+     * Se paga en peso: nadie recorta ni convierte a webp. Lo que corresponde
+     * es achicar al subir, del lado del panel, no depender de un servicio con
+     * cuota.
+     */
+    unoptimized: true,
     formats: ["image/avif", "image/webp"],
     /**
      * Las miniaturas de YouTube topean en 1280x720. Sin este limite, Next

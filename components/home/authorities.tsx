@@ -17,7 +17,32 @@ export function Authorities({
 }) {
   if (people.length === 0) return null;
 
+  /*
+    La grilla se dibuja con el doble de columnas de las que se ven y cada
+    persona ocupa dos.
+
+    Es para poder centrar la ultima fila cuando queda incompleta. Con cinco en
+    una grilla de tres, las dos de abajo se apoyan a la izquierda y la fila
+    queda coja; con el doble de columnas, media columna de corrimiento existe y
+    esas dos se pueden mandar al medio. El ancho de cada persona no cambia: dos
+    columnas mas la separacion del medio miden exactamente lo mismo que una
+    columna de la grilla simple.
+  */
   const columnas = people.length % 4 === 0 ? 4 : 3;
+  const sobran = people.length % columnas;
+
+  // Desde donde arranca la ultima fila para quedar centrada.
+  const ARRANQUE: Record<number, string> = {
+    2: "lg:col-start-2",
+    3: "lg:col-start-3",
+    4: "lg:col-start-4",
+  };
+
+  const arranqueLargo = sobran === 0 ? null : ARRANQUE[columnas - sobran + 1];
+  const primeraDeLaUltimaFila = people.length - sobran;
+
+  // Lo mismo en pantallas medianas, donde la grilla es de dos.
+  const arranqueMedio = people.length % 2 === 1 ? "sm:col-start-2" : null;
 
   return (
     <section
@@ -30,17 +55,22 @@ export function Authorities({
         </h2>
 
         {/*
-          Las columnas siguen a la cantidad de personas. Con cuatro en una
+          Las columnas siguen a la cantidad de personas: con cuatro en una
           grilla de tres, la cuarta queda sola en una fila entera y parece un
           error de carga.
         */}
         <ul
-          className={`mt-14 grid grid-cols-1 gap-x-10 gap-y-14 sm:grid-cols-2 md:mt-20 ${
-            columnas === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3"
+          className={`mt-14 grid grid-cols-1 gap-x-10 gap-y-14 sm:grid-cols-4 md:mt-20 ${
+            columnas === 4 ? "lg:grid-cols-8" : "lg:grid-cols-6"
           }`}
         >
           {people.map((person, i) => (
-            <li key={`${person.nombre}-${person.apellido}-${i}`}>
+            <li
+              key={`${person.nombre}-${person.apellido}-${i}`}
+              className={`sm:col-span-2 lg:col-span-2 ${
+                i === people.length - 1 && arranqueMedio ? arranqueMedio : ""
+              } ${i === primeraDeLaUltimaFila && arranqueLargo ? arranqueLargo : ""}`}
+            >
               <Reveal delay={(i % columnas) * 0.08}>
                 <figure className="flex flex-col items-center text-center">
                   <div className="relative aspect-square w-full max-w-[280px] overflow-hidden rounded-full bg-ink-700">
