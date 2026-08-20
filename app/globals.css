@@ -617,3 +617,78 @@ html.cursor-propio :is(input, textarea, [contenteditable="true"]) {
     height: var(--logo-alto-md, 40px);
   }
 }
+
+/*
+  Retrato de las autoridades.
+
+  Todo dentro de (hover: hover): en un telefono no hay cursor que posar, y sin
+  el, la unica parte que se veria del efecto seria el estado apagado. Las fotos
+  tienen que llegar en color a quien no puede pasar el mouse.
+
+  El anillo se dibuja con conic-gradient y una mascara que deja ver solo el
+  borde. Es un anillo de verdad, no un borde: asi puede girar y aparecer desde
+  un punto en vez de encenderse entero de golpe.
+*/
+@media (hover: hover) and (pointer: fine) {
+  .retrato-foto {
+    filter: grayscale(1) brightness(0.82) contrast(1.05);
+    transform: scale(1);
+    transition:
+      filter 700ms var(--ease-out-expo),
+      transform 900ms var(--ease-out-expo);
+  }
+
+  .retrato:hover .retrato-foto {
+    filter: grayscale(0) brightness(1) contrast(1);
+    transform: scale(1.06);
+  }
+
+  .retrato-anillo {
+    position: absolute;
+    inset: -6px;
+    border-radius: 9999px;
+    opacity: 0;
+    transform: rotate(-90deg);
+    background: conic-gradient(
+      from 0deg,
+      var(--color-flame-deep),
+      var(--color-flame) 25%,
+      var(--color-flame-warm) 45%,
+      transparent 62%,
+      transparent 100%
+    );
+    /* Solo el borde: el centro se recorta y queda el aro. */
+    mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px));
+    transition:
+      opacity 400ms ease,
+      transform 1100ms var(--ease-out-expo);
+    pointer-events: none;
+  }
+
+  .retrato:hover .retrato-anillo {
+    opacity: 1;
+    transform: rotate(270deg);
+  }
+
+  /* El cargo pasa de la tinta al fuego, que es el unico acento del sitio. */
+  .retrato-cargo {
+    transition: color 400ms ease;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .retrato-foto,
+  .retrato-anillo {
+    transition-duration: 1ms;
+  }
+
+  /* Sin giro: el anillo aparece y ya. */
+  .retrato:hover .retrato-anillo {
+    transform: rotate(-90deg);
+  }
+
+  .retrato:hover .retrato-foto {
+    transform: none;
+  }
+}

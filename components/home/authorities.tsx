@@ -72,8 +72,10 @@ export function Authorities({
               } ${i === primeraDeLaUltimaFila && arranqueLargo ? arranqueLargo : ""}`}
             >
               <Reveal delay={(i % columnas) * 0.08}>
-                <figure className="flex flex-col items-center text-center">
-                  <div className="relative aspect-square w-full max-w-[280px] overflow-hidden rounded-full bg-ink-700">
+                <figure className="retrato group flex flex-col items-center text-center">
+                  <div className="relative aspect-square w-full max-w-[280px] rounded-full bg-ink-700">
+                    <span aria-hidden="true" className="retrato-anillo" />
+                    <span className="absolute inset-0 overflow-hidden rounded-full">
                     {person.foto ? (
                       <Image
                         src={person.foto}
@@ -81,14 +83,15 @@ export function Authorities({
                         fill
                         sizes="(max-width: 640px) 70vw, (max-width: 1024px) 40vw, 280px"
                         quality={90}
-                        className="object-cover"
+                        className="retrato-foto object-cover"
                       />
                     ) : (
                       // Sin foto cargada, las iniciales sostienen el circulo.
-                      <span className="flex h-full w-full items-center justify-center font-display text-5xl font-extrabold uppercase text-paper-faint">
+                      <span className="flex h-full w-full items-center justify-center font-display text-5xl font-extrabold uppercase text-paper-faint transition-colors duration-500 group-hover:text-paper">
                         {(person.nombre[0] ?? "") + (person.apellido[0] ?? "")}
                       </span>
                     )}
+                    </span>
                   </div>
 
                   <figcaption className="mt-7">
@@ -102,7 +105,7 @@ export function Authorities({
                       )}
                     </p>
                     {person.cargo && (
-                      <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.2em] text-flame">
+                      <p className="retrato-cargo mt-3 font-mono text-[11px] uppercase tracking-[0.2em] text-flame group-hover:text-flame-warm">
                         {person.cargo}
                       </p>
                     )}
