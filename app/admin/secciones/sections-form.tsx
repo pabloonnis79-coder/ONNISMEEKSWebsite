@@ -37,6 +37,32 @@ function Guardar() {
   );
 }
 
+/** Ancho minimo para que una portada a pantalla completa no se vea blanda. */
+const ANCHO_RECOMENDADO = 1920;
+
+/**
+ * Las medidas del archivo, y el aviso si se queda corto.
+ *
+ * Va debajo de la vista previa y no en el momento de subir: asi tambien se
+ * entera quien entra a mirar una portada que subio otro hace meses.
+ */
+function Medidas({ medidas }: { medidas?: { ancho: number; alto: number } }) {
+  if (!medidas?.ancho) return null;
+
+  const corto = medidas.ancho < ANCHO_RECOMENDADO;
+
+  return (
+    <p
+      className={`mt-2 text-xs leading-relaxed ${corto ? "text-flame-warm" : "text-paper-faint"}`}
+    >
+      {medidas.ancho} × {medidas.alto}
+      {corto
+        ? `. Se ve a pantalla completa, así que va a salir blando: conviene volver a exportarlo en ${ANCHO_RECOMENDADO}×1080.`
+        : ". Alcanza para pantalla completa."}
+    </p>
+  );
+}
+
 export function SectionsForm({
   actuales,
   archivos,
@@ -46,6 +72,14 @@ export function SectionsForm({
 }) {
   const [state, formAction] = useActionState(saveSectionVideos, initial);
   const [mp4, setMp4] = useState<Record<string, string>>(archivos);
+
+  /*
+    Las medidas reales del archivo, leidas de la vista previa que ya esta abajo.
+    Es el unico dato que decide si una portada se va a ver bien: el peso no
+    dice nada —un 720p pesado se ve peor que un 1080p liviano— y el nombre del
+    archivo, menos.
+  */
+  const [medidas, setMedidas] = useState<Record<string, { ancho: number; alto: number }>>({});
 
   return (
     <form action={formAction} className="flex flex-col gap-8">
@@ -97,7 +131,9 @@ export function SectionsForm({
               <p className="mb-2 mt-1 max-w-[64ch] text-xs leading-relaxed text-paper-faint">
                 Un MP4 corto y mudo, de 10 a 15 segundos. Se ve sin ningún control
                 encima y arranca más rápido, porque no pasa por el reproductor de
-                YouTube. Conviene que pese menos de 5 MB.
+                YouTube. Exportalo en 1920×1080: ocupa la pantalla entera, así que
+                de 1280×720 para abajo se ve blando. Que pese lo que tenga que
+                pesar, hasta unos 25 MB.
               </p>
 
               <input
@@ -132,15 +168,26 @@ export function SectionsForm({
               </div>
 
               {mp4[campo.slug] && (
-                <video
-                  key={mp4[campo.slug]}
-                  src={mp4[campo.slug]}
-                  muted
-                  loop
-                  autoPlay
-                  playsInline
-                  className="mt-3 h-28 w-full bg-ink-800 object-cover"
-                />
+                <>
+                  <video
+                    key={mp4[campo.slug]}
+                    src={mp4[campo.slug]}
+                    muted
+                    loop
+                    autoPlay
+                    playsInline
+                    onLoadedMetadata={(e) => {
+                      const v = e.currentTarget;
+                      setMedidas((m) => ({
+                        ...m,
+                        [campo.slug]: { ancho: v.videoWidth, alto: v.videoHeight },
+                      }));
+                    }}
+                    className="mt-3 h-28 w-full bg-ink-800 object-cover"
+                  />
+
+                  <Medidas medidas={medidas[campo.slug]} />
+                </>
               )}
             </div>
           </div>

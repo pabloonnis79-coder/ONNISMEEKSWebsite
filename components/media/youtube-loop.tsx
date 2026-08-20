@@ -164,15 +164,22 @@ export function YoutubeLoop({
       {/*
         En horizontal, el 16:9 se desborda por el lado que sobre para cubrir
         sin bandas. En vertical ocupa la caja entera, porque el material ya
-        viene 9:16. El scale extra saca de cuadro lo que YouTube dibuja al
-        borde en los dos casos.
+        viene 9:16. El 135% saca de cuadro lo que YouTube dibuja al borde en
+        los dos casos.
+
+        Ese 135% va en el tamano y no en un transform: scale agranda lo que el
+        reproductor ya dibujo, asi que la imagen llegaba estirada un tercio.
+        Pidiendo la caja mas grande, YouTube dibuja esos pixeles de mas y la
+        misma porcion de pantalla se ve con un tercio mas de definicion.
+
+        56.25 y 177.78 son 9/16 y 16/9 en porcentaje; por 1.35 dan 75.94 y 240.
       */}
       <div
         id={contenedorId}
         className={
           vertical
-            ? "absolute inset-0 h-full w-full scale-[1.35] border-0"
-            : "absolute left-1/2 top-1/2 h-[56.25vw] min-h-full w-[177.78vh] min-w-full -translate-x-1/2 -translate-y-1/2 scale-[1.35] border-0"
+            ? "absolute left-1/2 top-1/2 h-[135%] w-[135%] -translate-x-1/2 -translate-y-1/2 border-0"
+            : "absolute left-1/2 top-1/2 h-[75.94vw] min-h-[135%] w-[240vh] min-w-[135%] -translate-x-1/2 -translate-y-1/2 border-0"
         }
       />
     </div>
