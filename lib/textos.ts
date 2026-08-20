@@ -420,6 +420,101 @@ GRUPOS.push({
   ]),
 });
 
+/**
+ * Preguntas frecuentes.
+ *
+ * Ninguna respuesta es nueva: todas dicen lo que el sitio ya decia en otro
+ * lado —la bajada de Servicios, los tres pasos de "Como trabajamos", la bajada
+ * de Contacto— puesto en forma de pregunta. Se escribio asi porque un buscador
+ * o un modelo que quiere citar algo necesita ver donde empieza y donde termina
+ * la respuesta, y un titulo de catalogo no se lo dice.
+ *
+ * Se ven en pantalla y ademas se declaran como datos estructurados, las dos
+ * cosas desde este mismo texto. Declarar una pregunta que no esta a la vista
+ * es motivo de penalizacion, y con una sola fuente no se pueden separar.
+ *
+ * Vaciar una pregunta o su respuesta la saca de los dos lados.
+ */
+GRUPOS.push({
+  titulo: "Preguntas frecuentes",
+  descripcion:
+    "Se ven al final de la página Servicios. Vaciar una pregunta o su respuesta la saca de la página.",
+  campos: [
+    {
+      id: "faq.1.pregunta",
+      etiqueta: "Pregunta 1",
+      valor: "¿Qué hace ONNIS & MEEKS?",
+    },
+    {
+      id: "faq.1.respuesta",
+      etiqueta: "Respuesta 1",
+      largo: "parrafo",
+      valor:
+        "Somos una productora audiovisual con equipo propio: producción audiovisual, producción fotográfica, color grading, animación y VFX, y contenido para marcas. Todo el proceso ocurre en el mismo estudio.",
+    },
+    {
+      id: "faq.2.pregunta",
+      etiqueta: "Pregunta 2",
+      valor: "¿Se puede contratar solo una parte del proceso?",
+    },
+    {
+      id: "faq.2.respuesta",
+      etiqueta: "Respuesta 2",
+      largo: "parrafo",
+      valor:
+        "Sí. Se puede contratar el proceso completo o entrar en la etapa que haga falta: solo el rodaje, solo la post, solo el color.",
+    },
+    {
+      id: "faq.3.pregunta",
+      etiqueta: "Pregunta 3",
+      valor: "¿Cómo es el proceso de trabajo?",
+    },
+    {
+      id: "faq.3.respuesta",
+      etiqueta: "Respuesta 3",
+      largo: "parrafo",
+      valor:
+        "Tres momentos con un solo interlocutor. Pensar: leemos el brief, discutimos el objetivo real y devolvemos un tratamiento con presupuesto cerrado. Filmar: plan de rodaje, equipo técnico y permisos a cargo nuestro. Terminar: montaje, color, sonido y las versiones que necesita cada canal.",
+    },
+    {
+      id: "faq.4.pregunta",
+      etiqueta: "Pregunta 4",
+      valor: "¿El presupuesto es cerrado?",
+    },
+    {
+      id: "faq.4.respuesta",
+      etiqueta: "Respuesta 4",
+      largo: "parrafo",
+      valor:
+        "Sí. El tratamiento se devuelve con presupuesto cerrado. Si hay que cambiar la idea para que entre en el presupuesto, lo decimos antes y no después.",
+    },
+    {
+      id: "faq.5.pregunta",
+      etiqueta: "Pregunta 5",
+      valor: "¿Qué se entrega al terminar?",
+    },
+    {
+      id: "faq.5.respuesta",
+      etiqueta: "Respuesta 5",
+      largo: "parrafo",
+      valor:
+        "El máster y los archivos fuente, con los nombres ordenados, más todas las versiones que necesita cada canal.",
+    },
+    {
+      id: "faq.6.pregunta",
+      etiqueta: "Pregunta 6",
+      valor: "¿En cuánto tiempo responden una consulta?",
+    },
+    {
+      id: "faq.6.respuesta",
+      etiqueta: "Respuesta 6",
+      largo: "parrafo",
+      valor:
+        "Dentro de las 48 horas hábiles. Si ya tenés brief, adjuntalo por correo y ganamos una vuelta.",
+    },
+  ],
+});
+
 /** Todos los campos en una sola lista, para buscar por id. */
 export const CAMPOS: CampoTexto[] = GRUPOS.flatMap((g) => g.campos);
 

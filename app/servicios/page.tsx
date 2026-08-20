@@ -6,6 +6,8 @@ import { JsonLd } from "@/components/json-ld";
 import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 import { capabilities, site } from "@/lib/site";
 import { getServicios } from "@/lib/db/servicios";
+import { getTextos } from "@/lib/db/textos";
+import { Faq, armarPreguntas } from "@/components/faq";
 
 export const metadata: Metadata = pageMetadata({
   title: "Servicios de producción audiovisual",
@@ -15,7 +17,8 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default async function ServicesPage() {
-  const services = await getServicios();
+  const [services, t] = await Promise.all([getServicios(), getTextos()]);
+  const preguntas = armarPreguntas(t);
 
   return (
     <>
@@ -115,6 +118,12 @@ export default async function ServicesPage() {
           ))}
         </ul>
       </section>
+
+      {/*
+        Antes del cierre: quien llego hasta aca ya vio que hacemos, y lo que
+        falta es lo que se pregunta antes de escribir.
+      */}
+      <Faq preguntas={preguntas} path="/servicios" />
 
       <section className="border-t border-line bg-ink-800">
         <div className="mx-auto flex max-w-[1600px] flex-col gap-8 px-5 py-20 md:flex-row md:items-center md:justify-between md:px-10 md:py-28">
