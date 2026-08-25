@@ -247,8 +247,19 @@ function chequearSincronizacion(proyectos: any[]): Chequeo {
   };
 }
 
-/** Las carpetas donde el panel deja lo que sube. */
-const CARPETAS = ["autoridades", "marcas", "portadas", "proyectos"];
+/*
+  Las carpetas ya no se escriben a mano: se preguntan.
+
+  Estaban puestas a dedo —autoridades, marcas, portadas, proyectos— y la
+  galeria de fotografia guarda en "fotografia", que no figuraba. Resultado: la
+  revision decia 174 MB cuando habia 43 MB mas que nadie estaba mirando, y las
+  fotos mas pesadas del sitio quedaban fuera de todo control.
+*/
+async function carpetasDelBucket(cliente: any): Promise<string[]> {
+  const { data, error } = await cliente.storage.from("media").list("", { limit: 200 });
+  if (error) return [];
+  return (data ?? []).filter((f: any) => !f.metadata).map((f: any) => f.name);
+}
 
 /**
  * Cuanto tiene que haber vivido un archivo antes de poder borrarlo.
@@ -341,7 +352,7 @@ export async function inventarioDeArchivos(supabase: any): Promise<{
     }
   };
 
-  for (const carpeta of CARPETAS) await recorrer(carpeta, 1);
+  for (const carpeta of await carpetasDelBucket(cliente)) await recorrer(carpeta, 1);
 
   sueltos.sort((a, b) => b.bytes - a.bytes);
   return { total, bytes, sueltos };

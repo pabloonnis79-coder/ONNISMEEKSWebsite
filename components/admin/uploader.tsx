@@ -3,7 +3,8 @@
 import { useId, useRef, useState } from "react";
 import { UploadSimpleIcon } from "@phosphor-icons/react";
 import { createClient } from "@/lib/supabase/browser";
-import { slugify } from "@/lib/utils";
+import { slugify, formatoTamano } from "@/lib/utils";
+import { achicarImagen } from "@/lib/achicar-imagen";
 
 /**
  * Sube archivos al bucket del proyecto y devuelve sus direcciones publicas.
@@ -37,8 +38,17 @@ export function Uploader({
     const supabase = createClient();
     const urls: string[] = [];
     const fallos: string[] = [];
+    let ahorrado = 0;
 
-    for (const file of Array.from(files)) {
+    for (const original of Array.from(files)) {
+      /*
+        Se achica antes de subir. Es acá y no en el servidor porque asi el
+        archivo grande ni siquiera viaja: la subida tarda menos y el trafico
+        que se ahorra es el doble, de ida y de vuelta.
+      */
+      const { archivo: file, antes, despues } = await achicarImagen(original);
+      ahorrado += antes - despues;
+
       const ext = file.name.split(".").pop() ?? "jpg";
       const base = slugify(file.name.replace(/\.[^.]+$/, "")) || "archivo";
       const path = `${carpeta}/${Date.now()}-${base}.${ext}`;
@@ -57,7 +67,13 @@ export function Uploader({
     }
 
     if (urls.length > 0) onSubido(urls);
-    setEstado(fallos.length > 0 ? `No se pudieron subir: ${fallos.join(", ")}` : null);
+    setEstado(
+      fallos.length > 0
+        ? `No se pudieron subir: ${fallos.join(", ")}`
+        : ahorrado > 51_200
+          ? `Listo. Se achicaron ${formatoTamano(ahorrado)} sin que se note.`
+          : null,
+    );
     if (input.current) input.current.value = "";
   }
 
